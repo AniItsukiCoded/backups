@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backups Launcher</title>
+<link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKev0wvKY2AE58kTKNU580K5VLnJoKS95qdZnq_I3_-R1uZQNWRNGN_OjQ&s=10">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-elevated: #111827;
+    --card: rgba(17, 24, 39, 0.6);
+    --card-hover: rgba(30, 41, 59, 0.7);
+    --border: rgba(51, 65, 85, 0.5);
+    --border-hover: rgba(74, 222, 128, 0.3);
+    --fg: #f1f5f9;
+    --fg-muted: #94a3b8;
+    --fg-dim: #475569;
+    --accent: #22c55e;
+    --accent-glow: rgba(34, 197, 94, 0.15);
+    --accent-soft: rgba(34, 197, 94, 0.08);
+    --danger: #ef4444;
+    --radius: 14px;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ---- Animated background ---- */
+  .bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.35;
+    animation: orbFloat 20s ease-in-out infinite alternate;
+  }
+
+  .bg-orb:nth-child(1) {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(34,197,94,0.4), transparent 70%);
+    top: -15%; left: -10%;
+    animation-duration: 22s;
+  }
+  .bg-orb:nth-child(2) {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%);
+    bottom: -10%; right: -5%;
+    animation-duration: 18s;
+    animation-delay: -5s;
+  }
+  .bg-orb:nth-child(3) {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(52,211,153,0.2), transparent 70%);
+    top: 40%; left: 50%;
+    animation-duration: 25s;
+    animation-delay: -10s;
+  }
+
+  @keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(60px, -40px) scale(1.1); }
+    66% { transform: translate(-30px, 50px) scale(0.95); }
+    100% { transform: translate(40px, 20px) scale(1.05); }
+  }
+
+  /* ---- Grid noise overlay ---- */
+  .bg-canvas::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 80%);
+  }
+
+  /* ---- Mouse glow ---- */
+  .mouse-glow {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(34,197,94,0.06), transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    transition: left 0.3s ease-out, top 0.3s ease-out;
+    will-change: left, top;
+  }
+
+  /* ---- Main layout ---- */
+  .app-shell {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* ---- Centered & Larger Header ---- */
+  .hub-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px 0 32px;
+    gap: 16px;
+  }
+
+  .hub-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-mark {
+    width: 90px; 
+    height: 90px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, var(--accent), #10b981);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 32px;
+    color: #000;
+    box-shadow: 0 0 32px rgba(34,197,94,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .logo-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2));
+  }
+
+  .logo-text {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--fg), var(--fg-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .clock-display {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--fg-dim);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+  }
+
+  /* ---- Grid (Centered Layout) ---- */
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 460px));
+    justify-content: center;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  /* ---- Cards ---- */
+  .hub-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    cursor: pointer;
+    text-align: left;
+    backdrop-filter: blur(12px);
+    transition: 
+      border-color 0.25s, 
+      background 0.25s, 
+      transform 0.25s,
+      box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: cardIn 0.4s ease forwards;
+  }
+
+  .hub-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .hub-card:hover {
+    border-color: var(--border-hover);
+    background: var(--card-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(34,197,94,0.1);
+  }
+
+  .hub-card:hover::before { opacity: 1; }
+
+  .hub-card:active {
+    transform: translateY(-1px) scale(0.99);
+    transition-duration: 0.08s;
+  }
+
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-size: 20px;
+    font-weight: 700;
+    position: relative;
+  }
+
+  .card-icon.blue { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .card-icon.green { background: rgba(34,197,94,0.12); color: #4ade80; }
+  .card-icon.purple { background: rgba(168,85,247,0.12); color: #c084fc; }
+  .card-icon.orange { background: rgba(249,115,22,0.12); color: #fb923c; }
+
+  .hub-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+
+  .hub-card-sub {
+    font-size: 14px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+  }
+
+  .card-arrow {
+    position: absolute;
+    top: 24px; right: 20px;
+    color: var(--fg-dim);
+    width: 18px; height: 18px;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s, transform 0.2s, color 0.2s;
+  }
+
+  .hub-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--accent);
+  }
+
+  /* ---- Footer ---- */
+  .hub-footer {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centered since the button is removed */
+  }
+
+  .hub-footer-left {
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+
+  /* ---- Discord CTA ---- */
+  .discord-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 11px 26px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 8px 22px rgba(79,70,229,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .discord-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(79,70,229,0.45);
+  }
+  .discord-btn:active {
+    transform: translateY(0) scale(0.97);
+  }
+
+  /* ---- Toast ---- */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    color: var(--fg);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    pointer-events: auto;
+    animation: toastIn 0.35s ease, toastOut 0.3s ease 2.7s forwards;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 360px;
+  }
+
+  .toast.err { border-color: rgba(239,68,68,0.4); }
+  .toast.err .toast-dot { background: var(--danger); box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+  .toast.ok { border-color: rgba(34,197,94,0.4); }
+  .toast.ok .toast-dot { background: var(--accent); box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+  .toast.load { border-color: rgba(59,130,246,0.4); }
+  .toast.load .toast-dot { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.5); animation: pulse 1s infinite; }
+
+  .toast-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="bg-canvas">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<!-- Mouse-following glow -->
+<div class="mouse-glow" id="mouseGlow"></div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- Main app -->
+<div class="app-shell">
+  <header class="hub-header">
+    <div class="hub-logo">
+      <div class="logo-mark">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKev0wvKY2AE58kTKNU580K5VLnJoKS95qdZnq_I3_-R1uZQNWRNGN_OjQ&s=10" alt="Backups Launcher logo" onerror="this.style.display='none';this.parentElement.textContent='B';">
+      </div>
+      <span class="logo-text" id="siteNameDisplay">Backups Launcher</span>
+    </div>
+    <div class="clock-display" id="clock"></div>
+    <a class="discord-btn" href="https://discord.gg/MV8RD9XzvA" target="_blank" rel="noopener noreferrer">https://discord.gg/MV8RD9XzvA</a>
+  </header>
+
+  <!-- Grid -->
+  <main class="hub-grid" id="grid"></main>
+
+  <footer class="hub-footer">
+    <span class="hub-footer-left">Backups Launcher</span>
+  </footer>
+</div>
+
+<script>
+// ===================== STATE =====================
+let apps = null;
+
+// ===================== UTILITIES =====================
+function escapeHtml(str) {
+  return (str || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function showToast(msg, type) {
+  const container = document.getElementById("toasts");
+  const toast = document.createElement("div");
+  toast.className = "toast " + (type || "ok");
+  toast.innerHTML = '<span class="toast-dot"></span>' + escapeHtml(msg);
+  container.appendChild(toast);
+  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3200);
+}
+
+// ===================== MOUSE GLOW & CLOCK =====================
+const mouseGlow = document.getElementById("mouseGlow");
+document.addEventListener("mousemove", (e) => {
+  mouseGlow.style.left = e.clientX + "px";
+  mouseGlow.style.top = e.clientY + "px";
+});
+
+function updateClock() {
+  const el = document.getElementById("clock");
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===================== LOAD APPS DIRECTLY =====================
+// Add new backups here as { name, url, desc, icon, color }.
+// "color" can be blue, green, purple, or orange.
+// A url on raw.githubusercontent.com loads inline in a new tab;
+// any other url (p5.js editor, other sites, etc.) just opens normally.
+function loadApps() {
+  apps = {
+    home: [
+      {
+        name: "Sketch Backup 1",
+        url: "https://editor.p5js.org/jace01b/full/mYFtQwQgD",
+        desc: "Backup copy of a p5.js sketch.",
+        icon: "🗂️",
+        color: "green"
+      },
+      {
+        name: "Sketch Backup 2",
+        url: "https://editor.p5js.org/jace01b/full/2nRl7Nr41",
+        desc: "Backup copy of a p5.js sketch.",
+        icon: "🗂️",
+        color: "green"
+      },
+      {
+        name: "Sketch Backup 3",
+        url: "https://editor.p5js.org/jace01b/full/1prpxaC-R",
+        desc: "Backup copy of a p5.js sketch.",
+        icon: "🗂️",
+        color: "green"
+      },
+      {
+        name: "Sketch Backup 4",
+        url: "https://editor.p5js.org/jace01b/full/Pd-AaFE8Q",
+        desc: "Backup copy of a p5.js sketch.",
+        icon: "🗂️",
+        color: "green"
+      }
+    ]
+  };
+  render();
+}
+
+// ===================== RENDER GRID =====================
+function render() {
+  if (!apps) return;
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  let items = apps["home"] || [];
+  renderCards(grid, items);
+}
+
+function renderCards(grid, items) {
+  if (items.length === 0) return;
+
+  items.forEach((app, i) => {
+    const card = document.createElement("article");
+    card.className = "hub-card";
+    card.style.animationDelay = (i * 0.06) + "s";
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", "Open " + app.name);
+
+    card.innerHTML = `
+      <div class="card-icon ${app.color || 'blue'}">${escapeHtml(app.icon || app.name.substring(0, 2).toUpperCase())}</div>
+      <div class="hub-card-title">${escapeHtml(app.name)}</div>
+      <div class="hub-card-sub">${escapeHtml(app.desc)}</div>
+      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+      </svg>
+    `;
+
+    const activate = () => openApp(app);
+    card.onclick = activate;
+    card.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); } };
+    grid.appendChild(card);
+  });
+}
+
+// ===================== OPEN APP =====================
+function openApp(app) {
+  if (!app.url) return;
+
+  if (!app.url.includes("raw.githubusercontent.com")) {
+    window.open(app.url, "_blank", "noopener");
+    return;
+  }
+
+  showToast("Loading " + app.name + "...", "load");
+
+  fetch(app.url)
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    })
+    .then(text => {
+      const win = window.open("about:blank", "_blank");
+      if (!win) {
+        showToast("Popup blocked — allow popups for this site", "err");
+        return;
+      }
+      win.document.open();
+      win.document.write(text);
+      win.document.close();
+      showToast(app.name + " opened successfully", "ok");
+    })
+    .catch(() => {
+      showToast("Failed to load " + app.name, "err");
+    });
+}
+
+// Initialize Data Load
+loadApps();
+</script>
+</body>
+</html>
