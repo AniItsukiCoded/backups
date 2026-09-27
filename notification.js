@@ -137,43 +137,39 @@
     const btnGroup = document.createElement('div');
     btnGroup.className = 'backup-btn-group';
 
-    // 6. Create the redirect button
-    // Opens a blank tab first, then points it at the backup server —
-    // avoids the click being tied directly to the destination URL and
-    // sidesteps some popup blockers that allow window.open('about:blank').
-    // A plain target="_blank" link already opens as about:blank for an
-    // instant before the browser navigates it to the destination — no JS
-    // redirect needed, and it won't get flagged/blocked by security
-    // extensions the way a script-driven "open blank tab, then redirect"
-    // trick can be.
+    // 6. Create the redirect button using the launcher fetch method
     const redirectBtn = document.createElement('a');
-    redirectBtn.href = "https://editor.p5js.org/jace01b/full/tcAWCrx1u";
+    redirectBtn.href = "https://aniitsukicoded.github.io/backups/index.html";
     redirectBtn.className = "backup-btn backup-redirect-btn";
     redirectBtn.textContent = "Backup Sites";
     redirectBtn.onclick = function(e) {
       e.preventDefault();
+      
       const destination = redirectBtn.href;
-      const win = window.open('about:blank', '_blank');
-      if (!win) {
-        window.open(destination, '_blank', 'noopener');
-        return;
-      }
-      // Embed the sketch in a full-page iframe rather than fetching and
-      // rewriting its HTML. p5.js's "/full/" editor links are built for
-      // exactly this (embedding), so this doesn't hit CORS at all — the
-      // tab's own address stays on about:blank while the iframe shows
-      // the real sketch.
-      win.document.open();
-      win.document.write(
-        '<!DOCTYPE html><html><head><title>Backup</title><style>' +
-        'html,body{margin:0;height:100%;overflow:hidden;background:#0a0e1a;}' +
-        'iframe{border:0;width:100%;height:100%;display:block;}' +
-        '</style></head><body>' +
-        '<iframe src="' + destination + '" allowfullscreen ' +
-        'allow="accelerometer; autoplay; camera; microphone; fullscreen"></iframe>' +
-        '</body></html>'
-      );
-      win.document.close();
+      const originalText = redirectBtn.textContent;
+      redirectBtn.textContent = "Loading...";
+
+      fetch(destination)
+        .then(r => {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.text();
+        })
+        .then(html => {
+          redirectBtn.textContent = originalText;
+          const win = window.open("about:blank", "_blank");
+          if (!win) {
+            alert("Popup blocked — please allow popups for this site.");
+            return;
+          }
+          win.document.open();
+          win.document.write(html);
+          win.document.close();
+        })
+        .catch(err => {
+          // Fallback to opening normally if fetch fails
+          redirectBtn.textContent = originalText;
+          window.open(destination, "_blank", "noopener");
+        });
     };
     btnGroup.appendChild(redirectBtn);
 
