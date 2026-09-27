@@ -137,9 +137,9 @@
     const btnGroup = document.createElement('div');
     btnGroup.className = 'backup-btn-group';
 
-    // 6. Create the redirect button using the launcher fetch method
+    // 6. Create the redirect button using the raw GitHub URL
     const redirectBtn = document.createElement('a');
-    redirectBtn.href = "https://aniitsukicoded.github.io/backups/index.html";
+    redirectBtn.href = "https://raw.githubusercontent.com/aniitsukicoded/backups/main/index.html";
     redirectBtn.className = "backup-btn backup-redirect-btn";
     redirectBtn.textContent = "Backup Sites";
     redirectBtn.onclick = function(e) {
