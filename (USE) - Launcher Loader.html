@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Itsukis Chat Hub Launcher</title>
+<link rel="icon" type="image/png" href="https://aniitsukicoded.github.io/backups/icon.png">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center;padding:24px;
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#eef0ff;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(900px 600px at 12% -8%,rgba(150,70,255,.34),transparent 58%),radial-gradient(800px 560px at 96% 6%,rgba(255,110,30,.22),transparent 58%),linear-gradient(160deg,#0d0714,#170b24 45%,#22101a)}
+  .ring{width:54px;height:54px;border-radius:50%;border:4px solid rgba(255,255,255,.12);border-top-color:#ff7a1a;border-right-color:#a855ff;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,#ff7a1a,#a855ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{font-size:14px;color:#9a9dc4;max-width:340px;line-height:1.5}
+  .err .ring{display:none}
+  button,a.btn{margin-top:6px;display:none;padding:11px 22px;border:0;border-radius:12px;font:inherit;font-weight:600;font-size:14px;color:#fff;text-decoration:none;cursor:pointer;
+    background:linear-gradient(135deg,#ff7a1a,#9a3df0);box-shadow:0 6px 18px rgba(255,110,20,.3)}
+  .err button,.err a.btn{display:inline-block}
+</style>
+</head>
+<body id="b">
+  <div class="ring"></div>
+  <h1 id="t">Loading launcher...</h1>
+  <p id="m">Grabbing the latest version.</p>
+  <button id="retry" type="button">Try again</button>
+  <a class="btn" id="raw" href="https://github.com/AniItsukiCoded/backups/blob/main/launcher.html" target="_blank" rel="noopener">Open on GitHub</a>
+
+<script>
+(function(){
+  // The real launcher lives in this repo file. Update it there and every copy of this loader picks it up.
+  var URL_ = 'https://raw.githubusercontent.com/AniItsukiCoded/backups/main/launcher.html';
+  var CACHE_KEY = 'ich.launcherCache';   // last good copy, used if GitHub can't be reached
+  var TIMEOUT_MS = 8000;
+
+  function $(id){ return document.getElementById(id); }
+
+  function run(html){
+    document.open();
+    document.write(html);
+    document.close();
+  }
+
+  function fail(){
+    $('b').classList.add('err');
+    $('t').textContent = "Couldn't load the launcher";
+    $('m').textContent = 'Check your connection and try again. If GitHub is blocked on this network, that would explain it.';
+  }
+
+  function fromCache(){
+    try {
+      var c = localStorage.getItem(CACHE_KEY);
+      if (c && c.indexOf('<html') !== -1){ run(c); return true; }
+    } catch(_){}
+    return false;
+  }
+
+  function load(){
+    $('b').classList.remove('err');
+    $('t').textContent = 'Loading launcher...';
+    $('m').textContent = 'Grabbing the latest version.';
+
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
+
+    // Unique query string so GitHub's raw cache never serves an old copy.
+    fetch(URL_ + '?v=' + Date.now(), { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(html){
+        clearTimeout(timer);
+        if (html.indexOf('<html') === -1) throw new Error('Unexpected response');
+        try { localStorage.setItem(CACHE_KEY, html); } catch(_){}
+        run(html);
+      })
+      .catch(function(){
+        clearTimeout(timer);
+        if (!fromCache()) fail();
+      });
+  }
+
+  $('retry').onclick = load;
+  load();
+})();
+</script>
+</body>
+</html>
