@@ -1,516 +1,506 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="hw-on">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Itsukis Chat Hub Launcher</title>
-<link rel="icon" href="https://aniitsukicoded.github.io/backups/icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="https://aniitsukicoded.github.io/backups/icon.png">
+<script>/* Halloween is ON by default, same storage key as the main site (ich.hwTheme). Runs before paint. */
+try{if(localStorage.getItem('ich.hwTheme')==='0')document.documentElement.classList.remove('hw-on')}catch(_){}</script>
 <style>
-  :root {
-    --bg: #0a0e1a;
-    --bg-elevated: #111827;
-    --card: rgba(17, 24, 39, 0.6);
-    --card-hover: rgba(30, 41, 59, 0.7);
-    --border: rgba(51, 65, 85, 0.5);
-    --border-hover: rgba(74, 222, 128, 0.3);
-    --fg: #f1f5f9;
-    --fg-muted: #94a3b8;
-    --fg-dim: #475569;
-    --accent: #22c55e;
-    --accent-glow: rgba(34, 197, 94, 0.15);
-    --accent-soft: rgba(34, 197, 94, 0.08);
-    --danger: #ef4444;
-    --radius: 14px;
-    --font: 'Space Grotesk', sans-serif;
-    --mono: 'JetBrains Mono', monospace;
-  }
+:root{
+  --bg:#0b0c1a; --bg2:#14152b; --panel:rgba(15,16,20,.55); --panel2:rgba(24,25,31,.7);
+  --text:#eef0ff; --muted:#9a9dc4; --accent:#7c6cff; --accent2:#ff6cb4;
+  --danger:#ff5d73; --ok:#4cd6a0; --border:rgba(255,255,255,.14);
+  --spring:cubic-bezier(.16,1,.3,1);
+}
+html.hw-on{--accent:#ff7a1a;--accent2:#a855ff;--border:rgba(255,165,90,.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit}
+::selection{background:rgba(124,108,255,.45)}
+html.hw-on ::selection{background:rgba(255,122,26,.45)}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ---------- background (same as the site) ---------- */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(1000px 640px at 10% -8%,rgba(124,108,255,.3),transparent 58%),radial-gradient(900px 600px at 96% 8%,rgba(255,108,180,.18),transparent 58%),linear-gradient(160deg,#0b0c1a,#14152b)}
+html.hw-on .bgfx{background:radial-gradient(1100px 680px at 12% -8%,rgba(150,70,255,.34),transparent 58%),radial-gradient(950px 640px at 96% 6%,rgba(255,110,30,.22),transparent 58%),radial-gradient(1000px 720px at 50% 118%,rgba(255,90,20,.20),transparent 62%),linear-gradient(160deg,#0d0714 0%,#170b24 45%,#22101a 100%)}
 
-  body {
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font);
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
+/* ---------- Halloween decorations (copied from the site) ---------- */
+.hw-deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;contain:layout paint style}
+.hw-deco *{pointer-events:none}
+.hw-vig{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 115%,rgba(255,110,20,.16),transparent 55%),radial-gradient(90% 70% at 100% 0,rgba(140,60,255,.16),transparent 60%),radial-gradient(70% 60% at 0 0,rgba(255,120,30,.09),transparent 60%)}
+.hw-moon{position:absolute;top:19vh;right:3%;width:60px;aspect-ratio:1;border-radius:50%;opacity:.55;animation:hwMoon 8s ease-in-out infinite;background:radial-gradient(circle at 30% 30%,#fff8dc,#ffd98a 58%,#e9a24a);box-shadow:0 0 34px 10px rgba(255,190,90,.26),0 0 90px 30px rgba(255,150,40,.12)}
+.hw-moon::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 62% 38%,rgba(170,110,40,.35) 0 7%,transparent 8%),radial-gradient(circle at 38% 66%,rgba(170,110,40,.3) 0 10%,transparent 11%),radial-gradient(circle at 70% 70%,rgba(170,110,40,.25) 0 5%,transparent 6%)}
+@keyframes hwMoon{50%{transform:translate3d(0,-6px,0)}}
+.hw-web{position:absolute;top:0;width:150px;height:150px;color:rgba(255,255,255,.17)}
+.hw-web.l{left:0}.hw-web.r{right:0;transform:scaleX(-1)}
+.hw-web svg{width:100%;height:100%}
+.hw-sp{position:absolute;top:0;left:var(--x);display:flex;flex-direction:column;align-items:center;transform-origin:top center;animation:hwSwing 4.5s ease-in-out infinite}
+.hw-sp u{display:block;width:1px;height:var(--l);background:rgba(255,255,255,.3)}
+.hw-sp b{font-size:18px;font-weight:400}
+@keyframes hwSwing{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.hw-bat{position:absolute;left:-70px;top:var(--y);font-size:var(--s);animation:hwBat var(--d) linear var(--t) infinite;opacity:.7;will-change:transform}
+.hw-bat i{display:block;font-style:normal;animation:hwFlap .3s ease-in-out infinite alternate}
+@keyframes hwFlap{from{transform:scale(1,1)}to{transform:scale(.55,1.1)}}
+@keyframes hwBat{0%{transform:translate3d(0,0,0) rotate(-6deg)}25%{transform:translate3d(28vw,-34px,0) rotate(8deg)}50%{transform:translate3d(58vw,20px,0) rotate(-8deg)}75%{transform:translate3d(86vw,-26px,0) rotate(7deg)}100%{transform:translate3d(118vw,6px,0) rotate(-4deg)}}
+.hw-gh{position:absolute;bottom:-60px;left:var(--x);font-size:30px;opacity:0;animation:hwGh var(--d) ease-in-out var(--t) infinite;will-change:transform,opacity}
+@keyframes hwGh{0%{transform:translate3d(0,0,0);opacity:0}12%{opacity:.5}50%{transform:translate3d(36px,-55vh,0)}88%{opacity:.35}100%{transform:translate3d(-24px,-112vh,0);opacity:0}}
+.hw-em{position:absolute;bottom:-10px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#ffb347;box-shadow:0 0 8px 2px rgba(255,140,40,.7);opacity:0;animation:hwEm var(--d) linear var(--t) infinite}
+@keyframes hwEm{0%{transform:translate3d(0,0,0) scale(1);opacity:0}10%{opacity:.8}100%{transform:translate3d(var(--dx),-95vh,0) scale(.3);opacity:0}}
+.hw-pk{position:absolute;bottom:6px;font-size:34px;line-height:1;opacity:.9;text-shadow:0 0 16px rgba(255,130,20,.8);animation:hwPk 2.8s ease-in-out infinite}
+.hw-pk.l{left:8px}.hw-pk.r{right:8px;animation-delay:-1.4s}
+@keyframes hwPk{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-4px,0)}}
+.hw-fog{position:absolute;left:-20%;bottom:-40px;width:140%;height:180px;animation:hwFog 26s ease-in-out infinite alternate;will-change:transform;background:radial-gradient(50% 100% at 30% 100%,rgba(200,170,255,.13),transparent 70%),radial-gradient(40% 90% at 72% 100%,rgba(255,170,100,.1),transparent 70%)}
+.hw-fog.f2{animation-duration:36s;animation-direction:alternate-reverse;opacity:.7}
+@keyframes hwFog{from{transform:translate3d(-6%,0,0)}to{transform:translate3d(6%,0,0)}}
+@media (max-width:700px){.hw-deco .hw-x{display:none}.hw-web{width:90px;height:90px}.hw-moon{width:42px}.hw-pk{font-size:26px}}
 
-  /* ---- Animated background ---- */
-  .bg-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
+/* ---------- page ---------- */
+.shell{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:22px 22px 28px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.chip-clock{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--panel);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:40px;padding:8px 16px}
 
-  .bg-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.35;
-    animation: orbFloat 20s ease-in-out infinite alternate;
-  }
+.hero{text-align:center;padding:34px 0 8px}
+.hero-icon{width:88px;height:88px;border-radius:50%;margin:0 auto 18px;overflow:hidden;border:1px solid var(--border);box-shadow:0 18px 48px rgba(0,0,0,.5),0 0 40px rgba(124,108,255,.25);animation:drop .6s var(--spring) both}
+html.hw-on .hero-icon{box-shadow:0 18px 48px rgba(0,0,0,.5),0 0 44px rgba(255,110,20,.32)}
+.hero-icon img{width:100%;height:100%;object-fit:cover;display:block}
+.logo{font-size:clamp(34px,8vw,48px);font-weight:800;letter-spacing:-.02em;line-height:1.1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;animation:drop .6s var(--spring) .06s both}
+html.hw-on .logo{filter:drop-shadow(0 0 12px rgba(255,120,20,.3))}
+.sub{margin-top:10px;font-size:15px;color:var(--muted);animation:drop .6s var(--spring) .12s both}
+@keyframes drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.94)}60%{opacity:1}to{opacity:1;transform:none}}
 
-  .bg-orb:nth-child(1) {
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(34,197,94,0.4), transparent 70%);
-    top: -15%; left: -10%;
-    animation-duration: 22s;
-  }
-  .bg-orb:nth-child(2) {
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%);
-    bottom: -10%; right: -5%;
-    animation-duration: 18s;
-    animation-delay: -5s;
-  }
-  .bg-orb:nth-child(3) {
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(52,211,153,0.2), transparent 70%);
-    top: 40%; left: 50%;
-    animation-duration: 25s;
-    animation-delay: -10s;
-  }
+/* ---------- Halloween banner (like the site's pass banner) ---------- */
+.hw-banner{display:none;align-items:center;gap:18px;margin:26px 0 0;padding:16px 20px;border-radius:22px;text-align:left;
+  background:radial-gradient(80% 160% at 6% 50%,rgba(255,120,20,.28),transparent 62%),linear-gradient(100deg,rgba(60,22,6,.6),rgba(34,14,56,.55) 70%),var(--panel2);
+  border:1px solid rgba(255,150,60,.38);box-shadow:0 14px 38px rgba(0,0,0,.35),0 0 40px rgba(255,110,20,.14),inset 0 1px 0 rgba(255,200,140,.25);animation:rise .6s var(--spring) .2s both}
+html.hw-on .hw-banner{display:flex}
+.hw-banner .big{font-size:40px;line-height:1;filter:drop-shadow(0 0 12px rgba(255,130,20,.7))}
+.hw-banner b{display:block;font-size:17px;margin-bottom:3px}
+.hw-banner span{font-size:13.5px;color:#d8c4ee;line-height:1.5}
 
-  @keyframes orbFloat {
-    0% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(60px, -40px) scale(1.1); }
-    66% { transform: translate(-30px, 50px) scale(0.95); }
-    100% { transform: translate(40px, 20px) scale(1.05); }
-  }
+/* ---------- launch card ---------- */
+.launch-card{position:relative;overflow:hidden;display:flex;align-items:center;gap:20px;width:100%;margin-top:22px;text-align:left;padding:24px;border-radius:24px;background:var(--panel);backdrop-filter:blur(18px) saturate(165%);-webkit-backdrop-filter:blur(18px) saturate(165%);border:1px solid var(--border);box-shadow:0 24px 70px rgba(0,0,0,.45),inset 0 1.5px 0 rgba(255,255,255,.2);animation:rise .6s var(--spring) .28s both;transition:transform .3s var(--spring),border-color .3s,box-shadow .3s,background .3s}
+.launch-card:hover,.launch-card:focus-visible{outline:none;transform:translate3d(0,-6px,0) scale(1.012);border-color:rgba(124,108,255,.7);box-shadow:0 20px 46px rgba(124,108,255,.32);background:var(--panel2)}
+html.hw-on .launch-card:hover,html.hw-on .launch-card:focus-visible{border-color:rgba(255,150,60,.75);box-shadow:0 20px 46px rgba(255,110,20,.3)}
+.launch-card:active{transform:none;transition-duration:.08s}
+.lc-ic{flex:none;width:72px;height:72px;font-size:36px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(124,108,255,.14);transition:transform .35s var(--spring),background .3s}
+html.hw-on .lc-ic{background:rgba(255,120,20,.16)}
+.launch-card:hover .lc-ic{transform:scale(1.12) rotate(-6deg);background:rgba(124,108,255,.26)}
+html.hw-on .launch-card:hover .lc-ic{background:rgba(255,120,20,.28)}
+.lc-body{flex:1;min-width:0}
+.lc-body h3{font-size:21px;font-weight:700;margin-bottom:5px}
+.lc-body p{font-size:14px;line-height:1.5;color:var(--muted)}
+.lc-go{flex:none;background:linear-gradient(135deg,var(--accent),#5a4bff);padding:12px 22px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 6px 18px rgba(124,108,255,.28);transition:filter .15s}
+html.hw-on .lc-go{background:linear-gradient(135deg,#ff7a1a,#9a3df0);box-shadow:0 6px 18px rgba(255,110,20,.3)}
+.launch-card:hover .lc-go{filter:brightness(1.12)}
+.launch-card + .launch-card{margin-top:16px}
+.lc-note{margin-top:8px;text-align:center;font-size:12px;color:var(--muted);opacity:.8}
 
-  /* ---- Grid noise overlay ---- */
-  .bg-canvas::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(34,197,94,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(34,197,94,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 80%);
-  }
+/* ---------- features ---------- */
+.sec-title{margin:40px 0 4px;text-align:center;font-size:24px;font-weight:700}
+.sec-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:22px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.opt{position:relative;overflow:hidden;background:var(--panel);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:22px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;animation:rise .55s var(--spring) both;transition:transform .3s var(--spring),border-color .3s,box-shadow .3s,background .3s}
+.opt:nth-child(1){animation-delay:.35s}.opt:nth-child(2){animation-delay:.41s}.opt:nth-child(3){animation-delay:.47s}.opt:nth-child(4){animation-delay:.53s}.opt:nth-child(5){animation-delay:.59s}.opt:nth-child(6){animation-delay:.65s}
+.opt::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);opacity:0;transition:opacity .3s}
+.opt:hover{transform:translate3d(0,-6px,0);border-color:rgba(124,108,255,.6);box-shadow:0 18px 40px rgba(124,108,255,.25);background:var(--panel2)}
+html.hw-on .opt{border-color:rgba(255,150,60,.2)}
+html.hw-on .opt:hover{border-color:rgba(255,150,60,.75);box-shadow:0 18px 40px rgba(255,110,20,.28)}
+.opt:hover::before{opacity:1}
+.opt .ic{width:60px;height:60px;font-size:30px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;background:rgba(124,108,255,.14);border-radius:18px;transition:transform .35s var(--spring),background .3s}
+html.hw-on .opt .ic{background:rgba(255,120,20,.14)}
+.opt:hover .ic{transform:scale(1.12) rotate(-6deg)}
+.opt h3{font-size:17px;font-weight:700;margin-bottom:5px}
+.opt p{font-size:13.5px;line-height:1.5;color:var(--muted)}
+.opt.wide{grid-column:1/-1}
 
-  /* ---- Mouse glow ---- */
-  .mouse-glow {
-    position: fixed;
-    width: 600px; height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(34,197,94,0.06), transparent 60%);
-    pointer-events: none;
-    z-index: 1;
-    transform: translate(-50%, -50%);
-    transition: left 0.3s ease-out, top 0.3s ease-out;
-    will-change: left, top;
-  }
+.more{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}
+.more span{font-size:13px;font-weight:600;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:30px;padding:8px 15px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 
-  /* ---- Main layout ---- */
-  .app-shell {
-    position: relative;
-    z-index: 2;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 30px 20px 40px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+/* ---------- footer ---------- */
+.foot{margin-top:auto;padding-top:40px;display:flex;flex-direction:column;align-items:center;gap:14px;font-size:13px;color:var(--muted);text-align:center}
+.tqq{display:flex;align-items:center;gap:14px;padding:10px 18px 10px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14);text-align:left;transition:border-color .25s,transform .25s var(--spring)}
+.tqq:hover{border-color:rgba(255,150,60,.5);transform:translateY(-2px)}
+.tqq-badge{padding:9px 14px;border-radius:999px;font-weight:800;font-size:13px;letter-spacing:.08em;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.tqq-txt small{display:block;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1px}
+.tqq-txt b{font-size:14px;color:var(--text)}
+.tqq-sis{display:flex;margin-left:4px}
+.tqq-sis i{width:18px;height:18px;border-radius:50%;background:var(--c);border:2px solid #17121f;margin-left:-6px;box-shadow:0 0 10px color-mix(in srgb,var(--c) 55%,transparent);transition:transform .3s var(--spring)}
+.tqq-sis i:first-child{margin-left:0}
+.tqq:hover .tqq-sis i{transform:translateY(-4px)}
+.tqq:hover .tqq-sis i:nth-child(2){transition-delay:.04s}.tqq:hover .tqq-sis i:nth-child(3){transition-delay:.08s}.tqq:hover .tqq-sis i:nth-child(4){transition-delay:.12s}.tqq:hover .tqq-sis i:nth-child(5){transition-delay:.16s}
+@media(max-width:480px){.tqq{border-radius:22px;flex-wrap:wrap;justify-content:center;padding:12px 16px}.tqq-sis{margin:0}}
+.foot-card{display:flex;align-items:center;gap:14px;text-align:left;padding:12px 22px 12px 14px;border-radius:20px;background:var(--panel);border:1px solid var(--border);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+.foot-card img{width:42px;height:42px;border-radius:50%;object-fit:cover}
+.foot-card b{display:block;font-size:15px;color:var(--text);margin-bottom:2px}
+.foot strong{color:var(--text);font-weight:700}
 
-  /* ---- Centered & Larger Header ---- */
-  .hub-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 16px 0 32px;
-    gap: 16px;
-  }
+.hw-switch{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--border);border-radius:40px;padding:7px 10px 7px 14px;font-size:13px;color:var(--text);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:border-color .15s,transform .15s}
+.hw-switch:hover{border-color:var(--accent);transform:translateY(-1px)}
+.hw-switch b{font-weight:600}
+.sw{position:relative;width:38px;height:22px;border-radius:20px;background:rgba(255,255,255,.14);transition:background .25s}
+.sw i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .3s var(--spring)}
+html.hw-on .sw{background:linear-gradient(135deg,#ff7a1a,#9a3df0)}
+html.hw-on .sw i{transform:translateX(16px)}
 
-  .hub-logo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
+/* ---------- Hubs & Tools modal ---------- */
+.modal-bg{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(6,7,16,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html.hw-on .modal-bg{background:rgba(14,5,22,.72)}
+.modal-bg.show{display:flex;animation:fade .25s ease}
+.modal-bg.closing{opacity:0;transition:opacity .2s}
+@keyframes fade{from{opacity:0}}
+.modal{width:100%;max-width:760px;height:min(640px,88vh);display:flex;flex-direction:column;padding:22px;border-radius:24px;background:rgba(17,18,30,.94);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);animation:rise .4s var(--spring)}
+html.hw-on .modal{border-color:rgba(255,150,60,.26);box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 50px rgba(255,100,20,.12)}
+.m-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.m-head h2{font-size:22px}
+.m-x{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);font-size:15px;transition:background .15s}
+.m-x:hover{background:rgba(255,255,255,.16)}
+.m-hint{color:var(--muted);font-size:13px;margin:4px 0 12px}
+.m-search{width:100%;background:rgba(8,9,12,.6);border:1px solid var(--border);border-radius:12px;padding:11px 14px;font:inherit;font-size:14px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
+.m-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,108,255,.18)}
+html.hw-on .m-search:focus{box-shadow:0 0 0 3px rgba(255,122,26,.2)}
+.m-tabs{display:flex;gap:6px;margin:12px 0 4px;padding:5px;border-radius:14px;background:rgba(8,9,12,.5);overflow-x:auto}
+.m-tab{flex:1;white-space:nowrap;padding:9px 10px;border-radius:10px;background:transparent;color:var(--muted);font-weight:600;font-size:13px;transition:background .2s,color .2s}
+.m-tab small{opacity:.7;margin-left:4px}
+.m-tab.on{color:#fff;background:linear-gradient(135deg,var(--accent),#5a4bff);box-shadow:0 4px 14px rgba(124,108,255,.35)}
+html.hw-on .m-tab.on{background:linear-gradient(135deg,#ff7a1a,#9a3df0);box-shadow:0 4px 14px rgba(255,110,20,.35)}
+.m-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.m-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);color:var(--muted);border:1px solid transparent}
+.m-chip.on{color:var(--text);border-color:var(--accent)}
+.m-list{flex:1;overflow-y:auto;margin-top:10px;padding-right:4px;display:flex;flex-direction:column;gap:8px}
+.m-list::-webkit-scrollbar{width:8px}.m-list::-webkit-scrollbar-thumb{background:rgba(124,108,255,.45);border-radius:8px}
+html.hw-on .m-list::-webkit-scrollbar-thumb{background:rgba(255,140,50,.45)}
+.hub-row{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);cursor:pointer;text-align:left;width:100%;transition:transform .2s var(--spring),border-color .2s,background .2s;animation:rise .35s var(--spring) both}
+.hub-row:hover{transform:translateX(4px);border-color:rgba(124,108,255,.55);background:rgba(255,255,255,.07)}
+html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
+.hub-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none;overflow:hidden}
+.hub-row .nm{flex:1;min-width:0}
+.hub-nm{font-weight:700;font-size:15px}
+.hub-desc{font-size:12.5px;line-height:1.45;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.hub-arrow{color:var(--muted);font-size:17px;transition:color .2s,transform .2s}
+.hub-row:hover .hub-arrow{color:#ffb26b;transform:translate(2px,-2px)}
+.m-empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
+.m-credit{font-size:12px;color:var(--muted);padding:2px 4px}
 
-  .logo-mark {
-    width: 90px; 
-    height: 90px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, var(--accent), #10b981);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 32px;
-    color: #000;
-    box-shadow: 0 0 32px rgba(34,197,94,0.3);
-    position: relative;
-    overflow: hidden;
-  }
+/* ---------- toast ---------- */
+.toasts{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;max-width:340px;background:rgba(15,16,32,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:14px;padding:12px 18px;font-size:14px;box-shadow:0 12px 36px rgba(0,0,0,.45);animation:tin .4s var(--spring),tout .3s ease 2.8s forwards}
+.toast i{width:8px;height:8px;border-radius:50%;flex:none}
+.toast.ok i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.toast.err i{background:var(--danger);box-shadow:0 0 8px var(--danger)}
+.toast.load i{background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.4}}
+@keyframes tin{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateX(40px)}}
 
-  .logo-mark img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    position: relative;
-    z-index: 1;
-  }
-
-  .logo-mark::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2));
-  }
-
-  .logo-text {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--fg), var(--fg-muted));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .clock-display {
-    font-family: var(--mono);
-    font-size: 14px;
-    color: var(--fg-dim);
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 14px;
-    backdrop-filter: blur(10px);
-    letter-spacing: 0.5px;
-  }
-
-  /* ---- Grid (Centered Layout) ---- */
-  .hub-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 460px));
-    justify-content: center;
-    gap: 16px;
-    margin: 20px 0;
-  }
-
-  /* ---- Cards ---- */
-  .hub-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px 22px;
-    cursor: pointer;
-    text-align: left;
-    backdrop-filter: blur(12px);
-    transition: 
-      border-color 0.25s, 
-      background 0.25s, 
-      transform 0.25s,
-      box-shadow 0.25s;
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(16px);
-    animation: cardIn 0.4s ease forwards;
-  }
-
-  .hub-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .hub-card:hover {
-    border-color: var(--border-hover);
-    background: var(--card-hover);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(34,197,94,0.1);
-  }
-
-  .hub-card:hover::before { opacity: 1; }
-
-  .hub-card:active {
-    transform: translateY(-1px) scale(0.99);
-    transition-duration: 0.08s;
-  }
-
-  @keyframes cardIn {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .card-icon {
-    width: 42px; height: 42px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 14px;
-    font-size: 20px;
-    font-weight: 700;
-    position: relative;
-  }
-
-  .card-icon.blue { background: rgba(59,130,246,0.12); color: #60a5fa; }
-
-  .hub-card-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--fg);
-    line-height: 1.3;
-  }
-
-  .hub-card-sub {
-    font-size: 14px;
-    color: var(--fg-muted);
-    line-height: 1.5;
-  }
-
-  .card-arrow {
-    position: absolute;
-    top: 24px; right: 20px;
-    color: var(--fg-dim);
-    width: 18px; height: 18px;
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: opacity 0.2s, transform 0.2s, color 0.2s;
-  }
-
-  .hub-card:hover .card-arrow {
-    opacity: 1;
-    transform: translateX(0);
-    color: var(--accent);
-  }
-
-  /* ---- Footer ---- */
-  .hub-footer {
-    margin-top: 32px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Centered since the button is removed */
-  }
-
-  .hub-footer-left {
-    font-size: 13px;
-    color: var(--fg-dim);
-  }
-
-  /* ---- Toast ---- */
-  .toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 200;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-  }
-
-  .toast {
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 14px;
-    color: var(--fg);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    pointer-events: auto;
-    animation: toastIn 0.35s ease, toastOut 0.3s ease 2.7s forwards;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: 360px;
-  }
-
-  .toast.err { border-color: rgba(239,68,68,0.4); }
-  .toast.err .toast-dot { background: var(--danger); box-shadow: 0 0 8px rgba(239,68,68,0.5); }
-  .toast.ok { border-color: rgba(34,197,94,0.4); }
-  .toast.ok .toast-dot { background: var(--accent); box-shadow: 0 0 8px rgba(34,197,94,0.5); }
-  .toast.load { border-color: rgba(59,130,246,0.4); }
-  .toast.load .toast-dot { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.5); animation: pulse 1s infinite; }
-
-  .toast-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
-  @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@media(max-width:620px){
+  .launch-card{flex-direction:column;text-align:center}
+  .opts{grid-template-columns:1fr}
+  .hw-banner{flex-direction:column;text-align:center}
+  .toasts{left:14px;right:14px;top:14px}.toast{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
 </style>
 </head>
 <body>
 
-<!-- Animated background -->
-<div class="bg-canvas">
-  <div class="bg-orb"></div>
-  <div class="bg-orb"></div>
-  <div class="bg-orb"></div>
-</div>
+<div class="bgfx"></div>
+<div class="toasts" id="toasts"></div>
 
-<!-- Mouse-following glow -->
-<div class="mouse-glow" id="mouseGlow"></div>
+<div class="modal-bg" id="hubBg"><div class="modal" role="dialog" aria-modal="true" aria-label="Hubs and Tools">
+  <div class="m-head"><h2>🎮 Hubs &amp; Tools</h2><button class="m-x" id="hubX" type="button" aria-label="Close">✕</button></div>
+  <div class="m-hint">Game sites, movie hubs, proxies, apps, tools and links. Pick one to open it in a new tab.</div>
+  <input class="m-search" id="hubSearch" placeholder="Search everything..." autocomplete="off">
+  <div class="m-tabs" id="hubTabs" role="tablist"></div>
+  <div class="m-chips" id="hubChips"></div>
+  <div class="m-list" id="hubList"><div class="m-empty">Loading...</div></div>
+</div></div>
 
-<!-- Toast container -->
-<div class="toast-container" id="toasts"></div>
+<div class="shell">
+  <div class="topbar"><button class="hw-switch" id="hwToggle" type="button" role="switch" aria-checked="true" title="Halloween theme"><span>🎃</span><b>Halloween</b><em class="sw"><i></i></em></button><div class="chip-clock" id="clock"></div></div>
 
-<!-- Main app -->
-<div class="app-shell">
-  <header class="hub-header">
-    <div class="hub-logo">
-      <div class="logo-mark">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKev0wvKY2AE58kTKNU580K5VLnJoKS95qdZnq_I3_-R1uZQNWRNGN_OjQ&s=10" alt="Itsukis Chat Hub Launcher logo" onerror="this.style.display='none';this.parentElement.textContent='I';">
-      </div>
-      <span class="logo-text" id="siteNameDisplay">Itsukis Chat Hub Launcher</span>
-    </div>
-    <div class="clock-display" id="clock"></div>
+  <header class="hero">
+    <div class="hero-icon"><img src="https://aniitsukicoded.github.io/backups/icon.png" alt="Itsukis Chat Hub"></div>
+    <h1 class="logo">Itsukis Chat Hub</h1>
+    <p class="sub">A global chatting hub made by Jace, inspired by VUS chat rooms.</p>
   </header>
 
-  <!-- Grid -->
-  <main class="hub-grid" id="grid"></main>
+  <div class="hw-banner">
+    <span class="big">🎃</span>
+    <div><b>Halloween Season Pass is live</b><span>Spend time online to level up through 30 levels of spooky badges, name effects and permanent roles. Runs until early November.</span></div>
+  </div>
 
-  <footer class="hub-footer">
-    <span class="hub-footer-left">Itsukis Chat Hub Launcher</span>
+  <button class="launch-card" id="launch" type="button" aria-label="Open Itsuki's Chat Hub">
+    <div class="lc-ic">💬</div>
+    <div class="lc-body"><h3>Itsuki's Chat Hub</h3><p>Opens the full hub in a new tab. Sign in with your account and jump straight into chat.</p></div>
+    <span class="lc-go">Launch</span>
+  </button>
+
+  <button class="launch-card" id="hubsBtn" type="button" aria-label="Open Hubs and Tools">
+    <div class="lc-ic">🎮</div>
+    <div class="lc-body"><h3>Hubs &amp; Tools</h3><p>Browse every game hub, app, tool, link and proxy in one place. Pick one to open it.</p></div>
+    <span class="lc-go">Browse</span>
+  </button>
+  <div class="lc-note">Allow popups for this page if the hub doesn't open.</div>
+
+  <h2 class="sec-title">What's inside</h2>
+  <p class="sec-sub">Everything you get on the main site</p>
+
+  <section class="opts">
+    <div class="opt"><div class="ic">🎮</div><h3>Hubs &amp; Tools</h3><p>Apps, hubs, tools, links and proxies in one place, all in one searchable menu.</p></div>
+    <div class="opt"><div class="ic">🌍</div><h3>Itsukis Chat</h3><p>Global chat, private rooms and announcements. Send up to 10 images per message and @ping people.</p></div>
+    <div class="opt"><div class="ic">💬</div><h3>Itsuki DMs</h3><p>Private chats with a friend request system.</p></div>
+    <div class="opt"><div class="ic">⚙️</div><h3>Settings</h3><p>Style your chat bubbles and text, set a personal background, tune UI blur and transparency, and add pronouns to your profile.</p></div>
+    <div class="opt"><div class="ic">🎵</div><h3>Music player</h3><p>Search songs and play them while you chat, with a seekable progress bar.</p></div>
+    <div class="opt"><div class="ic">🎡</div><h3>VIP Lounge &amp; Daily Spin</h3><p>A VIP room, Legend and Star roles, and a daily spin for rewards.</p></div>
+    <div class="opt wide"><div class="ic">🎃</div><h3>Halloween Pass</h3><p>Bats, ghosts, fog and cobwebs with an orange and purple look. Level up for titles, badges and glowing name effects that everyone can see, and equip them from the cosmetics menu.</p></div>
+  </section>
+
+  <div class="more">
+    <span>📜 Server rules</span>
+    <span>🔔 Rewards counter</span>
+    <span>🐌 Anti-lag mode</span>
+    <span>☁️ Settings saved to your account</span>
+  </div>
+
+  <footer class="foot">
+    <div class="foot-card">
+      <img src="https://aniitsukicoded.github.io/backups/icon.png" alt="">
+      <div><b>Itsukis Chat Hub Launcher</b><span>Made by <strong>Jace</strong></span></div>
+    </div>
+    <div class="tqq">
+      <span class="tqq-badge">TQQ</span>
+      <div class="tqq-txt"><small>Name inspiration</small><b>The Quintessential Quintuplets</b></div>
+      <div class="tqq-sis" aria-hidden="true"><i style="--c:#ff9ec4"></i><i style="--c:#b78cff"></i><i style="--c:#5aa9ff"></i><i style="--c:#5ee08a"></i><i style="--c:#ff5d73"></i></div>
+    </div>
   </footer>
 </div>
 
 <script>
-// ===================== STATE =====================
-let apps = null;
+// ===================== CONFIG =====================
+const APP = {
+  name: "Itsuki's Chat Hub",
+  url: "https://raw.githubusercontent.com/jace01b-web/itsukis-chat-hub-obfuscated/refs/heads/main/index.html"
+};
 
 // ===================== UTILITIES =====================
-function escapeHtml(str) {
-  return (str || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function escapeHtml(s){return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function showToast(msg,type){
+  const t=document.createElement("div");
+  t.className="toast "+(type||"ok");
+  t.innerHTML='<i></i>'+escapeHtml(msg);
+  document.getElementById("toasts").appendChild(t);
+  setTimeout(()=>t.remove(),3300);
 }
 
-function showToast(msg, type) {
-  const container = document.getElementById("toasts");
-  const toast = document.createElement("div");
-  toast.className = "toast " + (type || "ok");
-  toast.innerHTML = '<span class="toast-dot"></span>' + escapeHtml(msg);
-  container.appendChild(toast);
-  setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3200);
+// ===================== CLOCK =====================
+function tick(){document.getElementById("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});}
+setInterval(tick,1000);tick();
+
+// ===================== HALLOWEEN (same logic as the site) =====================
+const HW_KEY='ich.hwTheme';
+function hwDeco(on){
+  document.documentElement.classList.toggle('hw-on',on);
+  let d=document.getElementById('hwDeco');
+  if(!on){if(d)d.remove();return}
+  if(d)return;
+  const r=(a,b)=>(a+Math.random()*(b-a)).toFixed(2);
+  const web='<svg viewBox="0 0 120 120"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L120 0M0 0L0 120M0 0L100 60M0 0L60 100M0 0L115 25M0 0L25 115"/><path d="M0 30Q18 18 30 0M0 55Q32 36 55 0M0 82Q50 58 82 0M0 110Q70 82 110 0"/></g></svg>';
+  let h='<i class="hw-vig"></i><i class="hw-moon"></i><i class="hw-fog"></i><i class="hw-fog f2"></i><div class="hw-web l">'+web+'</div><div class="hw-web r">'+web+'</div>'
+    +'<span class="hw-sp" style="--x:14%;--l:60px"><u></u><b>🕷️</b></span><span class="hw-sp hw-x" style="--x:86%;--l:90px"><u></u><b>🕷️</b></span>';
+  for(let i=0;i<7;i++)h+='<b class="hw-bat'+(i>2?' hw-x':'')+'" style="--y:'+r(6,55)+'vh;--s:'+r(16,28)+'px;--d:'+r(16,30)+'s;--t:-'+r(0,24)+'s"><i>🦇</i></b>';
+  for(let i=0;i<4;i++)h+='<b class="hw-gh'+(i>1?' hw-x':'')+'" style="--x:'+r(4,92)+'%;--d:'+r(20,34)+'s;--t:-'+r(0,30)+'s">👻</b>';
+  for(let i=0;i<16;i++)h+='<i class="hw-em'+(i>7?' hw-x':'')+'" style="--x:'+r(0,100)+'%;--s:'+r(2,5)+'px;--dx:'+r(-60,60)+'px;--d:'+r(9,18)+'s;--t:-'+r(0,16)+'s"></i>';
+  h+='<b class="hw-pk l">🎃</b><b class="hw-pk r hw-x">🎃</b>';
+  d=document.createElement('div');d.id='hwDeco';d.className='hw-deco';d.setAttribute('aria-hidden','true');d.innerHTML=h;
+  document.body.insertBefore(d,document.body.firstChild);
+}
+function hwWant(){try{return localStorage.getItem(HW_KEY)!=='0'}catch(_){return true}}
+function hwLabel(){
+  const on=document.documentElement.classList.contains('hw-on');
+  document.getElementById('hwToggle').setAttribute('aria-checked',on);
+}
+document.getElementById('hwToggle').onclick=()=>{
+  const on=!document.documentElement.classList.contains('hw-on');
+  try{localStorage.setItem(HW_KEY,on?'1':'0')}catch(_){}
+  hwDeco(on);hwLabel();
+};
+hwDeco(hwWant());hwLabel();
+
+// ===================== HUBS & TOOLS (data and logic copied from the main site) =====================
+const GAME_HUBS_URL='https://raw.githubusercontent.com/Cra-Z-Gaming/VUS/refs/heads/main/apps.json';
+const PROXIES_URL='https://raw.githubusercontent.com/jace01b-web/itsukis-chat-hub-obfuscated/refs/heads/main/app.json';
+window.HUB_INFO={
+"kbh games":{n:"KBH Games",d:"More browser games to dig through. A few titles may be hit or miss."},
+"reids games":{n:"Reids Games",d:"A solid game collection with some movies mixed in."},
+"greeni":{n:"Greeni",d:"Movies and games together in one place."},
+"polaris hub":{n:"Polaris Hub",d:"One of the biggest libraries here. Loads of games to scroll through."},
+"wither games":{n:"Wither Games",d:"144 hand-picked popular and interesting games."},
+"gn-math":{n:"GN-Math",d:"A well-known game site and a great first stop."},
+"nautilusos":{n:"NautilusOS",d:"A polished, desktop-style interface with games inside."},
+"ultimate game stash":{n:"Ultimate Game Stash",d:"One of the biggest stashes. Use search to find a specific game, like Pokémon Emerald."},
+"sigma os":{n:"Sigma OS",d:"A Windows 11–style desktop with games and apps."},
+"noah's tutoring":{n:"Noah's Tutoring",d:"A big game library. It can be a little laggy while it loads."},
+"noah's tutoring launcher":{n:"Noah's Tutoring Launcher",d:"Same library as Noah's Tutoring, but opens behind a launch button."},
+"lucide":{n:"Lucide",d:"Web proxy for reaching sites that are otherwise blocked. Works well.",c:"orange"},
+"project bugs":{n:"Project Bugs",d:"A Google Sites page packed with games, with thumbnails so they're easy to browse.",c:"purple"},
+"calcsolver":{n:"CalcSolver",d:"Looks like a calculator site. Turn on Code mode, then tap (0) four times to open the game hub.",c:"grey"},
+"mantle":{n:"Mantle",d:"Quality over quantity: modded Minecraft, an AI assistant and a proxy in one app.",c:"red"},
+"fern":{n:"Fern",d:"Another web proxy for opening blocked sites.",c:"lime"},
+"game 'n go games 1":{n:"Game 'N Go Games 1",d:"A game hub that looks and feels like a computer desktop.",c:"cyan"},
+"game 'n go games 2":{n:"Game 'N Go Games 2",d:"Backup mirror of Game 'N Go, handy if the first one is down.",c:"cyan"},
+"zaka":{n:"Zaka",d:"Zaka's web proxy for opening blocked sites.",c:"blue"},
+"bestspark":{n:"BestSpark",d:"A collection of game hubs plus original games made by the community.",c:"lime"},
+"gust":{n:"Gust",d:"Another game hub to try when your usual ones are blocked.",c:"white"},
+"unblockedzone!":{n:"UnblockedZone!",d:"A very popular game site that keeps several mirrors as backups.",c:"red"},
+"idk 10.0":{n:"idk 10.0",d:"A desktop-style game hub with a big selection of games.",c:"purple"},
+"ghost hub cinema":{n:"Ghost Hub Cinema",d:"A collection of movies to browse and watch.",c:"white"}
+};
+window.HUB_INFO_X={
+apps:{
+"basik (chat)":{n:"BaSik",i:"BaSik",c:"blue",d:"Super lightweight text-only chat. No roles, no images, just messages."},
+"youtube v20":{n:"YouTube V20",i:"YT",c:"rose",d:"A YouTube player with playlists, settings and private + public keys."},
+"unicorn's hideout 🦄":{n:"Unicorn's Hideout 🦄",i:"🦄",c:"purple",d:"unicorngirl38's hideout."}
+},
+tools:{
+"ai code editor":{n:"AI Code Editor",c:"violet",d:"Code editor with built-in AI that can replace, add and delete specific lines."},
+"code editor":{n:"Code Editor",c:"blue",d:"Live HTML editor with an instant preview."},
+"about:blank opener":{n:"about:blank Opener",c:"amber",d:"Opens files and sites in an about:blank tab. Some sites block this kind of cloaking."},
+"timer":{n:"Timer",c:"orange",d:"Stopwatch and countdown timer in one."},
+"local music player":{n:"Local Music Player",c:"rose",d:"Play music files straight from your own device."},
+"file + folder viewer":{n:"File + Folder Viewer",c:"lime",d:"Browse the files and folders on your device."},
+"groq api keys":{n:"Groq API Keys",c:"green",d:"Grab a free Groq API key for AI tools."},
+"notes":{n:"Notes",c:"amber",d:"Quick notes saved right in your browser."},
+"image to base64":{n:"Image to Base64",c:"green",d:"Turn an image into base64 so you can embed it even when the image link is blocked."}
+},
+links:{
+"scratch":{n:"Scratch",c:"orange",d:"Games, music and animations made by the Scratch community."},
+"get youtube key":{n:"Get YouTube Key",c:"rose",d:"Step-by-step guide to getting a YouTube Data API v3 key."},
+"google doodles":{n:"Google Doodles",c:"blue",d:"Minesweeper, Solitaire, Snake and lots more Google games."},
+"cineby":{n:"Cineby",c:"yellow",d:"Movie and sports streaming. Not proxied, so some networks may block it."},
+"code editor":{n:"Code Editor (Web)",c:"green",d:"A feature-packed online code editor."},
+"cps test":{n:"CPS Test",c:"orange",d:"Test how many clicks per second you can hit."}
+}
+};
+const HUB_COLORS={
+  white:{bg:'rgba(255,255,255,.14)',fg:'#f8fafc'},green:{bg:'rgba(34,197,94,.16)',fg:'#4ade80'},
+  blue:{bg:'rgba(59,130,246,.16)',fg:'#60a5fa'},rose:{bg:'rgba(244,63,94,.16)',fg:'#fb7185'},
+  violet:{bg:'rgba(139,92,246,.16)',fg:'#a78bfa'},yellow:{bg:'rgba(234,179,8,.16)',fg:'#fde047'},
+  cyan:{bg:'rgba(6,182,212,.16)',fg:'#22d3ee'},lime:{bg:'rgba(132,204,22,.16)',fg:'#a3e635'},
+  orange:{bg:'rgba(249,115,22,.16)',fg:'#fb923c'},red:{bg:'rgba(239,68,68,.16)',fg:'#f87171'},
+  purple:{bg:'rgba(168,85,247,.16)',fg:'#c084fc'},black:{bg:'rgba(255,255,255,.08)',fg:'#e2e8f0'},
+  grey:{bg:'rgba(148,163,184,.16)',fg:'#cbd5e1'},amber:{bg:'rgba(245,158,11,.16)',fg:'#fbbf24'}
+};
+const PROXY_FALLBACK={"credits":"Every proxy here belongs to its original creators. Full credit to all of them. I didn't make any of these.","groups":[{"name":"Shadow","links":["https://studyeconomics.berugy.hu","https://reviewastronomy.dadaclubdearte.ar","https://explorephysics.flyredwing.ru","https://primegrammarhelp.telradio.com.ar","https://studychemistry.artsydomains.com","https://smartcalculuspractice.rostech.mx","https://clearreadinglab.thevictoryseed.org","https://dailygrammaracademy.krl.com.np","https://grammarlab.kominarstvotuzinsky.sk"]},{"name":"Petezah","links":["https://petezahgames11.firebaseapp.com","https://petezahgames12.firebaseapp.com","https://cdn.jsdelivr.net/gh/newrelightedteam/math@master/nirbytes.svg","https://cdn.jsdelivr.net/gh/PeteZah-G/PeteZahStaticDone@main/new.svg","https://cdn.jsdelivr.net/gh/Eraclio28/PeteZahStaticDone@main/new.svg","https://cdn.jsdelivr.net/gh/PeteZah-G/PeteZahStaticDone/main.svg","https://cdn.jsdelivr.net/gh/pineapple-petezah/homework/main.svg","https://petezahgames4.firebaseapp.com","https://123moviesgo.cfd","https://123movieshd.cyou","https://cdn.jsdelivr.net/gh/petezahiscool/svg@main/index.svg","https://cdn.jsdelivr.net/gh/homeworkpractive/svg@main/index.svg","https://quantil.jsdelivr.net/gh/homeworkpractive/svg@acfa607/pizza.svg","https://gcore.jsdelivr.net/gh/homeworkpractive/svg@acfa607/pizza.svg"]},{"name":"Nexora","links":["https://noterplusbunny7447.b-cdn.net","https://noterplusflare06.lucky-mode-2e0e.workers.dev","https://fnourguruh.b-cdn.net","https://bxappeidj4iav6crormf7atzvi0iwpnq.lambda-url.us-east-2.on.aws","https://noterplusfire06.firebaseapp.com/links","https://noterplusfire18.firebaseapp.com/links","https://noterplusfire21.firebaseapp.com/links","https://mirror.nexora-unblocked.workers.dev","https://noterplusflare02.lucky-mode-2e0e.workers.dev","https://dv2e5yktargs5yruv3eqcd6vcm0mwamc.lambda-url.us-east-2.on.aws","https://noterplusfire18.firebaseapp.com","https://noterplus-147.web.app","https://noterplus-177.web.app","https://noterplusfire32.firebaseapp.com"]},{"name":"Lunaar and V2","links":["https://lunar-school.inmobiliariamardelplata.com"]},{"name":"Selenite","links":["https://louispasteuriswformilkthegoatedhimselfdiddy.churchinhuntsville.org"]},{"name":"Void Network","links":["https://bcsdny.net","https://voidthebest.centrodiagnosticogenetico.com","https://iliketocode.majoitus.ee","https://doyourwork.mundra.com","https://voidistuff.rusticrivergear.com","https://bld.share-with.de","https://gmpuj.share-with.uk","https://cko.shared2.uk","https://wypa.anointedacres.com","https://jqwmq.deepee.com","https://bigboy4.pagostepeapulco.gob.mx","https://bigboy2.panel-laboralcj.gob.mx","https://bigboy3.root.sx"]},{"name":"Truffled","links":["https://health.wvpreschool.org","https://for-randomgamer5354.viapointpos.com","https://for-randomgamer5354.glamourfreaks.com","https://truffled.cafemeridiano.com.br","https://truffled.freshmilk.co.za","https://truffled.gparente.net.br","https://truffled.oxsec.com.mx"]}]};
+const SECS=[['hubs','Hubs'],['apps','Apps'],['tools','Tools'],['links','Links'],['proxies','Proxies']];
+let hubData=null,hubSec='hubs',hubQ='',hubGrp='',proxyCredit='';
+const $=id=>document.getElementById(id);
+
+function hubInfoFor(sec,name){const k=(name||'').trim().toLowerCase();return (sec==='hubs'?HUB_INFO:(HUB_INFO_X[sec]||{}))[k]||null;}
+
+async function loadHubs(){
+  const list=$('hubList');
+  list.innerHTML='<div class="m-empty">Loading...</div>';
+  try{
+    const res=await fetch(GAME_HUBS_URL+'?v='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json(),out=[];
+    SECS.forEach(([sec])=>{
+      (data[sec]||[]).forEach(h=>{
+        if(!h||!h.name||!h.name.trim()||!h.url||!h.url.trim())return;
+        const i=hubInfoFor(sec,h.name);
+        if(!i)return;
+        out.push({...h,sec,name:i.n||h.name.trim(),desc:i.d||h.desc||'',icon:i.i||h.icon||'',color:(h.color&&h.color.trim())||i.c||''});
+      });
+    });
+    let px=PROXY_FALLBACK;
+    try{const pr=await fetch(PROXIES_URL+'?v='+Date.now(),{cache:'no-store'});if(pr.ok){const pj=await pr.json();if(pj&&Array.isArray(pj.groups)&&pj.groups.length)px=pj;}}catch(_){}
+    proxyCredit=px.credits||PROXY_FALLBACK.credits;
+    const PXC=['blue','violet','rose','green','orange','cyan','purple','red'];
+    px.groups.forEach((g,gi)=>{
+      const ls=(g.links||[]).filter(u=>u&&u.trim());
+      ls.forEach((u,i)=>out.push({sec:'proxies',group:g.name,name:g.name+(ls.length>1?' '+(i+1):''),url:u.trim(),desc:u.trim().replace(/^https?:\/\//,''),icon:'\ud83c\udf10',color:PXC[gi%PXC.length]}));
+    });
+    hubData=out;renderHubs();
+  }catch(e){
+    list.innerHTML='<div class="m-empty">Couldn\'t load the list.<br><br><button class="lc-go" id="hubRetry" type="button">Retry</button></div>';
+    $('hubRetry').onclick=loadHubs;
+  }
 }
 
-// ===================== MOUSE GLOW & CLOCK =====================
-const mouseGlow = document.getElementById("mouseGlow");
-document.addEventListener("mousemove", (e) => {
-  mouseGlow.style.left = e.clientX + "px";
-  mouseGlow.style.top = e.clientY + "px";
-});
-
-function updateClock() {
-  const el = document.getElementById("clock");
-  const now = new Date();
-  el.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// ===================== LOAD APPS DIRECTLY =====================
-function loadApps() {
-  apps = {
-    home: [{
-      name: "Itsuki's Chat Hub",
-      url: "https://raw.githubusercontent.com/jace01b-web/itsukis-chat-hub-obfuscated/refs/heads/main/index.html",
-      desc: "A global chatting hub made by (Jace), inspired by VUS chat rooms. Name Inspo: TQQ",
-      icon: "💬",
-      color: "blue"
-    }]
-  };
-  render();
-}
-
-// ===================== RENDER GRID =====================
-function render() {
-  if (!apps) return;
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-
-  let items = apps["home"] || [];
-  renderCards(grid, items);
-}
-
-function renderCards(grid, items) {
-  if (items.length === 0) return;
-
-  items.forEach((app, i) => {
-    const card = document.createElement("article");
-    card.className = "hub-card";
-    card.style.animationDelay = (i * 0.06) + "s";
-    card.setAttribute("tabindex", "0");
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", "Open " + app.name);
-
-    card.innerHTML = `
-      <div class="card-icon ${app.color || 'blue'}">${escapeHtml(app.icon || app.name.substring(0, 2).toUpperCase())}</div>
-      <div class="hub-card-title">${escapeHtml(app.name)}</div>
-      <div class="hub-card-sub">${escapeHtml(app.desc)}</div>
-      <svg class="card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
-      </svg>
-    `;
-
-    const activate = () => openApp(app);
-    card.onclick = activate;
-    card.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); } };
-    grid.appendChild(card);
+function renderHubs(){
+  if(!hubData)return;
+  const q=hubQ;
+  const match=h=>!q||h.name.toLowerCase().includes(q)||(h.desc||'').toLowerCase().includes(q)||(h.group||'').toLowerCase().includes(q);
+  const counts={};hubData.forEach(h=>{if(match(h))counts[h.sec]=(counts[h.sec]||0)+1;});
+  $('hubTabs').innerHTML=SECS.map(([k,l])=>`<button class="m-tab${k===hubSec?' on':''}" data-k="${k}" type="button" role="tab">${l}<small>${counts[k]||0}</small></button>`).join('');
+  $('hubTabs').querySelectorAll('.m-tab').forEach(b=>b.onclick=()=>{hubSec=b.dataset.k;hubGrp='';renderHubs();$('hubList').scrollTop=0;});
+  const items=hubData.filter(h=>h.sec===hubSec&&match(h));
+  const isPx=hubSec==='proxies';
+  if(isPx&&hubGrp&&!items.some(h=>h.group===hubGrp))hubGrp='';
+  const groups=isPx?[...new Set(items.map(h=>h.group))]:[];
+  $('hubChips').innerHTML=groups.length?['',...groups].map(g=>`<button class="m-chip${g===hubGrp?' on':''}" data-g="${escapeHtml(g)}" type="button">${g?escapeHtml(g):'All'}</button>`).join(''):'';
+  $('hubChips').querySelectorAll('.m-chip').forEach(b=>b.onclick=()=>{hubGrp=b.dataset.g;renderHubs();});
+  const shown=isPx&&hubGrp?items.filter(h=>h.group===hubGrp):items;
+  const list=$('hubList');list.innerHTML='';
+  if(!shown.length){const other=Object.values(counts).reduce((a,b)=>a+b,0);list.innerHTML='<div class="m-empty">'+(q&&other?'No matches in this tab, but '+other+' in the other tabs.':'Nothing found.')+'</div>';return;}
+  if(isPx){const c=document.createElement('div');c.className='m-credit';c.textContent='❤️ '+proxyCredit;list.appendChild(c);}
+  shown.forEach((h,i)=>{
+    const c=HUB_COLORS[(h.color||'').toLowerCase()]||HUB_COLORS.grey;
+    const row=document.createElement('button');row.type='button';row.className='hub-row';row.style.animationDelay=Math.min(i,12)*0.02+'s';
+    row.innerHTML=`<div class="hub-ic" style="background:${c.bg};color:${c.fg}">${escapeHtml((h.icon||h.name.slice(0,2)).toString().slice(0,4))}</div><div class="nm"><div class="hub-nm">${escapeHtml(h.name)}</div>${h.desc?`<div class="hub-desc">${escapeHtml(h.desc)}</div>`:''}</div><div class="hub-arrow">↗</div>`;
+    row.onclick=()=>openLink(h);
+    list.appendChild(row);
   });
 }
 
-// ===================== OPEN APP =====================
-function openApp(app) {
-  if (!app.url) return;
+function openHubs(){
+  $('hubBg').classList.remove('closing');$('hubBg').classList.add('show');
+  if(hubData)renderHubs();else loadHubs();
+  setTimeout(()=>$('hubSearch').focus({preventScroll:true}),50);
+}
+function closeHubs(){
+  const bg=$('hubBg');if(!bg.classList.contains('show'))return;
+  bg.classList.add('closing');setTimeout(()=>bg.classList.remove('show','closing'),200);
+}
+$('hubsBtn').onclick=openHubs;
+$('hubX').onclick=closeHubs;
+$('hubBg').onclick=e=>{if(e.target.id==='hubBg')closeHubs();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHubs();});
+$('hubSearch').oninput=()=>{hubQ=$('hubSearch').value.trim().toLowerCase();renderHubs();};
 
-  if (!app.url.includes("raw.githubusercontent.com")) {
-    window.open(app.url, "_blank", "noopener");
-    return;
-  }
-
-  showToast("Loading " + app.name + "...", "load");
-
-  fetch(app.url)
-    .then(r => {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.text();
+// raw.githubusercontent links are page source, so fetch and write them into a fresh tab; everything else opens directly
+function openLink(h){
+  if(!h.url)return;
+  if(!h.url.includes('raw.githubusercontent.com')){window.open(h.url,'_blank','noopener');return;}
+  showToast('Loading '+h.name+'...','load');
+  fetch(h.url+(h.url.includes('?')?'&':'?')+'v='+Date.now(),{cache:'no-store'})
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(text=>{
+      const win=window.open('about:blank','_blank');
+      if(!win){showToast('Popup blocked — allow popups for this site','err');return;}
+      win.document.open();win.document.write(text);win.document.close();
     })
-    .then(text => {
-      const win = window.open("about:blank", "_blank");
-      if (!win) {
-        showToast("Popup blocked — allow popups for this site", "err");
-        return;
-      }
-      win.document.open();
-      win.document.write(text);
-      win.document.close();
-      showToast(app.name + " opened successfully", "ok");
-    })
-    .catch(() => {
-      showToast("Failed to load " + app.name, "err");
-    });
+    .catch(()=>showToast('Failed to load '+h.name,'err'));
 }
 
-// Initialize Data Load
-loadApps();
+// ===================== OPEN APP =====================
+function openApp(){
+  showToast("Loading "+APP.name+"...","load");
+  fetch(APP.url)
+    .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.text();})
+    .then(text=>{
+      const win=window.open("about:blank","_blank");
+      if(!win){showToast("Popup blocked — allow popups for this site","err");return;}
+      win.document.open();win.document.write(text);win.document.close();
+      showToast(APP.name+" opened successfully","ok");
+    })
+    .catch(()=>showToast("Failed to load "+APP.name,"err"));
+}
+document.getElementById("launch").onclick=openApp;
 </script>
-<script src="https://aniitsukicoded.github.io/backups/notification.js"></script>
 </body>
 </html>
