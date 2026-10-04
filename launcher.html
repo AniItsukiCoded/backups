@@ -176,6 +176,10 @@ html.hw-on .sw{background:linear-gradient(135deg,#ff7a1a,#9a3df0)}
 html.hw-on .sw i{transform:translateX(16px)}
 
 /* ---------- Hubs & Tools modal ---------- */
+.m-outdated{font-size:12px;line-height:1.4;color:#ffcf8a;background:rgba(255,170,60,.1);border:1px solid rgba(255,170,60,.28);border-radius:10px;padding:7px 10px;margin:-4px 0 10px}
+.hub-row.locked{cursor:not-allowed;opacity:.85}
+.hub-row.locked:hover{transform:none}
+.hub-row.locked:hover .hub-arrow{color:var(--muted);transform:none}
 .modal-bg{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(6,7,16,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 html.hw-on .modal-bg{background:rgba(14,5,22,.72)}
 .modal-bg.show{display:flex;animation:fade .25s ease}
@@ -241,7 +245,8 @@ html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
 
 <div class="modal-bg" id="hubBg"><div class="modal" role="dialog" aria-modal="true" aria-label="Hubs and Tools">
   <div class="m-head"><h2>🎮 Hubs &amp; Tools</h2><button class="m-x" id="hubX" type="button" aria-label="Close">✕</button></div>
-  <div class="m-hint">Game sites, movie hubs, proxies, apps, tools and links. Pick one to open it in a new tab.</div>
+  <div class="m-hint">Game sites, movie hubs, proxies, apps, tools and links. Sign in to use them.</div>
+  <div class="m-outdated">⚠️ This list may be outdated. Some links might be broken or no longer work.</div>
   <input class="m-search" id="hubSearch" placeholder="Search everything..." autocomplete="off">
   <div class="m-tabs" id="hubTabs" role="tablist"></div>
   <div class="m-chips" id="hubChips"></div>
@@ -271,10 +276,9 @@ html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
 
   <button class="launch-card" id="hubsBtn" type="button" aria-label="Open Hubs and Tools">
     <div class="lc-ic">🎮</div>
-    <div class="lc-body"><h3>Hubs &amp; Tools</h3><p>Browse every game hub, app, tool, link and proxy in one place. Pick one to open it.</p></div>
+    <div class="lc-body"><h3>Hubs &amp; Tools</h3><p>Browse every game hub, app, tool, link and proxy in one place. Sign in to use them.</p></div>
     <span class="lc-go">Browse</span>
   </button>
-  <div class="lc-note">Allow popups for this page if the hub doesn't open.</div>
 
   <h2 class="sec-title">What's inside</h2>
   <p class="sec-sub">Everything you get on the main site</p>
@@ -506,8 +510,8 @@ function renderHubs(){
   if(isPx){const c=document.createElement('div');c.className='m-credit';c.textContent='❤️ '+proxyCredit;list.appendChild(c);}
   shown.forEach((h,i)=>{
     const c=HUB_COLORS[(h.color||'').toLowerCase()]||HUB_COLORS.grey;
-    const row=document.createElement('button');row.type='button';row.className='hub-row';row.style.animationDelay=Math.min(i,12)*0.02+'s';
-    row.innerHTML=`<div class="hub-ic" style="background:${c.bg};color:${c.fg}">${escapeHtml((h.icon||h.name.slice(0,2)).toString().slice(0,4))}</div><div class="nm"><div class="hub-nm">${escapeHtml(h.name)}</div>${h.desc?`<div class="hub-desc">${escapeHtml(h.desc)}</div>`:''}</div><div class="hub-arrow">↗</div>`;
+    const row=document.createElement('button');row.type='button';row.className='hub-row locked';row.style.animationDelay=Math.min(i,12)*0.02+'s';
+    row.innerHTML=`<div class="hub-ic" style="background:${c.bg};color:${c.fg}">${escapeHtml((h.icon||h.name.slice(0,2)).toString().slice(0,4))}</div><div class="nm"><div class="hub-nm">${escapeHtml(h.name)}</div>${h.desc?`<div class="hub-desc">${escapeHtml(h.desc)}</div>`:''}</div><div class="hub-arrow">🔒</div>`;
     row.onclick=()=>openLink(h);
     list.appendChild(row);
   });
@@ -530,6 +534,8 @@ $('hubSearch').oninput=()=>{hubQ=$('hubSearch').value.trim().toLowerCase();rende
 
 // raw.githubusercontent links are page source, so fetch and write them into a fresh tab; everything else opens directly
 function openLink(h){
+  showToast('You must sign in to use the websites.','err');
+  return;
   if(!h.url)return;
   if(!h.url.includes('raw.githubusercontent.com')){window.open(h.url,'_blank','noopener');return;}
   showToast('Loading '+h.name+'...','load');
