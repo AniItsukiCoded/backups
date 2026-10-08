@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="hw-on">
 <head>
@@ -220,17 +221,17 @@ html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
 
 
 /* ---------- Launch mode picker ---------- */
-.modal.mode{height:auto;max-width:660px;padding:28px 26px 24px;position:relative;overflow:hidden}
+.modal.mode{height:auto!important;min-height:0;flex:none;max-width:640px;max-height:calc(100vh - 24px);padding:22px 22px 16px;position:relative;overflow-x:hidden;overflow-y:auto}
 .modal.mode::before{content:"";position:absolute;top:-120px;left:50%;width:420px;height:240px;margin-left:-210px;border-radius:50%;background:radial-gradient(closest-side,rgba(124,108,255,.28),transparent);pointer-events:none}
 html.hw-on .modal.mode::before{background:radial-gradient(closest-side,rgba(255,120,20,.26),transparent)}
 .mode-x{position:absolute;top:16px;right:16px;z-index:2}
 .mode-top{position:relative;text-align:center}
-.mode-top .mi{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,rgba(124,108,255,.28),rgba(255,108,180,.18));border:1px solid var(--border)}
+.mode-top .mi{width:48px;height:48px;margin:0 auto 10px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;background:linear-gradient(135deg,rgba(124,108,255,.28),rgba(255,108,180,.18));border:1px solid var(--border)}
 html.hw-on .mode-top .mi{background:linear-gradient(135deg,rgba(255,122,26,.3),rgba(168,85,255,.2))}
-.mode-top h2{font-size:23px;letter-spacing:-.01em}
+.mode-top h2{font-size:21px;letter-spacing:-.01em}
 .mode-top p{margin-top:6px;font-size:13.5px;color:var(--muted)}
-.mode-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;transition:opacity .25s,filter .25s}
-.mode-card{position:relative;display:flex;flex-direction:column;gap:12px;text-align:left;padding:12px 12px 16px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid var(--border);transition:transform .3s var(--spring),border-color .2s,background .2s,box-shadow .3s}
+.mode-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;padding-top:6px;transition:opacity .25s,filter .25s}
+.mode-card{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;padding:12px 12px 16px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid var(--border);transition:transform .3s var(--spring),border-color .2s,background .2s,box-shadow .3s}
 .mode-card:hover,.mode-card:focus-visible{outline:none;transform:translateY(-5px);background:rgba(255,255,255,.06);border-color:rgba(124,108,255,.7);box-shadow:0 18px 40px rgba(124,108,255,.25)}
 html.hw-on .mode-card:hover,html.hw-on .mode-card:focus-visible{border-color:rgba(255,150,60,.8);box-shadow:0 18px 40px rgba(255,110,20,.28)}
 .mode-card:active{transform:translateY(-1px) scale(.99);transition-duration:.08s}
@@ -239,7 +240,7 @@ html.hw-on .mode-card.rec{border-color:rgba(255,150,60,.6);background:linear-gra
 .mode-tag{position:absolute;top:-10px;right:14px;z-index:3;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:20px;color:#fff;background:linear-gradient(135deg,var(--accent),#5a4bff);box-shadow:0 6px 16px rgba(124,108,255,.4)}
 html.hw-on .mode-tag{background:linear-gradient(135deg,#ff7a1a,#9a3df0);box-shadow:0 6px 16px rgba(255,110,20,.4)}
 /* mini browser previews */
-.pv{position:relative;height:112px;border-radius:12px;overflow:hidden;background:#0a0b14;border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column}
+.pv{position:relative;height:96px;border-radius:12px;overflow:hidden;background:#0a0b14;border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column}
 .pv-tabs{display:flex;gap:3px;padding:6px 6px 0;background:#15162a}
 .pv-tabs span{font-size:8px;font-weight:600;color:#7d80a8;padding:4px 9px;border-radius:6px 6px 0 0;background:rgba(255,255,255,.05);white-space:nowrap}
 .pv-tabs span.on{color:#fff;background:#0a0b14}
@@ -274,9 +275,10 @@ html.hw-on .spin{border-top-color:#ff9a3c}
 .mode-status button{background:linear-gradient(135deg,var(--accent),#5a4bff);padding:6px 14px;border-radius:9px;font-weight:700;font-size:12.5px}
 html.hw-on .mode-status button{background:linear-gradient(135deg,#ff7a1a,#9a3df0)}
 @keyframes spin{to{transform:rotate(360deg)}}
-.mode-foot{margin-top:16px;text-align:center;font-size:12px;color:var(--muted);opacity:.85}
+.mode-foot{margin-top:12px;text-align:center;font-size:12px;color:var(--muted);opacity:.85}
+@media(max-height:640px){.pv,.mode-top .mi,.mode-foot{display:none}.mode-grid{margin-top:14px}.mode-card p{display:none}}
 @media(max-width:560px){
-  .modal.mode{padding:24px 16px 18px;max-height:92vh;overflow-y:auto}
+  .modal.mode{padding:24px 16px 18px}
   .mode-grid{grid-template-columns:1fr;gap:18px}
   .pv{height:88px}
 }
@@ -616,6 +618,7 @@ function renderHubs(){
 
 function openHubs(){
   $('hubBg').classList.remove('closing');$('hubBg').classList.add('show');
+  placeModal($('hubBg'),$('hubBg').firstElementChild,$('hubsBtn'),0,500);
   if(hubData)renderHubs();else loadHubs();
   setTimeout(()=>$('hubSearch').focus({preventScroll:true}),50);
 }
@@ -647,6 +650,19 @@ function openLink(h){
 }
 
 // ===================== OPEN APP =====================
+// When this page sits inside a tall embed (e.g. a Canva site), the iframe viewport is taller than the visible screen, so a
+// vertically centred modal can land below the fold. In that case, anchor the modal to the button that was just clicked.
+function embeddedTall(){
+  try{return window.self!==window.top&&window.innerHeight>(screen.availHeight||innerHeight)*0.8;}catch(_){return true;}
+}
+function placeModal(bg,box,anchor,extra,maxH){
+  box.style.marginTop='';box.style.height='';bg.style.alignItems='';
+  if(!embeddedTall())return;
+  if(maxH&&box.offsetHeight>maxH)box.style.height=Math.min(maxH,innerHeight-24)+'px';   // keep tall modals inside the visible part of the embed
+  const h=Math.min(box.offsetHeight+(extra||0),innerHeight-24),r=anchor.getBoundingClientRect(),mid=r.top+r.height/2;
+  const top=Math.max(12,Math.min(mid-h/2,innerHeight-h-12));
+  bg.style.alignItems='flex-start';box.style.marginTop=top+'px';
+}
 const ROOT=document.documentElement;
 let launching=false,lastMode='iframe';
 
@@ -662,6 +678,7 @@ function openMode(){
   if(launching||ROOT.classList.contains('app-open'))return;
   setStatus(null);
   $('modeBg').classList.remove('closing');$('modeBg').classList.add('show');
+  placeModal($('modeBg'),$('modeBox'),$('launch'),70);
   setTimeout(()=>$('modeIframe').focus({preventScroll:true}),60);
 }
 function closeMode(){
@@ -740,6 +757,7 @@ async function launchBlank(){
   launching=false;
 }
 
+window.addEventListener('resize',()=>{if($('modeBg').classList.contains('show'))placeModal($('modeBg'),$('modeBox'),$('launch'),70);if($('hubBg').classList.contains('show'))placeModal($('hubBg'),$('hubBg').firstElementChild,$('hubsBtn'),0,500);});
 $('launch').onclick=openMode;
 $('modeIframe').onclick=launchIframe;
 $('modeBlank').onclick=launchBlank;
