@@ -218,6 +218,77 @@ html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
 .m-empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px}
 .m-credit{font-size:12px;color:var(--muted);padding:2px 4px}
 
+
+/* ---------- Launch mode picker ---------- */
+.modal.mode{height:auto;max-width:660px;padding:28px 26px 24px;position:relative;overflow:hidden}
+.modal.mode::before{content:"";position:absolute;top:-120px;left:50%;width:420px;height:240px;margin-left:-210px;border-radius:50%;background:radial-gradient(closest-side,rgba(124,108,255,.28),transparent);pointer-events:none}
+html.hw-on .modal.mode::before{background:radial-gradient(closest-side,rgba(255,120,20,.26),transparent)}
+.mode-x{position:absolute;top:16px;right:16px;z-index:2}
+.mode-top{position:relative;text-align:center}
+.mode-top .mi{width:58px;height:58px;margin:0 auto 12px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,rgba(124,108,255,.28),rgba(255,108,180,.18));border:1px solid var(--border)}
+html.hw-on .mode-top .mi{background:linear-gradient(135deg,rgba(255,122,26,.3),rgba(168,85,255,.2))}
+.mode-top h2{font-size:23px;letter-spacing:-.01em}
+.mode-top p{margin-top:6px;font-size:13.5px;color:var(--muted)}
+.mode-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;transition:opacity .25s,filter .25s}
+.mode-card{position:relative;display:flex;flex-direction:column;gap:12px;text-align:left;padding:12px 12px 16px;border-radius:20px;background:rgba(255,255,255,.035);border:1px solid var(--border);transition:transform .3s var(--spring),border-color .2s,background .2s,box-shadow .3s}
+.mode-card:hover,.mode-card:focus-visible{outline:none;transform:translateY(-5px);background:rgba(255,255,255,.06);border-color:rgba(124,108,255,.7);box-shadow:0 18px 40px rgba(124,108,255,.25)}
+html.hw-on .mode-card:hover,html.hw-on .mode-card:focus-visible{border-color:rgba(255,150,60,.8);box-shadow:0 18px 40px rgba(255,110,20,.28)}
+.mode-card:active{transform:translateY(-1px) scale(.99);transition-duration:.08s}
+.mode-card.rec{border-color:rgba(124,108,255,.55);background:linear-gradient(180deg,rgba(124,108,255,.14),rgba(124,108,255,.04))}
+html.hw-on .mode-card.rec{border-color:rgba(255,150,60,.6);background:linear-gradient(180deg,rgba(255,122,26,.15),rgba(168,85,255,.05))}
+.mode-tag{position:absolute;top:-10px;right:14px;z-index:3;font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:20px;color:#fff;background:linear-gradient(135deg,var(--accent),#5a4bff);box-shadow:0 6px 16px rgba(124,108,255,.4)}
+html.hw-on .mode-tag{background:linear-gradient(135deg,#ff7a1a,#9a3df0);box-shadow:0 6px 16px rgba(255,110,20,.4)}
+/* mini browser previews */
+.pv{position:relative;height:112px;border-radius:12px;overflow:hidden;background:#0a0b14;border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column}
+.pv-tabs{display:flex;gap:3px;padding:6px 6px 0;background:#15162a}
+.pv-tabs span{font-size:8px;font-weight:600;color:#7d80a8;padding:4px 9px;border-radius:6px 6px 0 0;background:rgba(255,255,255,.05);white-space:nowrap}
+.pv-tabs span.on{color:#fff;background:#0a0b14}
+.pv-bar{display:flex;align-items:center;gap:4px;padding:6px 8px;background:#15162a}
+.pv-tabs + .pv-bar{background:#0a0b14;border-bottom:1px solid rgba(255,255,255,.06)}
+.pv-bar i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22)}
+.pv-bar i:nth-child(1){background:#ff5f57}.pv-bar i:nth-child(2){background:#febc2e}.pv-bar i:nth-child(3){background:#28c840}
+.pv-bar em{flex:1;height:9px;margin-left:6px;border-radius:6px;background:rgba(255,255,255,.08)}
+.pv-body{flex:1;position:relative;padding:8px;display:flex;gap:6px}
+.pv-body .sb{width:26%;border-radius:6px;background:rgba(124,108,255,.25)}
+.pv-body .ct{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.pv-body .ct s{display:block;height:11px;border-radius:6px;background:rgba(255,255,255,.1);text-decoration:none}
+.pv-body .ct s:nth-child(2){width:72%;margin-left:auto;background:rgba(124,108,255,.5)}
+.pv-body .ct s:nth-child(3){width:55%}
+html.hw-on .pv-body .sb{background:rgba(255,122,26,.28)}
+html.hw-on .pv-body .ct s:nth-child(2){background:rgba(255,122,26,.55)}
+.pv-frame .pv-body::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.1) 50%,transparent 65%);transform:translateX(-120%);transition:transform .8s ease}
+.mode-card:hover .pv-body::after{transform:translateX(120%)}
+.mode-card h3{font-size:16.5px;font-weight:700;padding:0 4px}
+.mode-card p{font-size:13px;line-height:1.5;color:var(--muted);padding:0 4px;margin-top:-6px}
+.mode-pts{display:flex;flex-wrap:wrap;gap:6px;padding:0 4px;margin-top:auto}
+.mode-pts span{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.07);color:#c9cbee}
+.mode-pts span.g{background:rgba(76,214,160,.14);color:#6fe8bb}
+/* loading state */
+.mode-status{display:none;align-items:center;justify-content:center;gap:12px;margin-top:18px;padding:13px 16px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-size:14px;font-weight:600}
+.modal.mode.busy .mode-status{display:flex;animation:fade .25s ease}
+.modal.mode.busy .mode-grid{opacity:.3;filter:blur(1px);pointer-events:none}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.2);border-top-color:var(--accent);animation:spin .75s linear infinite;flex:none}
+html.hw-on .spin{border-top-color:#ff9a3c}
+.mode-status.err .spin{display:none}
+.mode-status.err{color:#ff8da0;border-color:rgba(255,93,115,.4);background:rgba(255,93,115,.08)}
+.mode-status button{background:linear-gradient(135deg,var(--accent),#5a4bff);padding:6px 14px;border-radius:9px;font-weight:700;font-size:12.5px}
+html.hw-on .mode-status button{background:linear-gradient(135deg,#ff7a1a,#9a3df0)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mode-foot{margin-top:16px;text-align:center;font-size:12px;color:var(--muted);opacity:.85}
+@media(max-width:560px){
+  .modal.mode{padding:24px 16px 18px;max-height:92vh;overflow-y:auto}
+  .mode-grid{grid-template-columns:1fr;gap:18px}
+  .pv{height:88px}
+}
+
+/* ---------- full screen iframe + launch transition ---------- */
+#appFrame{position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2000;background:#0b0c1a;display:block;opacity:0;transform:scale(1.03);transition:opacity .6s ease,transform .7s var(--spring);will-change:opacity,transform}
+#appFrame.show{opacity:1;transform:none}
+html.app-launching .shell,html.app-launching .bgfx,html.app-launching .hw-deco,html.app-launching .modal-bg{transition:opacity .55s ease,transform .6s ease,filter .55s ease!important;opacity:0!important;transform:scale(.96);filter:blur(8px);pointer-events:none}
+html.app-open .shell,html.app-open .bgfx,html.app-open .hw-deco,html.app-open .modal-bg,html.app-open .toasts,html.app-open .hw-pop,html.app-open .hw-ripple{display:none!important}
+html.app-open,html.app-open body{overflow:hidden;background:#0b0c1a}
+@media (prefers-reduced-motion:reduce){#appFrame,html.app-launching .shell{transition-duration:.01s!important}}
+
 /* ---------- toast ---------- */
 .toasts{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{display:flex;align-items:center;gap:10px;max-width:340px;background:rgba(15,16,32,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:14px;padding:12px 18px;font-size:14px;box-shadow:0 12px 36px rgba(0,0,0,.45);animation:tin .4s var(--spring),tout .3s ease 2.8s forwards}
@@ -242,6 +313,32 @@ html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
 
 <div class="bgfx"></div>
 <div class="toasts" id="toasts"></div>
+
+<div class="modal-bg" id="modeBg"><div class="modal mode" id="modeBox" role="dialog" aria-modal="true" aria-labelledby="modeTitle">
+  <button class="m-x mode-x" id="modeX" type="button" aria-label="Close">✕</button>
+  <div class="mode-top">
+    <div class="mi">🚀</div>
+    <h2 id="modeTitle">Launch Itsuki's Chat Hub</h2>
+    <p>Choose how you want it to open</p>
+  </div>
+  <div class="mode-grid">
+    <button class="mode-card rec" id="modeIframe" type="button">
+      <span class="mode-tag">Recommended</span>
+      <div class="pv pv-frame"><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
+      <h3>Full screen iframe</h3>
+      <p>Same tab. The launcher disappears and only the hub is on screen.</p>
+      <div class="mode-pts"><span class="g">No popups</span><span>Same tab</span><span>Fastest</span></div>
+    </button>
+    <button class="mode-card" id="modeBlank" type="button">
+      <div class="pv pv-tab"><div class="pv-tabs"><span>Launcher</span><span class="on">about:blank</span></div><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
+      <h3>New tab (about:blank)</h3>
+      <p>Opens the hub in a separate blank tab next to this one.</p>
+      <div class="mode-pts"><span>New tab</span><span>Needs popups allowed</span></div>
+    </button>
+  </div>
+  <div class="mode-status" id="modeStatus" role="status" aria-live="polite"><span class="spin"></span><span id="modeStatusTxt">Loading...</span><button id="modeRetry" type="button" hidden>Retry</button></div>
+  <div class="mode-foot">Press Esc to cancel</div>
+</div></div>
 
 <div class="modal-bg" id="hubBg"><div class="modal" role="dialog" aria-modal="true" aria-label="Hubs and Tools">
   <div class="m-head"><h2>🎮 Hubs &amp; Tools</h2><button class="m-x" id="hubX" type="button" aria-label="Close">✕</button></div>
@@ -270,7 +367,7 @@ html.hw-on .hub-row:hover{border-color:rgba(255,150,60,.55)}
 
   <button class="launch-card" id="launch" type="button" aria-label="Open Itsuki's Chat Hub">
     <div class="lc-ic">💬</div>
-    <div class="lc-body"><h3>Itsuki's Chat Hub</h3><p>Opens the full hub in a new tab. Sign in with your account and jump straight into chat.</p></div>
+    <div class="lc-body"><h3>Itsuki's Chat Hub</h3><p>Open it in a full screen iframe or a new tab. Sign in with your account and jump straight into chat.</p></div>
     <span class="lc-go">Launch</span>
   </button>
 
@@ -550,19 +647,106 @@ function openLink(h){
 }
 
 // ===================== OPEN APP =====================
-function openApp(){
-  showToast("Loading "+APP.name+"...","load");
-  fetch(APP.url)
-    .then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.text();})
-    .then(text=>{
-      const win=window.open("about:blank","_blank");
-      if(!win){showToast("Popup blocked — allow popups for this site","err");return;}
-      win.document.open();win.document.write(text);win.document.close();
-      showToast(APP.name+" opened successfully","ok");
-    })
-    .catch(()=>showToast("Failed to load "+APP.name,"err"));
+const ROOT=document.documentElement;
+let launching=false,lastMode='iframe';
+
+function setStatus(kind,msg){
+  const box=$('modeBox'),st=$('modeStatus');
+  if(!kind){box.classList.remove('busy');st.classList.remove('err');return;}
+  box.classList.add('busy');
+  st.classList.toggle('err',kind==='err');
+  $('modeStatusTxt').textContent=msg;
+  $('modeRetry').hidden=kind!=='err';
 }
-document.getElementById("launch").onclick=openApp;
+function openMode(){
+  if(launching||ROOT.classList.contains('app-open'))return;
+  setStatus(null);
+  $('modeBg').classList.remove('closing');$('modeBg').classList.add('show');
+  setTimeout(()=>$('modeIframe').focus({preventScroll:true}),60);
+}
+function closeMode(){
+  const bg=$('modeBg');if(!bg.classList.contains('show'))return;
+  bg.classList.add('closing');setTimeout(()=>{bg.classList.remove('show','closing');setStatus(null);},200);
+}
+
+// Fetches the complete raw file: no cache, 3 tries, 20s timeout each, and checks it really is a whole HTML page
+async function fetchApp(){
+  let last;
+  for(let i=0;i<3;i++){
+    const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+    try{
+      const r=await fetch(APP.url+(APP.url.includes('?')?'&':'?')+'v='+Date.now()+i,{cache:'no-store',signal:ctl.signal});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const t=await r.text();
+      clearTimeout(to);
+      if(t.trim().length<500||!/<(!doctype|html|head|body|script)/i.test(t))throw new Error('Not a full page');
+      if(!/<\/html>/i.test(t)&&i<2)throw new Error('File looks cut off');
+      return t;
+    }catch(e){
+      clearTimeout(to);last=e;
+      if(i<2)await new Promise(res=>setTimeout(res,600*(i+1)));
+    }
+  }
+  throw last;
+}
+
+// ---- same tab: full screen iframe, launcher fades away and is hidden ----
+async function launchIframe(){
+  if(launching)return;
+  launching=true;lastMode='iframe';
+  setStatus('load','Loading '+APP.name+'...');
+  let text;
+  try{text=await fetchApp();}
+  catch(e){launching=false;setStatus('err','Couldn\'t load '+APP.name+'.');return;}
+
+  const f=document.createElement('iframe');
+  f.id='appFrame';f.title=APP.name;
+  f.setAttribute('allow','fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture');
+  f.setAttribute('allowfullscreen','');
+  let done=false,t;
+  const reveal=()=>{
+    if(done)return;done=true;clearTimeout(t);
+    ROOT.classList.add('app-launching');                 // launcher fades + blurs out
+    requestAnimationFrame(()=>requestAnimationFrame(()=>f.classList.add('show')));   // hub fades in on top
+    setTimeout(()=>{ROOT.classList.add('app-open');ROOT.classList.remove('app-launching');launching=false;setStatus(null);},750);   // then the launcher is fully hidden
+  };
+  f.onload=reveal;
+  t=setTimeout(reveal,12000);                           // never get stuck if a slow script holds the load event
+  f.srcdoc=text;
+  document.body.appendChild(f);
+}
+
+// ---- new tab: opened right on the click so popup blockers allow it, then filled with the full file ----
+async function launchBlank(){
+  if(launching)return;
+  launching=true;lastMode='blank';
+  const win=window.open('about:blank','_blank');
+  if(!win){launching=false;closeMode();showToast('Popup blocked — allow popups for this site','err');return;}
+  closeMode();
+  try{
+    win.document.open();
+    win.document.write('<!DOCTYPE html><title>'+escapeHtml(APP.name)+'</title><body style="margin:0;background:#0b0c1a;color:#9a9dc4;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Loading '+escapeHtml(APP.name)+'...</body>');
+    win.document.close();
+  }catch(_){}
+  showToast('Loading '+APP.name+'...','load');
+  try{
+    const text=await fetchApp();
+    win.document.open();win.document.write(text);win.document.close();
+    showToast(APP.name+' opened successfully','ok');
+  }catch(e){
+    try{win.close()}catch(_){}
+    showToast('Failed to load '+APP.name,'err');
+  }
+  launching=false;
+}
+
+$('launch').onclick=openMode;
+$('modeIframe').onclick=launchIframe;
+$('modeBlank').onclick=launchBlank;
+$('modeRetry').onclick=()=>{launching=false;(lastMode==='blank'?launchBlank:launchIframe)();};
+$('modeX').onclick=()=>{if(!launching)closeMode();};
+$('modeBg').onclick=e=>{if(e.target.id==='modeBg'&&!launching)closeMode();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!launching)closeMode();});
 </script>
 </body>
 </html>
