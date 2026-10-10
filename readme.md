@@ -1,16 +1,21 @@
 ICH (Itsuki's Chat Hub)
 
+🔥 !! NEW BYPASS !! - Since for lightspeed at most schools, you now longer could open about:blank tabs without it auto closing, HAS BEEN BYPASSED! ! 🔥
+(you can now launch in new tabs again without it closing!)
+
 EASY links:
 
 Canva:
 
-[Launcher 1](https://gazelle-0br9zq.my.canva.site/ich-launcher-backup-1)
+[Launcher 1](sukischathub-launcher.my.canva.site/ich-launcher-backup-1)
 
-[Launcher 2](https://gazelle-0br9zq.my.canva.site/ich-launcher)
+[Launcher 2](sukischathub-launcher.my.canva.site)
 
-[Launcher 3](https://gazelle-0br9zq.my.canva.site/ich)
+[Launcher 3](https://itsukischathub.my.canva.site/)
 
-[Launcher 4](https://itsukischathub.my.canva.site/)
+[Launcher 4](https://1143.my.canva.site)
+
+[Launcher 5](https://itsukis-chat-hub-by-jace.my.canva.site)
 
 Google Sites:
 
