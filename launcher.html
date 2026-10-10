@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="hw-on">
 <head>
@@ -264,6 +263,18 @@ html.hw-on .pv-body .ct s:nth-child(2){background:rgba(255,122,26,.55)}
 .mode-pts{display:flex;flex-wrap:wrap;gap:6px;padding:0 4px;margin-top:auto}
 .mode-pts span{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.07);color:#c9cbee}
 .mode-pts span.g{background:rgba(76,214,160,.14);color:#6fe8bb}
+
+.mode-note{display:flex;align-items:flex-start;gap:10px;margin:2px 4px 0;padding:10px 12px;border-radius:12px;font-size:12.5px;line-height:1.45;color:#c9cbee;background:rgba(124,108,255,.1);border:1px solid rgba(124,108,255,.28)}
+html.hw-on .mode-note{background:rgba(255,122,26,.1);border-color:rgba(255,150,60,.3)}
+.mode-note b{color:var(--text);font-weight:700}
+.mn-ic{flex:none;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(124,108,255,.22)}
+html.hw-on .mn-ic{background:rgba(255,122,26,.24)}
+.mode-pts span.a{background:rgba(124,108,255,.2);color:#c8c0ff}
+html.hw-on .mode-pts span.a{background:rgba(255,122,26,.2);color:#ffc08a}
+.mode-card{height:100%}
+.mode-pts{flex-wrap:nowrap}
+.mode-pts span{white-space:nowrap}
+@media(max-width:560px){.mode-pts{flex-wrap:wrap}}
 /* loading state */
 .mode-status{display:none;align-items:center;justify-content:center;gap:12px;margin-top:18px;padding:13px 16px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-size:14px;font-weight:600}
 .modal.mode.busy .mode-status{display:flex;animation:fade .25s ease}
@@ -335,7 +346,8 @@ html.app-open,html.app-open body{overflow:hidden;background:#0b0c1a}
       <div class="pv pv-tab"><div class="pv-tabs"><span>Launcher</span><span class="on">about:blank</span></div><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
       <h3>New tab (about:blank)</h3>
       <p>Opens the hub in a separate blank tab next to this one.</p>
-      <div class="mode-pts"><span>New tab</span><span>Needs popups allowed</span></div>
+      <div class="mode-note"><span class="mn-ic">⏱</span><span><b>Waits 6 seconds</b> before doing anything once launched, with <b>Quizlet</b> showing behind it.</span></div>
+      <div class="mode-pts"><span>New tab</span><span class="a">6s delay</span><span>Popups needed</span></div>
     </button>
   </div>
   <div class="mode-status" id="modeStatus" role="status" aria-live="polite"><span class="spin"></span><span id="modeStatusTxt">Loading...</span><button id="modeRetry" type="button" hidden>Retry</button></div>
@@ -733,7 +745,9 @@ async function launchIframe(){
   document.body.appendChild(f);
 }
 
-// ---- new tab: opened right on the click so popup blockers allow it, then filled with the full file ----
+// ---- new tab: opened right on the click so popup blockers allow it ----
+// Quizlet sits in a full-screen iframe in the back. The tab waits 6 seconds, then the hub loads in an iframe on top of it.
+const BLANK_DELAY=6000, BLANK_BEHIND='https://quizlet.com';
 async function launchBlank(){
   if(launching)return;
   launching=true;lastMode='blank';
@@ -742,13 +756,23 @@ async function launchBlank(){
   closeMode();
   try{
     win.document.open();
-    win.document.write('<!DOCTYPE html><title>'+escapeHtml(APP.name)+'</title><body style="margin:0;background:#0b0c1a;color:#9a9dc4;font:15px system-ui;display:flex;align-items:center;justify-content:center;height:100vh">Loading '+escapeHtml(APP.name)+'...</body>');
+    win.document.write('<!DOCTYPE html><title>Quizlet</title><body style="margin:0;background:#fff;overflow:hidden"><iframe id="behind" src="'+BLANK_BEHIND+'" style="position:fixed;inset:0;width:100%;height:100%;border:0;z-index:1;background:#fff"></iframe></body>');
     win.document.close();
   }catch(_){}
-  showToast('Loading '+APP.name+'...','load');
+  showToast('Opened. Waiting 6 seconds before loading '+APP.name+'...','load');
+  await new Promise(res=>setTimeout(res,BLANK_DELAY));      // do nothing for 6 seconds
+  if(win.closed){launching=false;return;}
   try{
     const text=await fetchApp();
-    win.document.open();win.document.write(text);win.document.close();
+    if(win.closed){launching=false;return;}
+    const f=win.document.createElement('iframe');
+    f.id='hubFrame';f.title=APP.name;
+    f.setAttribute('allow','fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture');
+    f.setAttribute('allowfullscreen','');
+    f.style.cssText='position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2;background:#0b0c1a';
+    f.srcdoc=text;
+    win.document.body.appendChild(f);
+    try{win.document.title=APP.name}catch(_){}
     showToast(APP.name+' opened successfully','ok');
   }catch(e){
     try{win.close()}catch(_){}
