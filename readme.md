@@ -7,9 +7,9 @@ EASY links:
 
 Canva:
 
-[Launcher 1](sukischathub-launcher.my.canva.site/ich-launcher-backup-1)
+[Launcher 1](https://sukischathub-launcher.my.canva.site/ich-launcher-backup-1)
 
-[Launcher 2](sukischathub-launcher.my.canva.site)
+[Launcher 2](https://sukischathub-launcher.my.canva.site)
 
 [Launcher 3](https://itsukischathub.my.canva.site/)
 
