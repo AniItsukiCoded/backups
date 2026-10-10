@@ -335,15 +335,15 @@ html.app-open,html.app-open body{overflow:hidden;background:#0b0c1a}
     <p>Choose how you want it to open</p>
   </div>
   <div class="mode-grid">
-    <button class="mode-card rec" id="modeIframe" type="button">
-      <span class="mode-tag">Recommended</span>
+    <button class="mode-card" id="modeIframe" type="button">
       <div class="pv pv-frame"><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
       <h3>Full screen iframe</h3>
       <p>Same tab. The launcher disappears and only the hub is on screen.</p>
       <div class="mode-pts"><span class="g">No popups</span><span>Same tab</span><span>Fastest</span></div>
     </button>
-    <button class="mode-card" id="modeBlank" type="button">
-      <div class="pv pv-tab"><div class="pv-tabs"><span>Launcher</span><span class="on">about:blank</span></div><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
+    <button class="mode-card rec" id="modeBlank" type="button">
+      <span class="mode-tag">Recommended</span>
+            <div class="pv pv-tab"><div class="pv-tabs"><span>Launcher</span><span class="on">about:blank</span></div><div class="pv-bar"><i></i><i></i><i></i><em></em></div><div class="pv-body"><div class="sb"></div><div class="ct"><s></s><s></s><s></s></div></div></div>
       <h3>New tab (about:blank)</h3>
       <p>Opens the hub in a separate blank tab next to this one.</p>
       <div class="mode-note"><span class="mn-ic">⏱</span><span><b>Waits 6 seconds</b> before doing anything once launched, with <b>Quizlet</b> showing behind it.</span></div>
@@ -691,7 +691,7 @@ function openMode(){
   setStatus(null);
   $('modeBg').classList.remove('closing');$('modeBg').classList.add('show');
   placeModal($('modeBg'),$('modeBox'),$('launch'),70);
-  setTimeout(()=>$('modeIframe').focus({preventScroll:true}),60);
+  setTimeout(()=>$('modeBlank').focus({preventScroll:true}),60);
 }
 function closeMode(){
   const bg=$('modeBg');if(!bg.classList.contains('show'))return;
