@@ -1,7 +1,8 @@
 ICH (Itsuki's Chat Hub)
 
-🔥 !! NEW BYPASS !! - Since for lightspeed at most schools, you now longer could open about:blank tabs without it auto closing, HAS BEEN BYPASSED! ! 🔥
-(you can now launch in new tabs again without it closing!)
+For schools that auto close about:blank tabs, a new bypass has been made and works for most schools! Make sure you launch "Itsukis Chat Hub", all games, proxies, apps, and more, are located in "Hubs & Tools". On the launcher page you can see my own games as well.
+
+May I also add both ICH (Itsukis Chat Hub) and VUS (Vlads Unblocked Sites) are having a colab soon and a whole new launcher, so stay tuned.
 
 EASY links:
 
