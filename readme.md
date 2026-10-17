@@ -6,6 +6,15 @@ May I also add both ICH (Itsukis Chat Hub) and VUS (Vlads Unblocked Sites) are h
 
 EASY links:
 
+Google Scripts (Reccomended):
+
+[Launcher 1](https://script.google.com/macros/s/AKfycbyuWXwDPcH0Din9xt4tqzTdPV66nVksdcWFftculkaV/dev)
+
+[Launcher 2](https://script.google.com/macros/s/AKfycbw8Qmn_jKARoLm8hvukg9hANaMxjaDcVT2PGd-ceT0/dev)
+
+[Launcher 3](https://script.google.com/macros/s/AKfycbyOidUxb1i1j_s1_hCrD-b_5TtYO7Gu0U33nkFlErw/dev)
+
+
 Canva:
 
 [Launcher 1](https://sukischathub-launcher.my.canva.site/ich-launcher-backup-1)
