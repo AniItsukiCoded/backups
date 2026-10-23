@@ -1,10 +1,19 @@
 ICH (Itsuki's Chat Hub)
 
-For schools that auto close about:blank tabs, a new bypass has been made and works for most schools! Make sure you launch "Itsukis Chat Hub", all games, proxies, apps, and more, are located in "Hubs & Tools". On the launcher page you can see my own games as well.
-
-May I also add both ICH (Itsukis Chat Hub) and VUS (Vlads Unblocked Sites) are having a colab soon and a whole new launcher, so stay tuned.
+Added 1v1.LOL (1v1.Arena, my remade version of 1v1.LOL, you can find it in APPS!)
 
 EASY links:
+
+[Download - Github](https://github.com/AniItsukiCoded/backups/blob/main/(USE)%20-%20Launcher%20Loader.html)
+
+p5js: (Yes, it works again and is unblocked!)
+
+[Launcher 1](https://editor.p5js.org/jace01b/sketches/mYFtQwQgD)
+
+[Launcher 2](https://editor.p5js.org/jace01b/full/WUTqx4Upg)
+
+[Launcher 3](https://editor.p5js.org/jace01b/full/1prpxaC-R)
+
 
 Google Scripts (Fixed):
 
@@ -42,14 +51,6 @@ Vercel:
 [Launcher 2](https://ich-launcher.vercel.app)
 
 [Launcher 3](https://ich-by-suki.vercel.app)
-
-p5js:
-
-[Launcher 1](https://editor.p5js.org/jace01b/sketches/mYFtQwQgD)
-
-[Launcher 2](https://editor.p5js.org/jace01b/full/WUTqx4Upg)
-
-[Launcher 3](https://editor.p5js.org/jace01b/full/1prpxaC-R)
 
 Base44:
 
