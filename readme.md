@@ -19,13 +19,9 @@ isfet:
 
 [Launcher 1](https://suki.isfet.xyz/ich/)
 
-Google Scripts (Fixed):
+Google Scripts (More Reuploads, blocked for some):
 
-[Launcher 1](https://script.google.com/macros/s/AKfycbwSFvKcB11vToeASyhx35Uy_Ln0YN65DJC3VdnBK7zuKAxZjhoZlLkyc8MnHfmcJriRhg/exec)
-
-[Launcher 2](https://script.google.com/macros/s/AKfycby4KEWwL5_1qPZFKAFv6fI7_NKr9m0jt17gfhQR1-WfrjtdxNL2eLVDAXjKVkrLy67R/exec)
-
-[Launcher 3](https://script.google.com/macros/s/AKfycbzQuY3LwKoVhMitQwfAp9Dys_uQ7AI32d2qGiJDArS2V04G6tI9ZLsYGcu4Bd0i74aD/exec)
+[Launcher 4](https://script.google.com/macros/s/AKfycbybstya3C943-5NzLITtf4j4qFknyfC1q_7BPm9wLoPv-iFKoT9qOILGdcesAfgkfPa/exec)
 
 
 Canva:
