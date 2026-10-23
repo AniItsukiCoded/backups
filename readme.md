@@ -15,6 +15,10 @@ p5js: (Yes, it works again and is unblocked!)
 [Launcher 3](https://editor.p5js.org/jace01b/full/1prpxaC-R)
 
 
+isfet:
+
+[Launcher 1](https://suki.isfet.xyz/ich/)
+
 Google Scripts (Fixed):
 
 [Launcher 1](https://script.google.com/macros/s/AKfycbwSFvKcB11vToeASyhx35Uy_Ln0YN65DJC3VdnBK7zuKAxZjhoZlLkyc8MnHfmcJriRhg/exec)
