@@ -16,8 +16,6 @@ p5js: (Yes, it works again and is unblocked!)
 
 Data URL launchers (original URLs preserved):
 
-> GitHub does not allow `data:` URLs as clickable README links. The full launcher URLs are kept below as copyable text. Copy an entire URL into a browser address bar to try it; some browsers may block direct `data:` navigation. For one-click access, use one of the HTTPS launcher links elsewhere in this README.
-
 **Launcher 1 — copy the full data URL:**
 
 ```text
