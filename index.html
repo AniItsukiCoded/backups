@@ -650,6 +650,17 @@ a,button,.card,.a-card,.g-card{-webkit-tap-highlight-color:transparent}
 .foot-card:hover{transform:translateY(-3px);border-color:var(--a);box-shadow:0 14px 34px color-mix(in srgb,var(--a) 22%,transparent)}
 .foot-keys{opacity:.8}
 .shell{padding-bottom:36px}
+/* ---------- library grid fix + filter transitions ---------- */
+.sbar .si,.sbar kbd{z-index:3}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;justify-content:stretch}
+.grid>.card{flex:none;max-width:none;width:100%}
+.grid>.grp-h,.grid>.credit,.grid>.g-card,.grid>.a-card,.grid>.empty2{grid-column:1/-1;flex:none}
+#libGrid{will-change:opacity,transform}
+#libGrid.swapout{opacity:0;transform:translateY(10px) scale(.992);transition:opacity .15s ease,transform .15s ease!important}
+#libGrid:not(.swapout){transition:opacity .3s ease,transform .4s var(--spring)}
+.grid.quiet>.card,.grid.quiet>.grp-h{animation:none}
+.segc button{transition:color .25s,transform .2s var(--spring)}
+.segc button:active{transform:scale(.94)}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -746,6 +757,8 @@ const HUBS=[
   {sec:'apps',group:'Apps By Suki',main:true,key:'main',name:MAIN_APP.name,url:MAIN_APP.url,desc:'The global chat hub: rooms, DMs, music, the VIP lounge and seasonal passes.',icon:'💬',color:'violet'},
   {sec:'apps',group:'Apps By Suki',name:'Cherri Proxy',url:'https://raw.githubusercontent.com/dadasuki/cherri/refs/heads/main/index.html',desc:'Cherri Proxy, relaunch if blocked to UNBLOCK it.',icon:'🌸',color:'red'},
   {sec:'apps',group:'Apps By Suki',name:'Gemini (AI)',url:'https://raw.githubusercontent.com/dadasuki/GMUB/refs/heads/main/index.html',desc:'Google Gemini Unblocked, relaunch if blocked to UNBLOCK it.',icon:'AI',color:'blue'},
+  {sec:'apps',group:'Apps By Suki',name:'Geometry Dash',url:'https://raw.githubusercontent.com/suki-web-ports/Geometry-Dash/refs/heads/main/Geometry%20Dash.html',desc:'Geometry Dash web port by Suki. Jump, fly and time every move through the levels.',icon:'GD',color:'blue'},
+  {sec:'apps',group:'Apps By Suki',name:'GDZ Modded (Level 67)',url:'https://raw.githubusercontent.com/suki-web-ports/Level-67-Modded-Outdated-/refs/heads/main/GDZ-auto-launcher.html',desc:'Modded GDZ with Level 67, auto-launches when opened. Outdated version.',icon:'GDZ',color:'purple'},
   {sec:'apps',group:'Apps By Suki',name:'Sukis Multi Tools',url:'https://raw.githubusercontent.com/jace01b-web/other/refs/heads/main/Sukis%20Multi%20Tools%20App.html',desc:'My multi tools app, including over 20 apps! Includes things like calculators, reaction test, and more!',icon:'SMT',color:'lime'},
   {sec:'apps',group:'Apps By Suki',name:'The Long Hall [Beta Version]',url:'https://raw.githubusercontent.com/AniItsukiCoded/tlh/refs/heads/main/index.html',desc:'Beta version of my game The Long Hall.',icon:'TLH',color:'red'},
   {sec:'apps',group:'Apps By Suki',name:'The Long Hall [Multiplayer]',url:'https://raw.githubusercontent.com/AniItsukiCoded/The-Long-Hall-AutoUpd/refs/heads/main/index.html',desc:'The full release version of The Long Hall: the boiled one. Play solo or with friends and try to escape the boiled one.',icon:'TLH',color:'red'},
@@ -1521,11 +1534,27 @@ function renderLib(){
    +'<div class="ctrl"><div class="segc" id="libTabs">'+[['all','All'],...SECS].map(([k,l])=>'<button type="button" data-k="'+k+'">'+l+'<small>'+(cnt[k]||0)+'</small></button>').join('')+'</div>'
    +'</div>'
    +'<div class="grid" id="libGrid"></div>';
-  libSeg=seg($('#libTabs'),k=>{libSec=k;store.set('libSec',k);drawLib()},libSec);
-  $('#lq').oninput=e=>{libQ=e.target.value.trim().toLowerCase();drawLib()};
+  libSeg=seg($('#libTabs'),k=>{libSec=k;store.set('libSec',k);swapLib()},libSec);
+  $('#lq').oninput=e=>{libQ=e.target.value.trim().toLowerCase();drawLib(true)};
   drawLib();
 }
-function drawLib(){
+/* filter change: the old grid fades, the height glides to the new size, then the new cards rise in */
+let swapT=0,swapT2=0;
+function swapLib(){
+  const g=$('#libGrid');if(!g)return;
+  clearTimeout(swapT);clearTimeout(swapT2);
+  const h0=g.offsetHeight;
+  g.style.transition='none';g.style.height=h0+'px';g.style.overflow='hidden';void g.offsetWidth;
+  g.classList.add('swapout');
+  swapT=setTimeout(()=>{
+    drawLib();
+    g.style.height='auto';const h1=g.scrollHeight;g.style.height=h0+'px';void g.offsetWidth;
+    g.classList.remove('swapout');
+    g.style.transition='height .5s cubic-bezier(.22,1,.36,1)';g.style.height=h1+'px';
+    swapT2=setTimeout(()=>{g.style.height='';g.style.transition='';g.style.overflow=''},540);
+  },150);
+}
+function drawLib(quiet){
   const g=$('#libGrid');if(!g)return;
   const q=libQ,m=h=>!q||h.name.toLowerCase().includes(q)||(h.desc||'').toLowerCase().includes(q)||(h.group||'').toLowerCase().includes(q);
   const out=[];let i=0;
@@ -1540,6 +1569,7 @@ function drawLib(){
     });
   });
   g.innerHTML=out.length?out.join(''):'<div class="empty2" style="grid-column:1/-1"><span class="em2">🔍</span>Nothing found'+(q?' for “'+esc(q)+'”':'')+'.<br>Try the Proxies tab too.</div>';
+  g.classList.toggle('quiet',!!quiet);
 }
 
 /* ===================== PROXIES ===================== */
