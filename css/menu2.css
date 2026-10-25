@@ -1,0 +1,163 @@
+/* =====================================================================
+   menu2.css — Fortnite-style game-mode screen (scroll down on the lobby) + AFK zone
+   Loaded last. Needs: body.msopen (set by js/lobby2.js), #msheet, #mstrack, .mcard, #mhint, #afk
+   ===================================================================== */
+
+/* ---------- lobby slides away while the mode screen is open ---------- */
+#lob{transition:transform .5s cubic-bezier(.2,.85,.25,1),opacity .35s ease,visibility 0s linear 0s}
+body.msopen #lob{transform:translateY(-9vh) scale(.985);opacity:0;visibility:hidden;pointer-events:none;transition:transform .5s cubic-bezier(.2,.85,.25,1),opacity .3s ease,visibility 0s linear .35s}
+body.msopen #net{opacity:0;pointer-events:none}
+body.msopen #menu.on::before{background:radial-gradient(120% 90% at 50% 50%,#10082b66 30%,#10082bf0 100%)}
+
+/* ---------- the "scroll for modes" pill at the bottom of the lobby ---------- */
+#mhint{left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0;border:0;background:none;color:#fff;cursor:pointer;
+ font-family:var(--font-d);letter-spacing:.14em;font-size:12px;text-shadow:0 2px 6px #000a;padding:4px 18px;opacity:.9;z-index:2}
+#mhint i{font-style:normal;font-size:26px;line-height:.7;animation:mhb 1.5s ease-in-out infinite}
+@keyframes mhb{50%{transform:translateY(6px);opacity:.55}}
+@media(hover:hover){#mhint:hover{opacity:1;filter:brightness(1.25)}}
+@media(max-width:700px) and (orientation:portrait){#mhint{display:none}}
+#modebox small{letter-spacing:.14em}
+
+/* ---------- the mode screen ---------- */
+#msheet{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;gap:clamp(8px,1.6vh,18px);
+ padding:max(16px,env(safe-area-inset-top)) clamp(14px,3.2vw,56px) max(14px,env(safe-area-inset-bottom));
+ background:radial-gradient(90vmax 70vmax at 50% -10%,#4a30b899,transparent 65%),linear-gradient(180deg,#0f0838f2,#0a0626fa);
+ backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);
+ transform:translateY(100%);visibility:hidden;pointer-events:none;
+ transition:transform .5s cubic-bezier(.2,.85,.25,1),visibility 0s linear .5s}
+body.msopen #msheet{transform:none;visibility:visible;pointer-events:auto;transition:transform .5s cubic-bezier(.2,.85,.25,1),visibility 0s linear 0s}
+#msheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background:repeating-linear-gradient(115deg,transparent 0 46px,#ffffff07 46px 92px)}
+#msheet>*{position:relative}
+.mshd{display:flex;align-items:center;gap:14px}
+#msback{width:46px;height:46px;border-radius:50%;border:2px solid #ffffff55;background:#ffffff1a;color:#fff;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 6px;transition:.15s}
+@media(hover:hover){#msback:hover{background:#ffffff33;transform:translateY(-2px)}}
+.mst small{display:block;font-family:var(--font-b);font-weight:800;letter-spacing:.3em;font-size:11px;color:#ffc933;opacity:.95}
+.mst h2{margin:0;font-size:clamp(26px,4.4vw,44px);line-height:1;text-shadow:0 3px 0 #0007}
+#msnow{margin-left:auto;display:flex;align-items:center;gap:8px;background:#ffffff14;border:2px solid #ffffff2e;border-radius:30px;padding:6px 16px 6px 10px;font-family:var(--font-d);font-size:18px;letter-spacing:.05em}
+#msnow span{font-size:22px}
+
+#mstrack{flex:1;min-height:0;position:relative;display:flex;gap:clamp(10px,1.5vw,24px);align-items:center;overflow-x:auto;overflow-y:hidden;padding:30px clamp(2px,1vw,12px) 40px;
+ scroll-snap-type:x proximity;touch-action:pan-x;overscroll-behavior:contain;justify-content:safe center;scrollbar-width:thin}
+.mcard{--c1:#2f8bff;--c2:#5a2ad8;position:relative;flex:0 0 auto;width:clamp(170px,17.4vw,282px);height:min(100%,560px);max-height:calc(100vh - 250px);min-height:250px;display:flex;flex-direction:column;padding:0;overflow:hidden;
+ text-align:left;color:#fff;cursor:pointer;border:3px solid #ffffff33;border-radius:22px;background:linear-gradient(170deg,var(--c1),var(--c2));
+ box-shadow:0 10px 0 #0a0524,0 18px 36px #0009;scroll-snap-align:center;transform:translateY(0) scale(.97);filter:saturate(.78) brightness(.82);
+ transition:transform .22s cubic-bezier(.2,.9,.3,1.25),filter .2s,box-shadow .2s,border-color .2s;gap:0;font-family:inherit}
+.mcard>*{pointer-events:none}
+@media(hover:hover){.mcard:hover{transform:translateY(-8px) scale(1);filter:saturate(1) brightness(1.05)}}
+.mcard.on{transform:translateY(-12px) scale(1.04);filter:none;border-color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--c1) 60%,transparent),0 12px 0 #0a0524,0 18px 34px color-mix(in srgb,var(--c1) 65%,transparent)}
+.mcard:active{transform:translateY(-4px) scale(.99)}
+.mart{position:relative;flex:1;min-height:0;display:grid;place-items:center;overflow:hidden;
+ background:radial-gradient(70% 55% at 50% 42%,#ffffff40,transparent 70%),repeating-linear-gradient(60deg,#ffffff12 0 14px,transparent 14px 28px)}
+.mart .mbig{font-size:clamp(70px,9vw,128px);line-height:1;filter:drop-shadow(0 10px 0 #0005) drop-shadow(0 0 22px #fff6);transition:transform .35s cubic-bezier(.2,.9,.3,1.3)}
+.mcard.on .mbig,.mcard:hover .mbig{transform:scale(1.14) rotate(-6deg)}
+.mart .mg1,.mart .mg2{position:absolute;border-radius:50%;background:#ffffff26;pointer-events:none}
+.mart .mg1{width:62%;aspect-ratio:1;left:-18%;bottom:-24%}.mart .mg2{width:34%;aspect-ratio:1;right:-8%;top:-8%}
+.mcard::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,#ffffff55 50%,transparent 62%);transform:translateX(-130%);transition:none}
+.mcard.on::after{animation:mshine 3.4s ease-in-out infinite}
+@keyframes mshine{55%,100%{transform:translateX(130%)}}
+.mbadge{position:absolute;z-index:2;top:12px;left:-34px;width:130px;text-align:center;transform:rotate(-38deg);background:#ffc933;color:#3a1c00;font-style:normal;font-family:var(--font-d);font-size:12px;letter-spacing:.12em;padding:3px 0;box-shadow:0 3px 0 #a85d00}
+.mchk{position:absolute;z-index:2;top:10px;right:10px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:20px;font-weight:900;background:#fff;color:#0a0524;box-shadow:0 3px 0 #0006;opacity:0;transform:scale(.4) rotate(-30deg);transition:.25s cubic-bezier(.2,.9,.3,1.5)}
+.mcard.on .mchk{opacity:1;transform:none}
+.minfo{position:relative;z-index:1;padding:12px 14px 14px;background:linear-gradient(180deg,#0a05246b,#0a0524e6 38%);backdrop-filter:blur(3px)}
+.mgrp{display:block;font-family:var(--font-b);font-weight:800;font-size:11px;letter-spacing:.24em;color:#ffc933}
+.minfo b{display:block;font-family:var(--font-d);font-weight:400;font-size:clamp(24px,2.6vw,36px);line-height:1.05;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 3px 0 #0007}
+.minfo p{margin:4px 0 8px;font-size:12px;font-weight:700;line-height:1.3;opacity:.85;min-height:2.6em}
+.mchips{display:flex;flex-wrap:wrap;gap:5px}.mchips span{background:#ffffff1c;border:1px solid #ffffff26;border-radius:20px;padding:2px 8px;font-size:10.5px;font-weight:800;white-space:nowrap}
+
+.msft{display:flex;align-items:center;gap:16px;justify-content:space-between}
+#msinfo{min-width:0;font-size:clamp(12px,1.3vw,15px);font-weight:800;line-height:1.35}#msinfo b{font-family:var(--font-d);font-weight:400;font-size:1.25em;letter-spacing:.04em}
+#msinfo small{display:block;opacity:.7;font-size:.85em;margin-top:2px}
+.msb{display:flex;gap:12px;align-items:center;flex:0 0 auto}
+.msb .btn{margin:0;width:auto}
+#msbot{padding:0 22px;font-size:17px;min-height:54px}
+#msplay{padding:0 clamp(28px,5vw,72px);min-height:62px;font-size:clamp(26px,3.2vw,38px);border-radius:20px;border:3px solid #fff;
+ background:linear-gradient(180deg,#ffe35c,var(--sun2));color:#3a1c00;text-shadow:0 2px 0 #ffffff66;box-shadow:0 7px 0 #a85d00,0 0 0 6px #ffc93333,0 14px 34px #ff9d1f66;letter-spacing:.08em}
+#msplay:active{transform:translateY(5px);box-shadow:0 2px 0 #a85d00}
+
+@media(max-width:900px){.mcard{width:clamp(150px,30vw,230px)}}
+@media(max-width:700px){
+ .mcard{width:62vw;max-width:260px;max-height:calc(100vh - 250px);min-height:220px}
+ #mstrack{justify-content:flex-start;padding-left:calc(50vw - 31vw);padding-right:calc(50vw - 31vw)}
+ .msft{flex-direction:column;align-items:stretch;gap:8px}#msinfo{text-align:center}
+ .msb{width:100%}.msb .btn{flex:1}#msbot{padding:0 10px;font-size:14px}
+ #msnow{display:none}
+}
+@media(max-height:520px){
+ .mst small{display:none}.mst h2{font-size:24px}#msback{width:38px;height:38px;font-size:22px}
+ .mcard{min-height:170px;max-height:calc(100vh - 150px)}.minfo p,.mchips{display:none}
+ #msplay{min-height:48px;font-size:24px}#msbot{min-height:44px;font-size:14px}#mstrack{padding-top:12px;padding-bottom:16px}#msinfo small{display:none}
+}
+body.touch .mcard,body.touch #msplay{box-shadow:0 6px 0 #0a0524}
+body.touch .mcard.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--c1) 60%,transparent),0 8px 0 #0a0524}
+body.touch .mcard::after,body.touch #mhint i{animation:none}
+@media(prefers-reduced-motion:reduce){.mcard.on::after,#mhint i{animation:none}#msheet,#lob{transition-duration:.01s}}
+
+/* ---------- AFK zone ---------- */
+#afk{background:none;animation:none;display:none;place-items:center}
+#afk.on{display:grid}
+#afk::before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(110% 90% at 50% 50%,#10082b55 20%,#10082be6 100%),linear-gradient(180deg,#10082bcc,transparent 25%,transparent 70%,#10082bd9)}
+#afkfx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+#afkfx i{position:absolute;bottom:-10%;font-style:normal;font-size:var(--s,24px);opacity:0;animation:afkup var(--d,9s) linear infinite}
+@keyframes afkup{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:.55}85%{opacity:.45}100%{transform:translateY(-118vh) rotate(260deg);opacity:0}}
+.afkf{position:absolute;bottom:34%;font-family:var(--font-d);font-size:clamp(24px,4vw,40px);color:#fff;text-shadow:0 3px 0 #0008,0 0 16px #fff8;animation:afkpop 2.4s cubic-bezier(.2,.8,.3,1) forwards;white-space:nowrap}
+.afkf.co{color:#ffd23f}.afkf.cd{color:#ff9a3a}
+@keyframes afkpop{0%{transform:translateY(20px) scale(.4);opacity:0}15%{transform:translateY(0) scale(1.25);opacity:1}30%{transform:scale(1)}100%{transform:translateY(-220px) scale(1);opacity:0}}
+#afkbar{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));display:flex;gap:10px;z-index:2}
+#afkbar span{display:flex;align-items:center;gap:6px;background:linear-gradient(180deg,#0a0526dd,#150a3acc);border:2px solid #ffc93366;border-radius:30px;padding:5px 16px;font-family:var(--font-d);font-size:20px}
+#afkbar b{font-weight:400}
+.afkc{position:relative;z-index:1;width:min(420px,92vw);padding:24px 26px 22px;text-align:center;border-radius:var(--r-lg);border:2px solid #ffffff38;
+ background:linear-gradient(180deg,#2e1b72e6,#1a1050eb);box-shadow:0 20px 60px #000a,inset 0 1px 0 #ffffff33;backdrop-filter:blur(10px);animation:pop .45s cubic-bezier(.2,1.3,.35,1) both}
+.afkh b{display:block;font-family:var(--font-d);font-weight:400;font-size:clamp(28px,5vw,36px);letter-spacing:.06em;text-shadow:0 3px 0 #0007}
+.afkh small{display:block;opacity:.75;font-size:13px;margin-top:2px}
+.afkring{position:relative;width:min(210px,52vw);aspect-ratio:1;margin:14px auto 12px}
+.afkring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.afkring circle{fill:none;stroke-width:9}.afkring .bg{stroke:#ffffff1f}
+.afkring .fg{stroke:#ffc933;stroke-linecap:round;transition:stroke-dashoffset .25s linear;filter:drop-shadow(0 0 8px #ffc93399)}
+.afkt{position:absolute;inset:0;display:grid;place-content:center;gap:0}
+.afkt b{font-family:var(--font-d);font-weight:400;font-size:clamp(38px,9vw,52px);line-height:1;text-shadow:0 3px 0 #0007}
+.afkt small{font-family:var(--font-b);font-weight:800;letter-spacing:.2em;font-size:11px;opacity:.7}
+.afkr{display:flex;gap:10px;justify-content:center}
+.afkr>div{flex:1;background:#0000003a;border:2px solid #ffffff22;border-radius:16px;padding:8px 6px;display:grid;justify-items:center;line-height:1.1}
+.afkr span{font-size:26px}.afkr b{font-family:var(--font-d);font-weight:400;font-size:26px;color:#ffd23f}.afkr small{opacity:.65;font-size:11px;font-weight:800}
+.afks{display:flex;gap:8px;justify-content:center;margin:12px 0 4px;flex-wrap:wrap}
+.afks span{background:#ffffff14;border-radius:20px;padding:4px 12px;font-size:14px;font-weight:800}.afks b{font-family:var(--font-d);font-weight:400}
+#afknote{margin:6px 0 2px;font-size:12px;opacity:.65;min-height:2.2em}
+#afkleave{margin-top:10px}
+#lside .sq.afkq{background:linear-gradient(180deg,#ffffff22,transparent 55%),linear-gradient(180deg,#2d8a7a,#14405a)}
+@media(max-height:560px){
+ .afkc{width:min(720px,94vw);display:grid;grid-template-columns:min(150px,38vh) 1fr;grid-template-areas:"h h" "ring r" "ring s" "ring l";gap:6px 18px;padding:12px 18px;align-items:center;max-height:calc(100vh - 12px)}
+ .afkh{grid-area:h}.afkring{grid-area:ring;width:100%;margin:0}.afkr{grid-area:r}.afks{grid-area:s;margin:0}#afkleave{grid-area:l;margin:0}
+ .afkh small,#afknote{display:none}.afkh b{font-size:26px}.afkt b{font-size:30px}.afkr span{font-size:20px}.afkr b{font-size:20px}.afkr>div{padding:4px}}
+@media(prefers-reduced-motion:reduce){#afkfx i{animation:none}}
+
+/* ---------- phones held upright: 6 side buttons = two tidy rows of three, nothing stacked on top of each other ---------- */
+@media(max-width:700px) and (orientation:portrait){
+ #lob>#lleft>#lside{grid-template-columns:repeat(3,1fr)!important}
+ #lob>#lleft>#lside .sq,body.touch #lside .sq{height:62px}
+ #lpass,body.touch #lpass{bottom:calc(env(safe-area-inset-bottom,0px) + 238px)!important}
+ #hpass,body.touch #hpass,body.touch #hpass[style*="flex"]{display:none!important}
+ body.touch #friend,#friend{bottom:calc(env(safe-area-inset-bottom,0px) + 306px)!important}
+ body.touch #evban,#evban{left:12px!important;transform:none!important;top:48px!important;font-size:10px;padding:4px 12px;max-width:calc(100vw - 150px)}#evbl{display:none}
+ body.touch #candyc,#candyc{top:48px!important;right:12px!important}
+ #chips{display:none!important}
+ #lob>#lleft{top:92px!important}
+ #msheet{padding-left:12px;padding-right:12px}
+}
+
+/* ---------- ADMIN button + panel (main menu only) ---------- */
+#lside .sq.admq{background:linear-gradient(180deg,#ffffff22,transparent 55%),linear-gradient(180deg,#b3202e,#4a0f2a);border-color:#ffd23f99}
+#admin .panel{max-height:92vh;overflow:auto}
+#admin .admr{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+#admin .admr .mini.on,#admin .admp.on{outline:3px solid #ffd23f;outline-offset:-1px}
+#admlist{display:flex;flex-direction:column;gap:6px;max-height:190px;overflow:auto;margin:10px 0;padding-right:2px}
+#admlist .sub{margin:6px 0;text-align:center}
+.admp{display:flex;justify-content:space-between;align-items:center;gap:10px;border:0;border-radius:12px;padding:10px 14px;background:#ffffff14;color:#fff;font-weight:800;font-size:15px;cursor:pointer;text-align:left}
+.admp:hover{background:#ffffff26}.admp b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}.admp small{opacity:.6;font-weight:800;flex:none}
+.admg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 4px}
+.admg small{display:block;font-size:11px;letter-spacing:.12em;font-weight:900;opacity:.75}
+.admg input{margin:4px 0 0}
+#admin .row .adn{width:92px;margin:0;flex:none;text-align:center}
+#admsend:disabled{filter:grayscale(.8) brightness(.7)}
+@media(max-width:480px){.admg{grid-template-columns:1fr}}
+#admsend+.sub{margin-top:16px}
