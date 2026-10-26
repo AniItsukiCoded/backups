@@ -351,7 +351,7 @@ html.booting .shell,html.booting .shell *,html.booting .shell *::before,html.boo
 @media(max-width:760px){.a-card{grid-template-columns:1fr;padding:24px 22px}.a-vis{display:none}}
 
 /* ---------- theme picker ---------- */
-.pop{position:fixed;z-index:60;top:78px;right:max(14px,calc((100vw - 1040px)/2 + 22px));width:min(480px,calc(100vw - 28px));max-height:calc(100vh - 100px);overflow:auto;padding:16px;border-radius:26px;background:var(--panel2);backdrop-filter:blur(28px) saturate(170%);-webkit-backdrop-filter:blur(28px) saturate(170%);border:1px solid var(--bd);box-shadow:0 30px 80px rgba(0,0,0,.6);transform-origin:top right;animation:popIn .35s var(--spring) both}
+.pop{position:fixed;z-index:60;top:78px;right:max(14px,calc((100vw - 1040px)/2 + 22px));width:min(480px,calc(100vw - 28px));max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);overflow:auto;overscroll-behavior:contain;padding:16px 16px 22px;border-radius:26px;background:var(--panel2);backdrop-filter:blur(28px) saturate(170%);-webkit-backdrop-filter:blur(28px) saturate(170%);border:1px solid var(--bd);box-shadow:0 30px 80px rgba(0,0,0,.6);transform-origin:top right;animation:popIn .35s var(--spring) both}
 .pop.closing{animation:none;opacity:0;transform:translateY(-8px) scale(.95);transition:.18s}
 .pop h5,.tg-h{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 4px 10px;font-weight:700}
 .pop::-webkit-scrollbar{width:8px}.pop::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--a) 50%,transparent);border-radius:8px}
@@ -681,6 +681,29 @@ html.has-sign .nav{margin-right:198px}
 @media(max-width:700px){.hsign{top:4px;right:4px;width:132px}html.has-sign .nav{margin-right:140px}}
 html.app-open .hsign,html.app-launching .hsign{display:none!important}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}html{scroll-behavior:auto}}
+/* --- fixes + downloads --- */
+.nav{max-width:100%;min-width:0}
+.tabs{min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tbtn{flex:0 0 auto}.brand{flex:0 0 auto}
+html.has-sign .nav{gap:8px}
+@media(max-width:1020px){html.has-sign .brand b{display:none}html.has-sign .tabs b,html.has-sign .tbtn b{display:none}html.has-sign .tabs button{padding:9px 13px}}
+@media(max-width:560px){html.has-sign .brand{display:none}html.has-sign .tabs button{padding:9px 8px}html.has-sign .nav{margin-right:128px}}
+@media(max-width:480px){.tabs button{padding:9px 9px}.tbtn{padding:9px 10px}}
+.appbar{position:fixed;z-index:2147483000;top:10px;right:10px;display:flex;gap:6px;padding:6px;border-radius:14px;background:rgba(12,13,28,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:.35;transition:opacity .2s;font-family:inherit}
+.appbar:hover,.appbar:focus-within{opacity:1}
+.appbar button{padding:7px 11px;border-radius:9px;background:rgba(255,255,255,.1);color:#fff;font:600 12.5px/1 inherit;border:0;cursor:pointer;white-space:nowrap}
+.appbar button:hover{background:rgba(255,255,255,.22)}
+.appbar .x{background:linear-gradient(135deg,var(--a),var(--c))}
+@media(max-width:560px){.appbar button span{display:none}}
+#themeBtn{display:none!important}
+.dlcard{display:flex;align-items:center;gap:12px;margin-top:14px;padding:9px 16px 9px 9px;border-radius:16px;text-align:left;color:#fff;cursor:pointer;border:1.5px solid transparent;background:linear-gradient(rgba(16,10,30,.92),rgba(16,10,30,.92)) padding-box,linear-gradient(135deg,var(--a),var(--b),var(--c)) border-box;box-shadow:0 8px 26px color-mix(in srgb,var(--a) 28%,transparent);transition:transform .25s var(--spring),box-shadow .25s}
+.dlcard:hover{transform:translateY(-3px);box-shadow:0 14px 34px color-mix(in srgb,var(--a) 45%,transparent)}
+.dlcard:active{transform:scale(.97)}
+.dli{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;font-size:19px;background:linear-gradient(135deg,var(--a),var(--c));box-shadow:0 4px 14px color-mix(in srgb,var(--a) 50%,transparent)}
+.dlcard:hover .dli{animation:dlb .6s ease}
+@keyframes dlb{40%{transform:translateY(4px)}}
+.dlt{display:flex;flex-direction:column;gap:2px}.dlt b{font-size:14px;font-weight:800}.dlt small{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -713,6 +736,8 @@ html.app-open .hsign,html.app-launching .hsign{display:none!important}
     <button class="vb" id="vReload" type="button">↻ <span>Reload</span></button>
     <button class="vb" id="vFull" type="button">⛶ <span>Fullscreen</span></button>
     <button class="vb" id="vTab" type="button">↗ <span>New tab</span></button>
+    <button class="vb" id="vDl" type="button" title="Download this app's HTML">⬇ <span>Download app</span></button>
+    <button class="vb" id="vDlL" type="button" title="Download the launcher">⬇ <span>Launcher</span></button>
   </div>
   <button class="vb vexit" id="vExit" type="button">Show bar</button>
   <div class="vload" id="vLoad"><span class="spinr"></span><span id="vLoadTxt">Loading…</span></div>
@@ -743,6 +768,20 @@ html.app-open .hsign,html.app-launching .hsign{display:none!important}
 'use strict';
 /* untouched copy of this page, grabbed before anything runs, so the sign can rebuild it inside an about:blank tab */
 const SRC='<!DOCTYPE html>'+document.documentElement.outerHTML;
+function downloadText(name,text,mime){const b=new Blob([text],{type:mime||'text/html'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+const LOADER="<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Itsukis Chat Hub Launcher<\/title>\n<link rel=\"icon\" type=\"image/png\" href=\"https://aniitsukicoded.github.io/backups/icon.png\">\n<style>\n  *{box-sizing:border-box;margin:0;padding:0}\n  html,body{height:100%}\n  body{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center;padding:24px;\n    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#eef0ff;-webkit-font-smoothing:antialiased;\n    background:radial-gradient(900px 600px at 12% -8%,rgba(150,70,255,.34),transparent 58%),radial-gradient(800px 560px at 96% 6%,rgba(255,110,30,.22),transparent 58%),linear-gradient(160deg,#0d0714,#170b24 45%,#22101a)}\n  .ring{width:54px;height:54px;border-radius:50%;border:4px solid rgba(255,255,255,.12);border-top-color:#ff7a1a;border-right-color:#a855ff;animation:spin .8s linear infinite}\n  @keyframes spin{to{transform:rotate(360deg)}}\n  h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,#ff7a1a,#a855ff);-webkit-background-clip:text;background-clip:text;color:transparent}\n  p{font-size:14px;color:#9a9dc4;max-width:340px;line-height:1.5}\n  .err .ring{display:none}\n  button,a.btn{margin-top:6px;display:none;padding:11px 22px;border:0;border-radius:12px;font:inherit;font-weight:600;font-size:14px;color:#fff;text-decoration:none;cursor:pointer;\n    background:linear-gradient(135deg,#ff7a1a,#9a3df0);box-shadow:0 6px 18px rgba(255,110,20,.3)}\n  .err button,.err a.btn{display:inline-block}\n<\/style>\n<\/head>\n<body id=\"b\">\n  <div class=\"ring\"><\/div>\n  <h1 id=\"t\">Loading launcher...<\/h1>\n  <p id=\"m\">Grabbing the latest version.<\/p>\n  <button id=\"retry\" type=\"button\">Try again<\/button>\n  <a class=\"btn\" id=\"raw\" href=\"https://github.com/AniItsukiCoded/backups/blob/main/launcher.html\" target=\"_blank\" rel=\"noopener\">Open on GitHub<\/a>\n\n<script>\n(function(){\n  // The real launcher lives in this repo file. Update it there and every copy of this loader picks it up.\n  var URL_ = 'https://raw.githubusercontent.com/AniItsukiCoded/backups/main/launcher.html';\n  var CACHE_KEY = 'ich.launcherCache';   // last good copy, used if GitHub can't be reached\n  var TIMEOUT_MS = 8000;\n\n  function $(id){ return document.getElementById(id); }\n\n  function run(html){\n    document.open();\n    document.write(html);\n    document.close();\n  }\n\n  function fail(){\n    $('b').classList.add('err');\n    $('t').textContent = \"Couldn't load the launcher\";\n    $('m').textContent = 'Check your connection and try again. If GitHub is blocked on this network, that would explain it.';\n  }\n\n  function fromCache(){\n    try {\n      var c = localStorage.getItem(CACHE_KEY);\n      if (c && c.indexOf('<html') !== -1){ run(c); return true; }\n    } catch(_){}\n    return false;\n  }\n\n  function load(){\n    $('b').classList.remove('err');\n    $('t').textContent = 'Loading launcher...';\n    $('m').textContent = 'Grabbing the latest version.';\n\n    var ctrl = window.AbortController ? new AbortController() : null;\n    var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, TIMEOUT_MS);\n\n    // Unique query string so GitHub's raw cache never serves an old copy.\n    fetch(URL_ + '?v=' + Date.now(), { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })\n      .then(function(r){\n        if (!r.ok) throw new Error('HTTP ' + r.status);\n        return r.text();\n      })\n      .then(function(html){\n        clearTimeout(timer);\n        if (html.indexOf('<html') === -1) throw new Error('Unexpected response');\n        try { localStorage.setItem(CACHE_KEY, html); } catch(_){}\n        run(html);\n      })\n      .catch(function(){\n        clearTimeout(timer);\n        if (!fromCache()) fail();\n      });\n  }\n\n  $('retry').onclick = load;\n  load();\n})();\n<\/script>\n<\/body>\n<\/html>\n";
+const dlLauncher=()=>{downloadText('itsukis-launcher-loader.html',LOADER);try{toast('Auto-updating launcher downloaded')}catch(_){}};
+const dlLauncherFull=()=>{downloadText('itsukis-chat-hub-launcher-offline.html',SRC);try{toast('Offline copy downloaded')}catch(_){}};
+const slug=n=>String(n||'app').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'app';
+function wrapHtml(name,url){return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(name)+'</title><style>html,body{margin:0;height:100%;background:#000}iframe{border:0;width:100%;height:100%}</style></head><body><iframe src="'+esc(url)+'" allow="fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media" allowfullscreen></iframe></body></html>'}
+async function dlApp(name,url,text){
+  try{
+    if(!text)text=await fetchText(url);
+    downloadText(slug(name)+'.html',text);toast('Downloaded '+name);
+  }catch(e){
+    downloadText(slug(name)+'.html',wrapHtml(name,url));toast('Saved a shortcut page (the site blocks direct download)');
+  }
+}
 /* ===================== helpers ===================== */
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1165,7 +1204,7 @@ const TABS=[['home','🏠','Home'],['lib','🎮','Games'],['px','🌐','Proxies'
 const ORD=TABS.map(t=>t[0]);
 let at='';
 $('#tabs').innerHTML='<i class="ind" id="ind"></i>'+TABS.map(([k,i,n])=>'<button type="button" data-s="'+k+'" aria-label="'+n+'"><span>'+i+'</span><b>'+n+'</b>'+(k==='favs'?'<em id="fb"></em>':'')+'</button>').join('');
-function ind(){const b=$('#tabs [data-s="'+at+'"]'),i=$('#ind');if(!b||!i||!b.offsetWidth)return;$$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));if(!ind.done){i.style.transition='none'}i.style.cssText=i.style.cssText+';width:'+b.offsetWidth+'px;transform:translateX('+b.offsetLeft+'px)';if(!ind.done){void i.offsetWidth;i.style.transition='';ind.done=true}}
+function ind(){const b=$('#tabs [data-s="'+at+'"]'),i=$('#ind');if(!b||!i||!b.offsetWidth)return;$$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));if(!ind.done){i.style.transition='none'}i.style.width=b.offsetWidth+'px';i.style.transform='translateX('+b.offsetLeft+'px)';if(!ind.done){void i.offsetWidth;i.style.transition='';ind.done=true}}
 function badge(){const n=fav().length,e=$('#fb');if(e)e.textContent=n||'';ind()}
 const RENDER={home:()=>renderHome(),lib:()=>renderLib(),px:()=>renderPx(),favs:()=>renderFavs(),set:()=>renderSet()};
 let goTok=0,leaveT=0;
@@ -1312,14 +1351,14 @@ function showTrouble(h){
 }
 
 /* ---- viewer (iframe over the launcher, with a bar) ---- */
-const V=$('#viewer');let vCur=null,vTok=0,vFr=$('#vFrame');
+const V=$('#viewer');let vCur=null,vText=null,vTok=0,vFr=$('#vFrame');
 function vFresh(){
   const f=document.createElement('iframe');f.id='vFrame';f.title='Viewer';
   f.setAttribute('allow','fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');
   vFr.replaceWith(f);vFr=f;return f;
 }
 async function viewerOpen(h){
-  vCur=h;const tok=++vTok;$('#vTab').style.display='none';
+  vCur=h;vText=null;const tok=++vTok;$('#vTab').style.display='none';
   $('#vName').textContent=h.name;$('#vLoadTxt').textContent='Loading '+h.name+'…';
   V.classList.remove('loaded','bare');V.classList.add('show');ROOT.style.overflow='hidden';
   const f=vFresh();let done=false;
@@ -1327,7 +1366,7 @@ async function viewerOpen(h){
   f.addEventListener('load',()=>{if(f.getAttribute('src')==='about:blank')return;setTimeout(reveal,40)});
   setTimeout(reveal,15000);
   if(isRaw(h.url)){
-    try{const text=await fetchText(h.url);if(tok!==vTok)return;f.srcdoc=text}
+    try{const text=await fetchText(h.url);if(tok!==vTok)return;vText=text;f.srcdoc=text}
     catch(e){if(tok!==vTok)return;$('#vLoadTxt').innerHTML='Couldn\'t load '+esc(h.name)+'.<br><br><button class="btn pri sm" id="vRetry" type="button" style="pointer-events:auto">Retry</button>';$('#vLoad .spinr').style.display='none';
       $('#vRetry').onclick=()=>{$('#vLoad .spinr').style.display='';viewerOpen(h)}}
   }else f.src=h.url;
@@ -1342,6 +1381,8 @@ function viewerClose(){
 $('#vClose').onclick=viewerClose;
 $('#vReload').onclick=()=>{if(vCur)viewerOpen(vCur)};
 $('#vTab').onclick=()=>{if(vCur)openTab(vCur)};
+$('#vDl').onclick=()=>{if(vCur)dlApp(vCur.name,vCur.url,vText)};
+$('#vDlL').onclick=dlLauncher;
 $('#vExit').onclick=()=>V.classList.remove('bare');
 $('#vFull').onclick=()=>{
   const fr=vFr,can=!!(fr.requestFullscreen||fr.webkitRequestFullscreen);
@@ -1397,6 +1438,13 @@ async function launchIframe(){
     setTimeout(()=>{ROOT.classList.add('app-open');ROOT.classList.remove('app-launching');launching=false;setStatus(null)},430);
   };
   f.onload=reveal;t=setTimeout(reveal,12000);f.srcdoc=text;document.body.appendChild(f);
+  const bar=document.createElement('div');bar.className='appbar';bar.id='appBar';
+  bar.innerHTML='<button type="button" data-a="app">⬇ <span>App</span></button><button type="button" data-a="l">⬇ <span>Launcher</span></button><button type="button" class="x" data-a="x">✕ <span>Close</span></button>';
+  bar.onclick=e=>{const a=e.target.closest('button');if(!a)return;
+    if(a.dataset.a==='app')downloadText(slug(MAIN_APP.name)+'.html',text);
+    else if(a.dataset.a==='l')dlLauncher();
+    else{f.remove();bar.remove();ROOT.classList.remove('app-open','app-launching');launching=false;setStatus(null)}};
+  document.body.appendChild(bar);
 }
 async function launchBlank(){
   if(launching)return;
@@ -1440,7 +1488,7 @@ function renderHome(){
   +'<section class="feat"><div class="fi"><img src="'+ICON+'" alt="" onerror="this.parentNode.textContent=\'💬\'"></div>'
   +'<div class="fb"><span class="tagline"><i></i>Main site</span><h3>Itsuki\'s Chat Hub</h3><p>The global chat hub with rooms, DMs, music, the VIP lounge and seasonal passes. Sign in with your account and jump straight into chat.</p>'
   +'<div class="chips"><span>💬 Global chat</span><span>💌 DMs</span><span>🎵 Music</span><span>🎡 VIP &amp; daily spin</span><span>🎁 Seasonal passes</span></div></div>'
-  +'<div class="fa"><button class="btn pri" id="mainGo" type="button">🚀 Launch Chat Hub</button><small class="fnote">Opens in about:blank</small></div></section>'
+  +'<div class="fa"><button class="btn pri" id="mainGo" type="button">🚀 Launch Chat Hub</button><small class="fnote">Opens in about:blank</small><button class="dlcard" id="homeDl" type="button"><span class="dli">⬇</span><span class="dlt"><b>Download Launcher</b><small>Auto-updating · always the latest version</small></span></button></div></section>'
   +'<div class="pass" id="pass"><span class="big">🎃</span><div><b>Halloween Season Pass is live</b><span class="t">Spend time online to level up through 30 levels of spooky badges, name effects and permanent roles. Runs until early November.</span></div></div>'
   +'<div class="sec-h"><h3>🕹️ Suki\'s Games</h3><a data-go="lib">All hubs &amp; games →</a></div>'
   +'<div class="grid">'+(hor?arena(hor):'')+rest.map((h,i)=>card(h,i)).join('')+'</div>'
@@ -1448,7 +1496,7 @@ function renderHome(){
   +'<div class="tiles">'
     +'<div class="tile s2" style="--i:1"><h4>Right now</h4><div class="big" id="hc"></div><span class="v" id="hd"></span><span class="v" id="hth"></span></div>'
     +'<div class="tile" style="--i:2"><h4>Today</h4><div class="row2"><div class="ringw"><svg class="rg" viewBox="0 0 80 80"><defs><linearGradient id="rgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--a)"/><stop offset="1" style="stop-color:var(--b)"/></linearGradient></defs><circle cx="40" cy="40" r="34" pathLength="100" style="stroke:rgba(255,255,255,.1)"/><circle id="rp" cx="40" cy="40" r="34" pathLength="100" stroke="url(#rgg)" stroke-dasharray="100" stroke-dashoffset="100" stroke-linecap="round"/></svg><b id="dp"></b></div><div><span class="v" style="margin:0">of the day is gone</span><span class="v" id="dl"></span></div></div></div>'
-    +'<div class="tile hol" id="holTile" style="--i:3" title="Open themes"><h4>Next holiday</h4><div class="row2"><span class="em2" id="he"></span><div><b id="hn" style="font-size:19px"></b><span class="v" id="hdays"></span></div></div></div>'
+    +'<div class="tile hol" id="holTile" style="--i:3" title="Themes are in Settings"><h4>Next holiday</h4><div class="row2"><span class="em2" id="he"></span><div><b id="hn" style="font-size:19px"></b><span class="v" id="hdays"></span></div></div></div>'
     +'<div class="tile s2" style="--i:4"><h4>This week <span id="wn"></span></h4><div class="wk" id="wk">'+'MTWTFSS'.split('').map(x=>'<i>'+x+'</i>').join('')+'</div><span class="v" id="we"></span></div>'
     +'<div class="tile" style="--i:5"><h4>This month</h4><div class="big" id="mp"></div><div class="bar"><i id="mb"></i></div><span class="v" id="ml"></span></div>'
     +'<div class="tile" style="--i:6"><h4>This year</h4><div class="big" id="yp"></div><div class="bar"><i id="yb"></i></div><span class="v" id="yl"></span></div>'
@@ -1619,11 +1667,14 @@ function renderSet(){
     +tgl('ttr','Trouble helper','After an about:blank launch, show “Having trouble? Launch as iframe” when you come back.',store.get('trouble',true))
     +tgl('t24','24-hour clock','Show the time as 13:00 instead of 1:00 PM.',store.get('h24',true))
     +tgl('tsec','Show seconds','Tick the clock every second.',store.get('secs',true))
+    +'<div class="setrow"><span>Download launcher<small>Auto-updating loader. It always pulls the newest version.</small></span><button class="btn pri sm" id="dlSet" type="button">⬇ Download</button></div>'
+    +'<div class="setrow"><span>Offline copy<small>A frozen copy of this exact launcher that never updates.</small></span><button class="btn sec sm" id="dlSet2" type="button">⬇ Offline</button></div>'
     +'<div class="setrow"><span>Reset<small>Clears favorites and recently opened.</small></span><button class="btn sec sm" id="reset" type="button">Clear</button></div></div>';
   refreshThemeUI();
   seg($('#fxTabs'),k=>{store.set('fx',k);const t=TH[curKey];fxSet(t.fx||null)},fxLevel());
   $('#nick').oninput=e=>{store.set('nick',e.target.value.trim());tick()};
   [['t24','h24'],['tsec','secs'],['ttr','trouble']].forEach(([id,key])=>$('#'+id).onclick=e=>{const b=e.currentTarget,on=!b.classList.contains('on');b.classList.toggle('on',on);b.setAttribute('aria-checked',on);store.set(key,on);tick()});
+  $('#dlSet').onclick=dlLauncher;$('#dlSet2').onclick=dlLauncherFull;
   $('#reset').onclick=()=>{store.set('fav',[]);store.set('rec',[]);badge();toast('Cleared')};
 }
 
@@ -1631,8 +1682,9 @@ function renderSet(){
 $('#stage').addEventListener('click',e=>{
   if(themeClick(e))return;
   const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+  if(e.target.closest('#homeDl')){dlLauncher();return}
   if(e.target.closest('#mainGo')){mainFlow();return}
-  if(e.target.closest('#holTile')){e.stopPropagation();scrollTo({top:0,behavior:'smooth'});openPop();return}
+  if(e.target.closest('#holTile')){e.stopPropagation();go('set');return}
   const f=e.target.closest('[data-fav]');if(f){e.stopPropagation();toggleFav(f.dataset.fav);return}
   const k=e.target.closest('[data-k]');if(k&&byKey[k.dataset.k]){const sr=$('#sres');if(sr)sr.hidden=true;launch(byKey[k.dataset.k])}
 });
@@ -1650,7 +1702,7 @@ document.addEventListener('keydown',e=>{
   if(typing||e.ctrlKey||e.metaKey||e.altKey)return;
   if(V.classList.contains('show'))return;
   if(e.key==='/'){e.preventDefault();const q=$('#q')||$('#lq')||$('#pq');if(q){q.focus();q.select()}else{go('lib');setTimeout(()=>{const l=$('#lq');if(l)l.focus()},60)}}
-  else if(e.key==='t'||e.key==='T'){popEl.hidden?openPop():closePop()}
+  else if(e.key==='t'||e.key==='T'){go('set')}
   else if(/^[1-5]$/.test(e.key))go(ORD[+e.key-1]);
 });
 $('#stage').addEventListener('pointermove',e=>{const c=e.target.closest('.card,.feat,.a-card');if(!c)return;const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')},{passive:true});
