@@ -1,4 +1,4 @@
-ICH (Itsuki's Chat Hub)
+ICH (Itsuki's Chat Hub) - All 19 official launchers + launcher code and download..
 
 Fully revamped the launcher, it looks a lot better, all apps, games, hubs, and proxies are now all unlocked, no login needed, as well as a lot more added!
 
@@ -14,7 +14,7 @@ p5js: (Yes, it works again and is unblocked!)
 
 [Launcher 3](https://editor.p5js.org/jace01b/full/1prpxaC-R)
 
-Data Url: (Tech by Da_Goat, bypassed the blocked Data links!)
+Data Urls:
 
 Launcher 1:
 
@@ -44,7 +44,7 @@ Google Scripts (More Reuploads, blocked for some):
 [Launcher 4](https://script.google.com/macros/s/AKfycbybstya3C943-5NzLITtf4j4qFknyfC1q_7BPm9wLoPv-iFKoT9qOILGdcesAfgkfPa/exec)
 
 
-Canva:
+Canva: (Auto detection for Lightspeed, bypass WIP)
 
 [Launcher 1](https://sukischathub-launcher.my.canva.site/ich-launcher-backup-1)
 
