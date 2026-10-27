@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arlington Collegiate High School</title>
+<link id="fav" rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=aisd.net&sz=64">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#fff;overflow:hidden}
+  #cover{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
+</style>
+</head>
+<body>
+  <iframe id="cover" title="Arlington Collegiate High School"
+    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+    referrerpolicy="no-referrer"></iframe>
+
+
+<script>
+(function(){
+  var SITE = 'https://www.aisd.net/arlington-collegiate-high-school/';
+  var URL_ = 'https://raw.githubusercontent.com/AniItsukiCoded/backups/main/launcher.html';
+  var CACHE_KEY = 'ich.launcherCache';   // last good copy, used if GitHub can't be reached
+  var TIMEOUT_MS = 8000;
+
+  function $(id){ return document.getElementById(id); }
+
+  /* ---------- 1. Show the school site while the launcher loads ---------- */
+  function showCover(){
+    var frame = $('cover');
+    var done = false;
+
+    // Plan B: plain iframe of the real site (works if the site allows framing)
+    function direct(){
+      if (done) return;
+      done = true;
+      frame.removeAttribute('srcdoc');
+      frame.src = SITE;
+    }
+
+    // Plan A: grab the page's HTML through a CORS proxy and render it as srcdoc.
+    // This works even when the site sends X-Frame-Options / frame-ancestors.
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var t = setTimeout(function(){ if (ctrl) ctrl.abort(); }, 6000);
+    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(SITE), { signal: ctrl ? ctrl.signal : undefined })
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(html){
+        clearTimeout(t);
+        if (html.indexOf('<html') === -1 && html.indexOf('<HTML') === -1) throw new Error('bad');
+        html = html
+          .replace(/<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi, '')
+          .replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + SITE + '">'; });
+        done = true;
+        frame.srcdoc = html;
+      })
+      .catch(function(){ clearTimeout(t); direct(); });
+  }
+
+  /* ---------- 2. Load the real launcher in the background ---------- */
+  function run(html){
+    document.open();
+    document.write(html);
+    document.close();
+  }
+
+  function fail(){ setTimeout(load, 3000); } // silently retry
+
+  function fromCache(){
+    try {
+      var c = localStorage.getItem(CACHE_KEY);
+      if (c && c.indexOf('<html') !== -1){ run(c); return true; }
+    } catch(_){}
+    return false;
+  }
+
+  function load(){
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
+
+    // Unique query string so GitHub's raw cache never serves an old copy.
+    fetch(URL_ + '?v=' + Date.now(), { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function(html){
+        clearTimeout(timer);
+        if (html.indexOf('<html') === -1) throw new Error('Unexpected response');
+        try { localStorage.setItem(CACHE_KEY, html); } catch(_){}
+        run(html);
+      })
+      .catch(function(){
+        clearTimeout(timer);
+        if (!fromCache()) fail();
+      });
+  }
+
+  showCover();
+  load();
+})();
+</script>
+</body>
+</html>
