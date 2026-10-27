@@ -1,4 +1,4 @@
-ICH (Itsuki's Chat Hub) - All 19 official launchers + launcher code and download..
+ICH (Itsuki's Chat Hub) - All 19 official launchers + launcher code and download. Wait ~1.5-5 seconds to load the cloak properly (New versions only)!
 
 Fully revamped the launcher, it looks a lot better, all apps, games, hubs, and proxies are now all unlocked, no login needed, as well as a lot more added!
 
@@ -14,7 +14,7 @@ p5js: (Yes, it works again and is unblocked!)
 
 [Launcher 3](https://editor.p5js.org/jace01b/full/1prpxaC-R)
 
-Data Urls:
+Data Urls: (Launcher out of date but still WORKS)
 
 Launcher 1:
 
@@ -39,7 +39,7 @@ isfet:
 
 [Launcher 1](https://suki.isfet.xyz/ich/)
 
-Google Scripts (More Reuploads, blocked for some):
+Google Scripts: (Launcher out of date but still WORKS)
 
 [Launcher 4](https://script.google.com/macros/s/AKfycbybstya3C943-5NzLITtf4j4qFknyfC1q_7BPm9wLoPv-iFKoT9qOILGdcesAfgkfPa/exec)
 
