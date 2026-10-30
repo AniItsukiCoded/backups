@@ -990,6 +990,11 @@ html.has-sign .nav,html.has-dly .nav{
 }
 html.os-mode .nav{margin-left:0!important;margin-right:0!important}
 
+/* ---------- panic cover: the cloak site itself, filling the tab ---------- */
+/* The frame takes no clicks, so focus stays on this page and the panic key can always bring you back. */
+#shield iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;pointer-events:none}
+#shield.live .shbar,#shield.live .shbox{display:none}
+
 /* ---------- the screen-time girl stands in the BOTTOM-left corner ---------- */
 /* She used to lean in from the top left, which crowded the brand and forced the whole top bar to
    shift right to make room for her. Down in the corner she is out of the way of every section of
@@ -1962,11 +1967,19 @@ const qshell=()=>{
     :'<div id="behind" style="--sc:'+CLOAK.c+'"><div class="fb">'+CLOAK.label+'</div><div class="fx"><h1>Sign in</h1><p>to continue to '+CLOAK.label+'</p><i>Username or email</i><i>Password</i><b>Log in</b></div></div>';   // the rest can't be framed, so a look-alike sign-in page sits there
   return '<!DOCTYPE html><title>'+CLOAK_NAME+'</title><link rel="icon" href="'+CLOAK_ICON+'"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;height:100%;background:#fff;overflow:hidden}iframe{position:fixed;inset:0;width:100%;height:100%;border:0}#behind{z-index:1;background:#f4f7fb;font-family:Arial,sans-serif;text-align:center;color:#1f2d3d}div#behind{position:fixed;inset:0}.fb{height:56px;line-height:56px;padding:0 22px;background:var(--sc);color:#fff;font-size:22px;font-weight:700;text-align:left}.fx{width:min(360px,calc(100vw - 32px));margin:70px auto 0;padding:28px 24px;background:#fff;border:1px solid #d5dde8;border-radius:10px;box-sizing:border-box}.fx h1{margin:0 0 6px;font-size:24px}.fx p{margin:0 0 18px;color:#5b6b7e;font-size:14px}.fx i{display:block;height:40px;margin-bottom:12px;border:1px solid #c5cfdc;border-radius:6px;text-align:left;padding:11px 12px;box-sizing:border-box;color:#8a97a8;font-size:14px;font-style:normal}.fx b{display:block;height:42px;line-height:42px;border-radius:6px;background:var(--sc);color:#fff}#app{z-index:2;opacity:0;background:#0b0c1a;transition:opacity .35s ease;will-change:opacity}#app.in{opacity:1}</style><body>'+behind+'</body>';
 };
+/* The guard inside an opened tab works the same way as the panic key on the launcher: it drops the site
+   you opened behind the cloak page that is already sitting in that tab, and the same key brings it back.
+   It used to send the tab to the cloak site for real, which threw away whatever you had open. */
 function shellGuard(){
-  const cfg=JSON.stringify({k:panicKey(),h:hideOn(),g:CLOAK_URL}).replace(/</g,'\\u003c');
-  return '<style>body.cv #app{opacity:0!important;visibility:hidden}</style><script>(function(){var c='+cfg+',b=document.body;'
+  const cfg=JSON.stringify({k:panicKey(),h:hideOn()}).replace(/</g,'\\u003c');
+  return '<style>body.cv #app,body.pk #app{opacity:0!important;visibility:hidden;pointer-events:none}</style><script>(function(){var c='+cfg+',b=document.body;'
   +'document.addEventListener("visibilitychange",function(){if(!c.h)return;if(document.hidden)b.classList.add("cv");else b.classList.remove("cv")});'
-  +'addEventListener("keydown",function(e){if(e.ctrlKey||e.metaKey||e.altKey||e.key.toLowerCase()!==c.k)return;b.classList.add("cv");setTimeout(function(){location.replace(c.g)},60)},true);'
+  +'addEventListener("keydown",function(e){'
+  +'if(e.key==="Escape"){b.classList.remove("pk");return}'
+  +'if(e.ctrlKey||e.metaKey||e.altKey||!e.key||e.key.toLowerCase()!==c.k)return;'
+  +'e.preventDefault();b.classList.toggle("pk");'
+  +'try{var a=document.activeElement;if(a&&a.blur)a.blur()}catch(_){}'   /* so the key keeps reaching this page */
+  +'},true);'
   +'})()<\/script>';
 }
 async function blankShell(name,getContent,delay,onOpen){
@@ -2347,7 +2360,7 @@ function renderSet(){
     +'<div class="setrow"><span>Tab cloak<small>Always on. Pick the name and site icon your tab and about:blank window use (the icon is the real website icon), plus what the panic key opens. Choose Custom to type your own school or site. Default DeltaMath.</small></span></div>'
     +'<div class="ckdd" id="cloakPick"><button type="button" class="ckbtn" id="ckBtn" aria-haspopup="listbox" aria-expanded="false"><span id="ckName">'+esc(CLOAK.name)+'</span><b class="chev">▾</b></button><div class="ckpanel" id="ckPanel" hidden><input class="ckq" id="ckQ" placeholder="Search cloaks…" autocomplete="off" spellcheck="false"><div class="cklist" id="ckList" role="listbox"></div></div><div class="ckcu" id="ckCu"'+(CLOAK.id==='custom'?'':' hidden')+'><input class="field" id="cuName" maxlength="60" placeholder="Tab name (e.g. My School Portal)" value="'+esc(store.get('cname','')||'')+'"><input class="field" id="cuUrl" maxlength="200" placeholder="Site address (e.g. myschool.edu)" value="'+esc(store.get('curl','')||'')+'" autocapitalize="none" spellcheck="false"></div></div>'
     +tgl('thd','Hide screen when off tab','Covers the page with a fake DeltaMath screen whenever you switch tabs or click away. On by default.',hideOn())
-    +'<div class="setrow"><span>Panic key<small>Press it on the launcher to instantly cover the screen and send this tab to your cloak site. Default K. Click to change, Esc to cancel.</small></span><button class="btn sec sm" id="pkBtn" type="button">'+keyLabel(panicKey())+'</button></div>'
+    +'<div class="setrow"><span>Panic key<small>Press it to cover the whole screen with your cloak site, right here — press it again (or Esc) to come back. Default K. Click to change, Esc to cancel.</small></span><button class="btn sec sm" id="pkBtn" type="button">'+keyLabel(panicKey())+'</button></div>'
     +tgl('ttr','Trouble helper','After an about:blank launch, show “Having trouble? Launch as iframe” when you come back.',store.get('trouble',true))
     +tgl('t24','24-hour clock','Show the time as 13:00 instead of 1:00 PM.',store.get('h24',true))
     +tgl('tsec','Show seconds','Tick the clock every second.',store.get('secs',true))
@@ -2468,37 +2481,49 @@ function openBlank(){
   if(!w){try{w=window.top.open('about:blank','_blank')}catch(_){}}
   return w;
 }
+/* The panic key just covers the screen with the cloak site, right here in this tab. It used to open a
+   new about:blank tab and send this one to the cloak site for real, which meant the launcher (and
+   whatever you had open) was gone for good and you had to start again. Now nothing is thrown away:
+   press the key once to put the site over everything, press it again to come straight back. */
 function panic(){
-  if(panicBusy)return;
-  const w=openBlank();                                      // straight from the click so popup blockers allow it
-  if(!w){toast('Popup blocked — allow popups for this site','err');return}
-  panicBusy=true;
-  try{w.name=AB_NAME}catch(_){}
-  try{w.document.open();w.document.write(abDoc());w.document.close()}
-  catch(_){try{w.close()}catch(__){}toast('Could not open about:blank','err');panicBusy=false;return}
-  const G=CLOAK_URL;
-  setTimeout(()=>{                                          // this tab becomes the cloak site (the whole tab, not just an iframe inside it)
-    try{window.top.location.replace(G)}catch(_){}
-    setTimeout(()=>{try{location.replace(G)}catch(_){}panicBusy=false},400);   // only runs if the top-level jump was blocked
-  },120);
+  shieldFrame(true);
+  try{const a=document.activeElement;if(a&&a.blur)a.blur()}catch(_){}   // keep the key working: nothing inside the page holds focus
+  try{window.focus()}catch(_){}
 }
 function showSign(){if(signEl&&signEl.isConnected)signEl.classList.add('in');const d=$('#dly');if(d)d.classList.add('in')}
 
 /* ===================== SCREEN SHIELD + PANIC KEY ===================== */
 let shieldWhy='',rebinding=false;
 const shield=$('#shield');
-function shieldOn(why){if(!shield||shield.classList.contains('on'))return;shieldWhy=why;document.title=CLOAK_NAME;shield.classList.add('on')}
+/* The cover shows the cloak site itself whenever that site allows being framed (DeltaMath, the district
+   pages…); for the ones that refuse, the hand-made sign-in page underneath stays, exactly as before.
+   The frame is left loaded after the first time, so the next press is instant, and it never takes
+   clicks or focus — that way the panic key always still reaches this page and can bring you back. */
+function shieldFrame(on){
+  if(!shield)return;
+  const old=shield.querySelector('iframe');
+  if(!on||!CLOAK.fr){if(old)old.remove();shield.classList.remove('live');return}   /* cloak that refuses framing: the sign-in page covers instead */
+  if(old&&old.dataset.u===CLOAK_URL){shield.classList.add('live');return}
+  if(old)old.remove();
+  const f=document.createElement('iframe');
+  f.dataset.u=CLOAK_URL;f.title=CLOAK_NAME;f.setAttribute('referrerpolicy','no-referrer');
+  f.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms');   // no top navigation: the site can never bump this tab off the launcher
+  f.src=CLOAK_URL;
+  shield.appendChild(f);shield.classList.add('live');
+}
+function shieldOn(why){if(!shield||shield.classList.contains('on'))return;shieldWhy=why;document.title=CLOAK_NAME;shieldFrame(true);shield.classList.add('on')}
 function shieldOff(){if(!shield||!shield.classList.contains('on'))return;shield.classList.remove('on');shieldWhy='';applyCloak()}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(hideOn())shieldOn('away')}else if(shieldWhy==='away')shieldOff()});
 addEventListener('blur',()=>{if(!hideOn())return;setTimeout(()=>{if(!document.hasFocus())shieldOn('away')},0)});
 addEventListener('focus',()=>{if(shieldWhy==='away')shieldOff()});
-if(shield)shield.addEventListener('click',()=>{if(shieldWhy==='panic')shieldOff()});
+/* a stray click must not uncover the launcher — the panic key itself (or Esc) brings it back */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!rebinding&&shieldWhy==='panic')shieldOff()},true);
 document.addEventListener('keydown',e=>{
   if(rebinding||e.repeat||e.ctrlKey||e.metaKey||e.altKey||!e.key||e.key.toLowerCase()!==panicKey())return;
   const t=e.target||{};
   if(e.key.length===1&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')||t.isContentEditable))return;   // don't fire while typing
   e.preventDefault();e.stopImmediatePropagation();
-  if(shieldWhy==='panic'){shieldOff();return}
+  if(shieldWhy==='panic'){shieldOff();return}          // same key again: back to the launcher
   shieldOff();shieldOn('panic');panic();
 },true);
 
@@ -2796,6 +2821,8 @@ function applyOS(){
   $$('img[data-ic]').forEach(i=>i.src=ICON);
   applyCloak();
   applyOS();
+  setTimeout(()=>shieldFrame(true),4000);          // load the cover site quietly up front, so the panic key is instant
+
   setTimeout(autoBlank,1800);                      // auto about:blank, once the page is actually up
   /* loading screen: stays for a moment, waits for fonts, then fades away */
   const bootEl=$('#boot');
