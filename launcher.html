@@ -1519,6 +1519,9 @@ function applyCloak(){
 }
 
 /* Same list the main site shows in Hubs & Tools. Everything here opens straight from the launcher. */
+/* built-in file lists for the multi-file games: the last-resort backup if GitHub and jsDelivr are both unreachable. Normally the live list is used. */
+const RLFILES={"Shrek-Escape-The-Swamp":[["Build/Shrek.data.br.js","9a73add39ea98004dba57926349d057defee6c76",42417812],["Build/Shrek.framework.js.br.js","3bfd5dc5aa76767d40661f4d551382fbcb19c242",95036],["Build/Shrek.loader.js","cc237f0a0804fdc801206c93aa3bdebcb281ace0",20642],["Build/Shrek.wasm.br.js","90ec0fae19d129d317c13e3fe3b05d738f0c50ce",8454492],["_external/app-415567.games.s3.yandex.net/sdk.js","303aab9c50b1b44b50b704f253c051346bd9d551",3731],["_sdk/brotli-decode.js","8c75d95ebcc53b8f88b47327210eaca151484b8a",195431],["_sdk/credit.js","1b0329907e927ac71b4d88b7ecfb181bdf52f4ce",1014],["_sdk/offline-shim.js","ebebc7376d9464543f2d4513211fca3ccf871bdb",7220],["_sdk/yandex-sdk-stub.js","066c9a860e9dc8ded3f8beb8a00c9aa12e38c0aa",3845],["background.jpg","153104d530e3139b691226825fd4ff4a78a01d57",538423],["index.html","4c5693f3344889c95c68e270497e64c64a67f728",39544],["logo.png","e3a93ea04b8887dcc77997716d2bd0bb99d6f8ee",35004],["style.css","f117bd965c627af3a93934ddbb615245d7d1801d",1847]],"Granny-Barbie":[["Build/granny-1-barbie.data","d32b482d66f149eb1f62ddb9909f27dd4838a263",30581996],["Build/granny-1-barbie.data.ssp.js","b625ca691ef29f42574147d6f8cea4484ecc5311",40776039],["Build/granny-1-barbie.framework.js","de4ab4c08ea61c73dc615576b4d3b832cedc160a",400591],["Build/granny-1-barbie.framework.js.ssp.js","bda35c334a3a0ab93bafb83db19e27c5f3636d3a",534175],["Build/granny-1-barbie.loader.js","52cc1ed8a1fb60d1b2ab3fc535b3aaa76429814a",21845],["Build/granny-1-barbie.loader.js.ssp.js","9acc03ba863907c1363a7567d83edb367f4a17d5",29176],["Build/granny-1-barbie.wasm","af4bc9d68ec60080b29872327c9904b430c47e40",39297591],["Build/granny-1-barbie.wasm.ssp.js","139a39b04df8dcd16a9cf0f65676b78b5722f8fb",52396831],["Play offline (server).bat","df17969ccd5bbb9259ed6406f8e36aef395e034a",6173],["TemplateData/favicon.ico","07db393850608b8752b24045c47c03b19bb35610",2305],["TemplateData/favicon.ico.ssp.js","528ab5aaa0d64ec6f85bdf8c2a7dbfdc48957013",3117],["TemplateData/fullscreen-button.png","e7b6496fc9c99bf761524e2b962b6de8bfca90d7",175],["TemplateData/fullscreen-button.png.ssp.js","f625cad995f69eab2e53fac6836aa12ab8e73d89",287],["TemplateData/progress-bar-empty-dark.png","d01612f729991d6b606e9148c70014b2d5aa5a00",96],["TemplateData/progress-bar-empty-dark.png.ssp.js","0cb9ecb836a1921813a97ddbf5e7488ce17b7d0a",185],["TemplateData/progress-bar-full-dark.png","c432c8666d955307ec7c690ef3624e50093513fe",74],["TemplateData/progress-bar-full-dark.png.ssp.js","c6f6f200d4f6a9b9877a6c50d020ab1f089d493d",156],["TemplateData/style.css","f9b10c9b6e988ad2fc70380516287b1260b8c4ff",1428],["TemplateData/style.css.ssp.js","a1cba617e542b1047749f86ab5c388e80103f02b",1943],["TemplateData/unity-logo-dark.png","2c3323841b378f8f84e7bf977e1292a982fe563b",3042],["TemplateData/unity-logo-dark.png.ssp.js","32ab6523f4894bc4fca537596fce06873d0580a6",4105],["TemplateData/webgl-logo.png","338b1ae11040ab9dc728694efc38e8140bc7c332",2947],["TemplateData/webgl-logo.png.ssp.js","25e62e9ff0ed98bf7f6bce29cd617eb310927daf",3976],["_external/app-522766.cdn.games.yandex.net/sdk.js","303aab9c50b1b44b50b704f253c051346bd9d551",3731],["_external/app-522766.cdn.games.yandex.net/sdk.js.ssp.js","3ec4f6ef16947df3b99080dc6e610d7ae3f20e5c",5041],["_sdk/credit.js","1b0329907e927ac71b4d88b7ecfb181bdf52f4ce",1014],["_sdk/offline-shim.js","13a5f7323eaaae762020e46940e249b4c5aa1840",12097],["_sdk/yandex-sdk-stub.js","709ef7d8b03916a9cc0bf8875899197a05512ab1",4738],["index.html","340c05c2a87f05144089e0cf2799241d331c4d5f",12205]],"Granny-Spongebob":[["Build/granny-1-sponge-bob.data","874361e8b8c9a2e1274996bf1fa6fa2001858cad",32573197],["Build/granny-1-sponge-bob.data.ssp.js","3392499297809d5e13c07500c26670da67025239",43430979],["Build/granny-1-sponge-bob.framework.js","f3d130b2fe9527d19eda6d60c7d87032a2996be2",414732],["Build/granny-1-sponge-bob.framework.js.ssp.js","e5ec226b00d79f22a323a0092830cdc159d44181",553031],["Build/granny-1-sponge-bob.loader.js","9e89a2217d93358a38131749770c87dd65c659bd",21837],["Build/granny-1-sponge-bob.loader.js.ssp.js","e1ed7c1b56cb15c1627f4a0c22ae6cb42ec3b58d",29168],["Build/granny-1-sponge-bob.wasm","e1aec13b34d5b4c719e94e284393b8fcd5797e2d",35834282],["Build/granny-1-sponge-bob.wasm.ssp.js","353dcc078c02194d8173e6b8aeccad8001ef2777",47779091],["Play offline (server).bat","df17969ccd5bbb9259ed6406f8e36aef395e034a",6173],["TemplateData/favicon.ico","07db393850608b8752b24045c47c03b19bb35610",2305],["TemplateData/favicon.ico.ssp.js","528ab5aaa0d64ec6f85bdf8c2a7dbfdc48957013",3117],["TemplateData/fullscreen-button.png","e7b6496fc9c99bf761524e2b962b6de8bfca90d7",175],["TemplateData/fullscreen-button.png.ssp.js","f625cad995f69eab2e53fac6836aa12ab8e73d89",287],["TemplateData/progress-bar-empty-dark.png","d01612f729991d6b606e9148c70014b2d5aa5a00",96],["TemplateData/progress-bar-empty-dark.png.ssp.js","0cb9ecb836a1921813a97ddbf5e7488ce17b7d0a",185],["TemplateData/progress-bar-full-dark.png","c432c8666d955307ec7c690ef3624e50093513fe",74],["TemplateData/progress-bar-full-dark.png.ssp.js","c6f6f200d4f6a9b9877a6c50d020ab1f089d493d",156],["TemplateData/style.css","f9b10c9b6e988ad2fc70380516287b1260b8c4ff",1428],["TemplateData/style.css.ssp.js","a1cba617e542b1047749f86ab5c388e80103f02b",1943],["TemplateData/unity-logo-dark.png","2c3323841b378f8f84e7bf977e1292a982fe563b",3042],["TemplateData/unity-logo-dark.png.ssp.js","32ab6523f4894bc4fca537596fce06873d0580a6",4105],["TemplateData/webgl-logo.png","338b1ae11040ab9dc728694efc38e8140bc7c332",2947],["TemplateData/webgl-logo.png.ssp.js","25e62e9ff0ed98bf7f6bce29cd617eb310927daf",3976],["_external/app-485699.cdn.games.yandex.net/sdk.js","303aab9c50b1b44b50b704f253c051346bd9d551",3731],["_external/app-485699.cdn.games.yandex.net/sdk.js.ssp.js","96f0274905a5e5f8284aeaad6f19df05ea9178b7",5041],["_sdk/credit.js","1b0329907e927ac71b4d88b7ecfb181bdf52f4ce",1014],["_sdk/offline-shim.js","6bb6c146ff5623f5c8aa1e714772478f09f46d49",12113],["_sdk/yandex-sdk-stub.js","709ef7d8b03916a9cc0bf8875899197a05512ab1",4738],["index.html","2b638f2836ac4039abfe9e30923f21ea7b9612f4",3825]],"Obby-Aimbot-Arena-Shooter":[["Build/sdsd.data.unityweb","72692d201e6045f0e4adb59d2c6d647498c64086",8840419],["Build/sdsd.data.unityweb.js","8d6e5e8374bcd31b19203620a74e54eb4b0268d2",11787269],["Build/sdsd.framework.js.unityweb","7757ddb2d40b8e4bb174db884029f7c3c0eda0e0",70746],["Build/sdsd.framework.js.unityweb.js","f85cb34a5bd4d7a714e665aea699b3f442450839",94377],["Build/sdsd.loader.js","c2e160fa710b765dae63909583986bbb99460bb7",114374],["Build/sdsd.wasm.unityweb","7e9e454617cb056ebc499b1e2faf776bac6708eb",6783651],["Build/sdsd.wasm.unityweb.js","a9ed3bfdb93262e55d9d00054ad8d1bb2c55d145",9044909],["_external/app-473221.games.s3.yandex.net/sdk.js","303aab9c50b1b44b50b704f253c051346bd9d551",3731],["_sdk/brotli-decode.js","8c75d95ebcc53b8f88b47327210eaca151484b8a",195431],["_sdk/credit.js","1b0329907e927ac71b4d88b7ecfb181bdf52f4ce",1014],["_sdk/modmenu.js","177c775d7b0e58e79891bf9fb2f926f6bd631a82",9038],["_sdk/offline-shim.js","8b2a15d50db2ee9d4862c50709516fbe8d4ed999",7235],["_sdk/yandex-sdk-stub.js","5a2def65880792eb2ef4f8c1b98714d22c8172a9",4650],["index.html","9ed3cbec4084291b6462395a5993e65f692cc7be",27665],["style.css","1321b4b830571c1d4956648fa6d2fee00c931898",2594]],"Granny-vs-Grandpa-Online":[["Build/007be1218bc8969630e27bf31f397390.framework.js","5002ba600d4a228201fe57531fe20f08b1c6dfbf",456667],["Build/007be1218bc8969630e27bf31f397390.framework.js.ssp.js","4e018a2272da7f7c3e18acb9649afd15addaf0f5",608960],["Build/249cc5ac0f45d8ed04ab6dcf720b1fae.wasm","6602aa5781e7459bf06e3cb6353367ffb6d6b9cf",47115306],["Build/249cc5ac0f45d8ed04ab6dcf720b1fae.wasm.ssp.js","c616e7e8a8db6b16433d8a30953c8917f1068904",62820468],["Build/ba67ce0d25c9a361a35ebddffb4f7dcd.data","fcbd5c729781b3211cf60ede127268b552d8bd6a",26737298],["Build/ba67ce0d25c9a361a35ebddffb4f7dcd.data.ssp.js","30778e28b3dda4dacc45af509be3434d07b81c24",35649792],["Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js","cc237f0a0804fdc801206c93aa3bdebcb281ace0",20642],["Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js.ssp.js","cb3dd28ad4092782d7d0c8c596204d9042194f99",27589],["Play offline (server).bat","df17969ccd5bbb9259ed6406f8e36aef395e034a",6173],["TemplateData/favicon.ico","07db393850608b8752b24045c47c03b19bb35610",2305],["TemplateData/favicon.ico.ssp.js","528ab5aaa0d64ec6f85bdf8c2a7dbfdc48957013",3117],["TemplateData/progress-bar-empty-dark.png","d01612f729991d6b606e9148c70014b2d5aa5a00",96],["TemplateData/progress-bar-empty-dark.png.ssp.js","0cb9ecb836a1921813a97ddbf5e7488ce17b7d0a",185],["TemplateData/progress-bar-full-dark.png","c432c8666d955307ec7c690ef3624e50093513fe",74],["TemplateData/progress-bar-full-dark.png.ssp.js","c6f6f200d4f6a9b9877a6c50d020ab1f089d493d",156],["TemplateData/style.css","393a598d05cb773ed106be92dc51fced23ac087d",1172],["TemplateData/style.css.ssp.js","5b5d56a785509ed9ecde9bdfb1f10b44cebc0244",1603],["TemplateData/unity-logo-dark.png","2c3323841b378f8f84e7bf977e1292a982fe563b",3042],["TemplateData/unity-logo-dark.png.ssp.js","32ab6523f4894bc4fca537596fce06873d0580a6",4105],["_external/app-389848.games.s3.yandex.net/sdk.js","303aab9c50b1b44b50b704f253c051346bd9d551",3731],["_external/app-389848.games.s3.yandex.net/sdk.js.ssp.js","c5a3e135a5ddc9da6421d5cd218470f340e4f7e5",5040],["_sdk/credit.js","1b0329907e927ac71b4d88b7ecfb181bdf52f4ce",1014],["_sdk/offline-shim.js","3f742811bac174d9f3632f1a5ffc1e25b1b5d234",12093],["_sdk/yandex-sdk-stub.js","709ef7d8b03916a9cc0bf8875899197a05512ab1",4738],["index.html","d5b41d40ca9e87854c900aa6738a6ac78e1c4294",3914]]};
+const RL=(o,r,e)=>({o,r,b:'main',entry:e||'index.html',files:RLFILES[r]});
 const HUBS=[
   /* ---- apps ---- */
   {sec:'apps',group:'Apps By Suki',name:'1v1.ARENA',url:'https://raw.githubusercontent.com/jace01b-web/other/refs/heads/main/1v1lol%20remake.html',desc:'Sukis remade version of (1v1 lol)',icon:'1v1',color:'lime',arena:true,tags:['Multiplayer','Multiple modes','1v1','Made by Suki']},
@@ -1530,8 +1533,13 @@ const HUBS=[
   {sec:'apps',group:'Apps By Suki',name:'Geometry Dash',url:'https://raw.githubusercontent.com/suki-web-ports/Geometry-Dash/refs/heads/main/Geometry%20Dash.html',desc:'Geometry Dash web port by Suki. Jump, fly and time every move through the levels.',icon:'GD',color:'blue'},
   {sec:'apps',group:'Apps By Suki',name:'GDZ Modded (Level 67)',url:'https://raw.githubusercontent.com/suki-web-ports/Level-67-Modded-Outdated-/refs/heads/main/GDZ-auto-launcher.html',desc:'Modded GDZ with Level 67, auto-launches when opened. Outdated version.',icon:'GDZ',color:'purple'},
   {sec:'apps',group:'Apps By Suki',name:'Granny 1.2 Webport (Modified)',url:'https://raw.githubusercontent.com/jace01b-web/other/refs/heads/main/Granny%201.2%20Single.html',desc:'Granny 1.2 web port (modified) by Suki. Escape the house before time runs out.',icon:'GR',color:'red'},
+{sec:'apps',group:'Apps By Suki',name:'Granny: Barbie',url:'https://github.com/dadasuki/Granny-Barbie',repo:RL('dadasuki','Granny-Barbie'),desc:'A Barbie mod of Granny. Escape the house before time runs out.',icon:'GB',color:'rose',tags:['Granny mod','Horror','First person']},
+  {sec:'apps',group:'Apps By Suki',name:'Granny: SpongeBob',url:'https://github.com/dadasuki/Granny-Spongebob',repo:RL('dadasuki','Granny-Spongebob'),desc:'A SpongeBob mod of Granny. Escape the house before time runs out.',icon:'GS',color:'yellow',tags:['Granny mod','Horror','First person']},
+  {sec:'apps',group:'Apps By Suki',name:'Granny vs Grandpa Online',url:'https://github.com/dadasuki/Granny-vs-Grandpa-Online',repo:RL('dadasuki','Granny-vs-Grandpa-Online'),desc:'Multiplayer Granny PVP game from Yandex Games.',icon:'GvG',color:'red',tags:['Multiplayer','PVP','Granny','Yandex Games']},
 {sec:'apps',group:'Apps By Suki',name:'Granny Steam Webport',url:'https://raw.githubusercontent.com/jace01b-web/other/refs/heads/main/Granny%20Steam%20Webport%20Single.html',desc:'Granny Steam web port by Suki. Escape the house before time runs out.',icon:'GR',color:'red'},
+  {sec:'apps',group:'Apps By Suki',name:'Obby: Aimbot Arena Shooter',url:'https://github.com/dadasuki/Obby-Aimbot-Arena-Shooter',repo:RL('dadasuki','Obby-Aimbot-Arena-Shooter'),desc:'A first-person Obby arena shooter from Yandex Games. Includes the OP mod menu (Insert key).',icon:'OB',color:'orange',tags:['Shooter','Obby','First person','Yandex Games']},
     {sec:'apps',group:'Apps By Suki',name:'Race Survival: Arena King (Modded)',url:'https://raw.githubusercontent.com/jace01b-web/Race-Survival-Modded/refs/heads/main/index.html',desc:'Race Survival: Arena King modded by Suki. Everything unlocked: all cars, colors and unlimited currency.',icon:'RS',color:'orange',tags:['Racing','Cars','Modded','Made by Suki']},
+  {sec:'apps',group:'Apps By Suki',name:'Shrek: Escape The Swamp',url:'https://github.com/dadasuki/Shrek-Escape-The-Swamp',repo:RL('dadasuki','Shrek-Escape-The-Swamp'),desc:'Shrek: Escape The Swamp, a game from Yandex Games.',icon:'SH',color:'green',tags:['Adventure','Yandex Games']},
   {sec:'apps',group:'Apps By Suki',name:'Sukis Multi Tools',url:'https://raw.githubusercontent.com/jace01b-web/other/refs/heads/main/Sukis%20Multi%20Tools%20App.html',desc:'My multi tools app, including over 20 apps! Includes things like calculators, reaction test, and more!',icon:'SMT',color:'lime'},
   {sec:'apps',group:'Apps By Suki',name:'The Long Hall [Beta Version]',url:'https://raw.githubusercontent.com/AniItsukiCoded/tlh/refs/heads/main/index.html',desc:'Beta version of my game The Long Hall.',icon:'TLH',color:'red'},
   {sec:'apps',group:'Apps By Suki',name:'The Long Hall [Multiplayer]',url:'https://raw.githubusercontent.com/AniItsukiCoded/The-Long-Hall-AutoUpd/refs/heads/main/index.html',desc:'The full release version of The Long Hall: the boiled one. Play solo or with friends and try to escape the boiled one.',icon:'TLH',color:'red'},
@@ -1871,6 +1879,8 @@ const MAIN_ITEM=byKey.main;
 /* Proxies: only these. The links are never shown on screen (stored encoded, opened inside about:blank). */
 const PXDEF=[['Opium','aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL2NsZXZlcmxlYXJuaW5nL3N0dWR5','violet'],['Strawberrii','aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3N0cmF3YmVycmlpL2luZGV4Lmh0bWw=','rose'],['Achroma','aHR0cHM6Ly9zaTFhYXdtYXozdy5tYXAuYXppb25lZGdlLm5ldA==','cyan']];
 const PX=PXDEF.map(([n,e,c])=>register({sec:'proxies',name:n,url:atob(e),desc:'Web proxy for opening blocked sites.',icon:'🌐',color:c,key:'proxies::'+n}));
+/* Relay (by Suki) is a single raw page, so it opens in the same cloaked about:blank shell as every other app: panic key and leave-the-tab cover included */
+PX.push(register({sec:'proxies',name:'Relay',url:'https://raw.githubusercontent.com/jace01b-web/Relay-Proxy-Loader/refs/heads/main/loader.html',desc:'Relay proxy by Suki. Relaunch if blocked to UNBLOCK it.',icon:'RL',color:'cyan',key:'proxies::Relay'}));
 const pxCredit='Every proxy here belongs to its original creators. Full credit to them.';
 
 const fav=()=>store.get('fav',[]),rec=()=>store.get('rec',[]);
@@ -1994,6 +2004,328 @@ async function fetchText(url){
   }
   throw last;
 }
+/* ===================== MULTI-FILE APPS (whole GitHub repos) =====================
+   Some games are a folder of files (loader, .wasm, .data, css, images...). They can't be one srcdoc string, so:
+   1. The file list comes from the GitHub API (git tree, with each file's hash). If that is rate-limited or
+      blocked it falls back to jsDelivr's listing, then to the last list this device saw, then to the list
+      baked into this launcher. A repo is never "unavailable" just because one service is down.
+   2. Every file is downloaded from raw.githubusercontent.com, with jsDelivr mirrors as backup, and checked
+      against its git hash. Downloads are kept in the browser cache keyed by that hash, so the next launch
+      only re-downloads files that actually changed on GitHub (that's the auto-update).
+   3. Site Saver ".js" packs (base64 files) and Brotli/gzip files are unpacked here, then every file gets a
+      blob: URL. A tiny virtual file system is injected into the page so fetch/XHR/<script>/<img>/CSS all
+      find their files, which works the same in about:blank, an iframe or a tab.
+   Nothing here is per-game: a new repo only needs an entry in HUBS with a `repo` field. */
+const RLCAM=`(function(){try{if(window.__rlCam)return;window.__rlCam=1;
+var MP=MouseEvent.prototype,dx=Object.getOwnPropertyDescriptor(MP,'movementX'),dy=Object.getOwnPropertyDescriptor(MP,'movementY');
+if(!dx||!dx.get||!dy||!dy.get)return;
+var pn=function(){return window.performance&&performance.now?performance.now():Date.now()},quiet=0,skip=0,V=new WeakMap(),SPIKE=450;
+function arm(ms,n){quiet=Math.max(quiet,pn()+ms);skip=Math.max(skip,n)}
+['pointerlockchange','visibilitychange','fullscreenchange'].forEach(function(t){document.addEventListener(t,function(){arm(t==='pointerlockchange'?240:140,3)},true)});
+['focus','blur','pageshow'].forEach(function(t){addEventListener(t,function(){arm(140,2)},true)});
+arm(700,3);
+function bad(e){var v=V.get(e);if(v!==undefined)return v;v=false;
+ if(e.isTrusted){var t=e.type,mv=(t==='mousemove'||t==='pointermove'||t==='pointerrawupdate');
+  if(pn()<quiet)v=true;
+  else if(mv&&skip>0){skip--;v=true}
+  else if(document.pointerLockElement){var x=dx.get.call(e),y=dy.get.call(e);if(Math.abs(x)>SPIKE||Math.abs(y)>SPIKE)v=true}}
+ V.set(e,v);return v}
+Object.defineProperty(MP,'movementX',{configurable:true,enumerable:true,get:function(){var v=dx.get.call(this);return bad(this)?0:v}});
+Object.defineProperty(MP,'movementY',{configurable:true,enumerable:true,get:function(){var v=dy.get.call(this);return bad(this)?0:v}});
+}catch(_){}})();`;
+
+/* the virtual file system that runs inside the opened page. Its source is sent over as text, M is {path: blob url}. */
+const RLVFS=function(M){try{
+/* a page written into about:blank / an iframe has document.URL "about:srcdoc", and Unity (and plenty of other code) does new URL(x, document.URL), which throws. Give it a real-looking address. */
+var fb=(location.origin&&location.origin!=='null'?location.origin:'https://game.invalid')+'/index.html';
+try{if(!/^https?:/i.test(document.URL)){Object.defineProperty(document,'URL',{configurable:true,get:function(){return fb}});Object.defineProperty(document,'documentURI',{configurable:true,get:function(){return fb}})}}catch(_){}
+var L={},KV={};for(var k in M){L[k.toLowerCase()]=M[k];KV[M[k]]=1}
+function norm(p){var o=[];p.split('/').forEach(function(s){if(s==='..')o.pop();else if(s&&s!=='.')o.push(s)});return o.join('/')}
+function look(u){
+ if(u==null)return null;if(typeof u!=='string')u=String(u.url||u.href||u);
+ if(/^blob:/i.test(u)){if(KV[u.split('#')[0]])return null;var r=u.replace(/^blob:(?:[a-z]+:\/\/[^\/]*|null)\//i,'');if(r===u)return null;u=r}
+ if(/^(data:|javascript:|about:)/i.test(u))return null;
+ var p=u.split('#')[0].split('?')[0];
+ if(/^[a-z][a-z0-9+.\-]*:/i.test(p)||p.slice(0,2)==='//'){
+  try{var a=new URL(u,location.href);if(a.origin!==location.origin&&a.protocol!=='about:')return null;p=a.pathname}catch(_){return null}}
+ try{p=decodeURIComponent(p)}catch(_){}
+ p=norm(p);var s=p.split('/');
+ for(var i=0;i<s.length;i++){var c=s.slice(i).join('/');if(M[c])return M[c];if(L[c.toLowerCase()])return L[c.toLowerCase()]}
+ return null}
+var rf=window.fetch;
+window.fetch=function(i,n){var m=look(i);if(m){return rf.call(this,m,(i&&i.url)?undefined:n)}return rf.apply(this,arguments)};
+var xo=XMLHttpRequest.prototype.open;
+XMLHttpRequest.prototype.open=function(a,u){var m=look(u);if(m){arguments[1]=m}return xo.apply(this,arguments)};
+function hook(P,prop){try{var d=Object.getOwnPropertyDescriptor(P,prop);if(!d||!d.set)return;
+ Object.defineProperty(P,prop,{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){var m=look(v);d.set.call(this,m||v)}})}catch(_){}}
+hook(HTMLScriptElement.prototype,'src');hook(HTMLLinkElement.prototype,'href');hook(HTMLImageElement.prototype,'src');
+hook(HTMLMediaElement.prototype,'src');hook(HTMLSourceElement.prototype,'src');hook(HTMLIFrameElement.prototype,'src');
+var sa=Element.prototype.setAttribute;
+Element.prototype.setAttribute=function(n,v){if((n==='src'||n==='href')&&typeof v==='string'){var m=look(v);if(m)v=m}return sa.call(this,n,v)};
+var W=window.Worker;if(W){window.Worker=function(u,o){var m=look(u);return new W(m||u,o)};window.Worker.prototype=W.prototype}
+var A=window.Audio;if(A){window.Audio=function(u){var a=new A();if(u!==undefined)a.src=u;return a};window.Audio.prototype=A.prototype}
+}catch(e){try{console.error('vfs',e)}catch(_){}}};
+
+const RLSKIP=/(^|\/)(\.gitattributes|\.gitignore|license[^\/]*|readme[^\/]*|[^\/]*\.(bat|sh|md))$/i;
+const RLPACK=/\.(ssp|br|gz|unityweb)\.js$/i;
+const rlEnc=p=>p.split('/').map(encodeURIComponent).join('/');
+const rlLS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(_){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
+const RLMEM=new Map();            // repo -> {ver, urls:{path:blobUrl}} kept for this session so reopening is instant
+
+function rlMime(p){
+  p=p.toLowerCase().replace(/\.(br|gz|gzip|unityweb)$/,'');
+  const m={wasm:'application/wasm',js:'application/javascript',mjs:'application/javascript',json:'application/json',css:'text/css',html:'text/html',htm:'text/html',
+    png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',svg:'image/svg+xml',ico:'image/x-icon',
+    mp3:'audio/mpeg',ogg:'audio/ogg',wav:'audio/wav',mp4:'video/mp4',webm:'video/webm',woff:'font/woff',woff2:'font/woff2',ttf:'font/ttf',otf:'font/otf',txt:'text/plain'};
+  const e=(p.match(/\.([a-z0-9]+)$/)||[])[1];
+  return m[e]||'application/octet-stream';
+}
+async function rlJSON(url){
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),9000);
+  try{const r=await fetch(url,{signal:ctl.signal,cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}
+  finally{clearTimeout(to)}
+}
+/* file list: [[path, version, size], ...] and which source it came from */
+async function rlTree(R){
+  const key='rl_tree_'+R.o+'/'+R.r;
+  const srcs=[
+    ['api',async()=>{const j=await rlJSON('https://api.github.com/repos/'+R.o+'/'+R.r+'/git/trees/'+encodeURIComponent(R.b)+'?recursive=1');
+      if(!j.tree||j.truncated)throw new Error('bad tree');return j.tree.filter(x=>x.type==='blob').map(x=>[x.path,x.sha,x.size])}],
+    ['jsdelivr',async()=>{const j=await rlJSON('https://data.jsdelivr.com/v1/package/gh/'+R.o+'/'+R.r+'@'+encodeURIComponent(R.b)+'/flat');
+      if(!j.files||!j.files.length)throw new Error('bad list');return j.files.map(f=>[f.name.replace(/^\//,''),'jd:'+f.hash,f.size])}]
+  ];
+  for(const [name,fn] of srcs){
+    try{const t=await fn();if(t.length){rlLS.set(key,t);return{files:t,from:name}}}catch(_){}
+  }
+  const saved=rlLS.get(key);if(saved&&saved.length)return{files:saved,from:'saved'};
+  return{files:R.files,from:'built-in'};
+}
+async function rlFetchBuf(url,onBytes){
+  const ctl=new AbortController();let idle=setTimeout(()=>ctl.abort(),30000);
+  try{
+    const r=await fetch(url,{signal:ctl.signal});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const total=+r.headers.get('content-length')||0;
+    if(!r.body||!r.body.getReader){const b=new Uint8Array(await r.arrayBuffer());onBytes&&onBytes(b.length);return b}
+    const rd=r.body.getReader(),parts=[];let n=0;
+    for(;;){
+      const {done,value}=await rd.read();if(done)break;
+      parts.push(value);n+=value.length;onBytes&&onBytes(value.length);
+      clearTimeout(idle);idle=setTimeout(()=>ctl.abort(),30000);
+    }
+    const out=new Uint8Array(n);let o=0;for(const p of parts){out.set(p,o);o+=p.length}
+    return out;
+  }finally{clearTimeout(idle)}
+}
+async function rlGitSha(b){
+  if(!(window.crypto&&crypto.subtle))return null;
+  const h=new TextEncoder().encode('blob '+b.length+'\0'),all=new Uint8Array(h.length+b.length);all.set(h);all.set(b,h.length);
+  const d=new Uint8Array(await crypto.subtle.digest('SHA-1',all));
+  return Array.from(d,x=>x.toString(16).padStart(2,'0')).join('');
+}
+/* downloads one file with mirrors. Checks the git hash; a mirror serving an old copy is skipped, but if every
+   source disagrees the newest-looking copy is still used rather than failing. */
+async function rlDownload(R,path,ver,onBytes){
+  const e=rlEnc(path),base=R.o+'/'+R.r;
+  const urls=[
+    'https://raw.githubusercontent.com/'+base+'/refs/heads/'+encodeURIComponent(R.b)+'/'+e,
+    'https://cdn.jsdelivr.net/gh/'+base+'@'+encodeURIComponent(R.b)+'/'+e,
+    'https://fastly.jsdelivr.net/gh/'+base+'@'+encodeURIComponent(R.b)+'/'+e,
+    'https://gcore.jsdelivr.net/gh/'+base+'@'+encodeURIComponent(R.b)+'/'+e,
+    'https://raw.githubusercontent.com/'+base+'/'+encodeURIComponent(R.b)+'/'+e
+  ];
+  let fallback=null,last;
+  for(let round=0;round<2;round++){
+    for(const u of urls){
+      let got=0;
+      try{
+        const b=await rlFetchBuf(u,n=>{got+=n;onBytes&&onBytes(n)});
+        if(!/^[0-9a-f]{40}$/.test(ver||''))return b;
+        const sha=await rlGitSha(b);
+        if(sha===null||sha===ver)return b;
+        fallback=b;last=new Error('hash mismatch');
+      }catch(err){last=new Error(path+' ('+u.split('/')[2]+'): '+(err&&err.message||err))}
+      onBytes&&onBytes(-got);          // this attempt didn't count
+    }
+    if(fallback)return fallback;
+    await new Promise(r=>setTimeout(r,700));
+  }
+  throw last||new Error('download failed');
+}
+/* Site Saver pack: __ss_pack("path","BASE64") -> the real bytes */
+function rlUnpack(buf){
+  const dec=new TextDecoder('latin1'),head=dec.decode(buf.subarray(0,1024));
+  const m=head.match(/^\s*__ss_pack\(\s*"(?:[^"\\]|\\.)*"\s*,\s*"/);
+  if(!m)return buf;
+  const start=m[0].length;let end=buf.length;
+  while(end>start&&buf[end-1]!==34)end--;            // closing quote
+  end--;
+  let n=end-start,pad=0;
+  if(buf[end-1]===61)pad++;if(buf[end-2]===61)pad++;
+  const out=new Uint8Array((n/4)*3-pad),CH=4194304;let o=0;
+  for(let i=start;i<end;i+=CH){
+    const bin=atob(dec.decode(buf.subarray(i,Math.min(end,i+CH))));
+    for(let j=0;j<bin.length;j++)out[o++]=bin.charCodeAt(j);
+  }
+  return out;
+}
+let rlBrotli=null;
+async function rlBrotliSrc(R,treeFiles){
+  if(rlBrotli)return rlBrotli;
+  const own=treeFiles.find(f=>/(^|\/)brotli-decode\.js$/i.test(f[0]));
+  let b;
+  if(own)b=await rlDownload(R,own[0],own[1]);
+  else b=await rlDownload({o:'dadasuki',r:'Shrek-Escape-The-Swamp',b:'main'},'_sdk/brotli-decode.js','');
+  return rlBrotli=new TextDecoder().decode(b);
+}
+async function rlInflate(R,treeFiles,path,bytes){
+  const head=new TextDecoder('latin1').decode(bytes.subarray(0,64));
+  if(/UnityWeb Compressed Content \(brotli\)/.test(head)||/\.br$/i.test(path)){
+    const src=await rlBrotliSrc(R,treeFiles);
+    try{
+      const wsrc=src+';onmessage=function(e){try{var r=BrotliDecode(new Int8Array(e.data));var b=r.byteLength===r.buffer.byteLength?r.buffer:r.buffer.slice(r.byteOffset,r.byteOffset+r.byteLength);postMessage({ok:b},[b])}catch(x){postMessage({err:String(x)})}};';
+      const url=URL.createObjectURL(new Blob([wsrc],{type:'application/javascript'}));
+      const w=new Worker(url);
+      const copy=bytes.slice().buffer;
+      const res=await new Promise((ok,bad)=>{w.onmessage=e=>e.data.ok?ok(new Uint8Array(e.data.ok)):bad(new Error(e.data.err));w.onerror=e=>bad(new Error('worker'));w.postMessage(copy,[copy])});
+      w.terminate();URL.revokeObjectURL(url);return res;
+    }catch(e){
+      const fn=new Function(src+';return BrotliDecode')();       // no worker allowed: do it on this thread
+      const r=fn(new Int8Array(bytes.buffer,bytes.byteOffset,bytes.length));return new Uint8Array(r.buffer,r.byteOffset,r.length);
+    }
+  }
+  if(bytes[0]===0x1f&&bytes[1]===0x8b&&/\.(gz|gzip|unityweb)$/i.test(path)&&window.DecompressionStream){
+    const st=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Uint8Array(await new Response(st).arrayBuffer());
+  }
+  return bytes;
+}
+/* turn the raw file list into the files the page actually asks for: packs become their real names, and the
+   copy of a file that exists in both forms is only downloaded once */
+function rlPlan(files){
+  const have=new Set(files.map(f=>f[0])),plan=[];
+  for(const [p,v,s] of files){
+    if(RLSKIP.test(p))continue;
+    if(RLPACK.test(p)){
+      const real=p.replace(/\.ssp\.js$/i,'').replace(/\.js$/i,'');
+      if(have.has(real))continue;                   // the plain file is there, ignore the pack copy
+      plan.push({path:p,key:real,ver:v,size:s,pack:true});
+    }else plan.push({path:p,key:p,ver:v,size:s,pack:false});
+  }
+  return plan;
+}
+const rlJoin=(dir,p)=>{const o=dir?dir.split('/'):[];p.split('/').forEach(s=>{if(s==='..')o.pop();else if(s&&s!=='.')o.push(s)});return o.join('/')};
+function rlLookup(urls,dir,ref){
+  if(!ref||/^(data:|blob:|#|[a-z][a-z0-9+.\-]*:|\/\/)/i.test(ref))return null;
+  let p=ref.split('#')[0].split('?')[0];try{p=decodeURIComponent(p)}catch(_){}
+  p=p.replace(/^\//,'');
+  return urls[rlJoin(dir,p)]||urls[rlJoin('',p)]||null;
+}
+function rlRewriteCss(css,urls,dir){
+  return css.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi,(m,q,u)=>{const b=rlLookup(urls,dir,u.trim());return b?'url('+q+b+q+')':m});
+}
+function rlInject(text,snippet){
+  const tag='<script>'+snippet.replace(/<\/script/gi,'<\\/script')+'<\/script>';
+  let m=text.match(/<head(\s[^>]*)?>/i);
+  if(m)return text.slice(0,m.index+m[0].length)+tag+text.slice(m.index+m[0].length);
+  m=text.match(/<html(\s[^>]*)?>/i);
+  if(m)return text.slice(0,m.index+m[0].length)+'<head>'+tag+'</head>'+text.slice(m.index+m[0].length);
+  m=text.match(/<!doctype[^>]*>/i);
+  if(m)return text.slice(0,m.index+m[0].length)+tag+text.slice(m.index+m[0].length);
+  return tag+text;
+}
+/* progress: fn(fraction 0..1, label) */
+async function rlBuild(h,progress){
+  const R=h.repo,id=R.o+'/'+R.r;
+  progress&&progress(0,'Checking for updates');
+  const t=await rlTree(R);
+  const plan=rlPlan(t.files);
+  const verKey=plan.map(p=>p.path+':'+p.ver).join('|');
+  const entryPath=R.entry||'index.html';
+  const mem=RLMEM.get(id);
+  let urls,mapSrc;
+  if(mem&&mem.ver===verKey){urls=mem.urls}
+  else{
+    let cache=null;try{if(window.caches)cache=await caches.open('rl-'+id)}catch(_){}
+    const total=plan.reduce((a,p)=>a+(p.size||0),0)||1;let done=0;
+    const tick=(n,label)=>{done=Math.max(0,done+n);progress&&progress(Math.min(.97,done/total),label)};
+    const data={};                                   // key -> Uint8Array (final bytes)
+    const order=plan.slice().sort((a,b)=>(b.size||0)-(a.size||0));
+    let ni=0,err=null,fresh=0;const missing=[];
+    const worker=async()=>{
+      while(ni<order.length&&!err){
+        const f=order[ni++],ck='https://rl.local/'+rlEnc(f.path);
+        try{
+          let bytes=null;
+          if(cache){
+            try{const r=await cache.match(ck);if(r&&r.headers.get('x-v')===String(f.ver)){bytes=new Uint8Array(await r.arrayBuffer());tick(f.size||bytes.length,'Loading')}}catch(_){}
+          }
+          if(!bytes){
+            let b=await rlDownload(R,f.path,f.ver,n=>tick(n,'Downloading'));
+            if(f.pack)b=rlUnpack(b);
+            bytes=b;fresh++;
+            if(cache){try{await cache.put(ck,new Response(bytes.slice(),{headers:{'x-v':String(f.ver)}}))}catch(_){}}
+          }
+          data[f.key]=await rlInflate(R,t.files,f.key,bytes);
+        }catch(e){
+          if(/\.(ico|png|jpe?g|gif|svg|webp|mp3|ogg|wav|woff2?|ttf|otf)$/i.test(f.key)){missing.push(f.key);try{console.warn('Relay loader: skipped',f.key,e)}catch(_){}}   // an icon or picture that won't download shouldn't stop the game
+          else err=e;
+        }
+      }
+    };
+    await Promise.all([worker(),worker(),worker()]);
+    if(err)throw err;
+    if(cache){                                       // drop files that no longer exist on GitHub
+      try{const keep=new Set(plan.map(p=>'https://rl.local/'+rlEnc(p.path)));for(const rq of await cache.keys())if(!keep.has(rq.url))await cache.delete(rq)}catch(_){}
+    }
+    progress&&progress(.98,'Starting');
+    urls={};
+    const css=[];
+    for(const f of plan){
+      if(!data[f.key])continue;
+      if(/\.css$/i.test(f.key)){css.push(f);continue}
+      let fb=data[f.key];
+      if(/(^|\/)offline-shim\.js$/i.test(f.key))fb=new TextEncoder().encode(new TextDecoder().decode(fb).replace(/document\.currentScript/g,'null'));   // our file system does its job; this keeps only its resolution cap
+      urls[f.key]=URL.createObjectURL(new Blob([fb],{type:rlMime(f.key)}));
+    }
+    for(const f of css){                             // stylesheets point at images, so they go last
+      const dir=f.key.includes('/')?f.key.replace(/\/[^\/]*$/,''):'';
+      const txt=rlRewriteCss(new TextDecoder().decode(data[f.key]),urls,dir);
+      urls[f.key]=URL.createObjectURL(new Blob([txt],{type:'text/css'}));
+    }
+    RLMEM.set(id,{ver:verKey,urls});
+    while(RLMEM.size>2)RLMEM.delete(RLMEM.keys().next().value);   // don't hold every game's files at once
+    rlLS.set('rl_ver_'+id,{ver:verKey,at:Date.now(),from:t.from,fresh});
+  }
+  /* the entry page */
+  let entry=entryPath;
+  if(!plan.some(p=>p.key===entry)){const e=plan.find(p=>/^[^\/]+\.html?$/i.test(p.key));if(e)entry=e.key;else throw new Error('No page to open in '+id)}
+  let html=await (await fetch(urls[entry])).text();
+  html=html.replace(/<meta[^>]+http-equiv\s*=\s*["']?content-security-policy["']?[^>]*>/gi,'');
+  const dir=entry.includes('/')?entry.replace(/\/[^\/]*$/,''):'';
+  /* offline-shim.js from the export tries to serve files itself; ours does that now, so it only keeps the resolution cap */
+  html=html.replace(/(\s(?:src|href|poster|data-src)\s*=\s*)(["'])(.*?)\2/gi,(m,a,q,v)=>{const b=rlLookup(urls,dir,v);return b?a+q+b+q:m});
+  html=rlRewriteCss(html,urls,dir);
+  const map={};for(const k in urls){map[k]=urls[k];if(dir&&k.startsWith(dir+'/'))map[k.slice(dir.length+1)]=urls[k]}
+  const snip='('+RLVFS.toString()+')('+JSON.stringify(map).replace(/<\//g,'<\\/')+');\n'+RLCAM;
+  progress&&progress(1,'Ready');
+  return rlInject(html,snip);
+}
+/* every app that opens as text goes through here: whole repos are built, single files get the camera guard */
+async function appText(h,progress){
+  if(h.repo)return rlBuild(h,progress);
+  return rlInject(await fetchText(h.url),RLCAM);
+}
+const needsText=h=>!!h.repo||isRaw(h.url);
+/* a progress toast that stays until the app is ready */
+function rlProgress(name){
+  const t=document.createElement('div');t.className='toast load';t.innerHTML='<i></i><span></span>';
+  const s=t.querySelector('span');s.textContent='Loading '+name+'…';
+  toasts.appendChild(t);
+  let last=0;
+  return{fn:(f,label)=>{const now_=Date.now();if(f<1&&now_-last<150)return;last=now_;s.textContent=(label||'Loading')+' '+name+(f>0&&f<1?' · '+Math.round(f*100)+'%':'…')},
+    done:()=>t.remove()};
+}
 const isRaw=u=>/raw\.githubusercontent\.com/.test(u||'');
 const openMode=()=>store.get('open','blank');           // blank | iframe | tab
 function pushRecent(h){store.set('opens',store.get('opens',0)+1);store.set('rec',[h.key,...rec().filter(x=>x!==h.key)].slice(0,8))}
@@ -2019,14 +2351,14 @@ function stampIcon(win,title){
 const SPLASH=n=>'<!DOCTYPE html><title>'+esc(CLOAK_NAME)+'</title><link rel="icon" href="'+CLOAK_ICON+'"><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0b0c1a;color:#9a9dc4;font:600 16px system-ui,sans-serif">Loading '+esc(n)+'…</body>';
 /* new tab: raw.githubusercontent.com serves source as plain text, so those are fetched and written into a blank tab */
 function openTab(h){
-  if(!isRaw(h.url)){window.open(h.url,'_blank','noopener');return}
+  if(!needsText(h)){window.open(h.url,'_blank','noopener');return}
   const win=window.open('about:blank','_blank');
   if(!win){toast('Popup blocked — allow popups for this site','err');return}
   try{win.document.open();win.document.write(SPLASH(h.name));win.document.close()}catch(_){}
   stampIcon(win);
-  const t=toast('Loading '+h.name+'...','load');
-  fetchText(h.url).then(text=>{t.remove();if(win.closed)return;win.document.open();win.document.write(text);win.document.close();stampIcon(win)})
-    .catch(()=>{t.remove();try{win.close()}catch(_){}toast('Failed to load '+h.name,'err')});
+  const pg=rlProgress(h.name);
+  appText(h,pg.fn).then(text=>{pg.done();if(win.closed)return;win.document.open();win.document.write(text);win.document.close();stampIcon(win)})
+    .catch(()=>{pg.done();try{win.close()}catch(_){}toast('Failed to load '+h.name,'err')});
 }
 /* about:blank launch: DeltaMath sits in the tab permanently, and after a delay the app fades in on top of it */
 const qshell=()=>{
@@ -2078,7 +2410,14 @@ async function blankShell(name,getContent,delay,onOpen){
   return win;
 }
 function blankApp(h){
-  blankShell(h.name,()=>isRaw(h.url)?fetchText(h.url).then(x=>({srcdoc:x})):Promise.resolve({src:h.url}),loadDelay(),()=>armTrouble(h));
+  let pg=null;
+  blankShell(h.name,()=>{
+    if(!needsText(h))return Promise.resolve({src:h.url});
+    if(h.repo)pg=rlProgress(h.name);
+    const p=appText(h,pg&&pg.fn).then(x=>({srcdoc:x}));
+    p.then(()=>pg&&pg.done(),()=>pg&&pg.done());
+    return p;
+  },loadDelay(),()=>armTrouble(h));
 }
 
 /* ---- "Having trouble?" prompt when you come back to the launcher after an about:blank launch ---- */
@@ -2118,8 +2457,10 @@ async function viewerOpen(h){
   const reveal=()=>{if(done||tok!==vTok)return;done=true;V.classList.add('loaded')};
   f.addEventListener('load',()=>{if(f.getAttribute('src')==='about:blank')return;setTimeout(reveal,40)});
   setTimeout(reveal,15000);
-  if(isRaw(h.url)){
-    try{const text=await fetchText(h.url);if(tok!==vTok)return;vText=text;f.srcdoc=text}
+  if(needsText(h)){
+    try{
+      const text=await appText(h,h.repo?((fr,l)=>{if(tok===vTok)$('#vLoadTxt').textContent=(l||'Loading')+' '+h.name+(fr>0&&fr<1?' · '+Math.round(fr*100)+'%':'…')}):null);
+      if(tok!==vTok)return;vText=h.repo?null:text;f.srcdoc=text}
     catch(e){if(tok!==vTok)return;$('#vLoadTxt').innerHTML='Couldn\'t load '+esc(h.name)+'.<br><br><button class="btn pri sm" id="vRetry" type="button" style="pointer-events:auto">Retry</button>';$('#vLoad .spinr').style.display='none';
       $('#vRetry').onclick=()=>{$('#vLoad .spinr').style.display='';viewerOpen(h)}}
   }else f.src=h.url;
@@ -2134,7 +2475,7 @@ function viewerClose(){
 $('#vClose').onclick=viewerClose;
 $('#vReload').onclick=()=>{if(vCur)viewerOpen(vCur)};
 $('#vTab').onclick=()=>{if(vCur)openTab(vCur)};
-$('#vDl').onclick=()=>{if(vCur)dlApp(vCur.name,vCur.url,vText)};
+$('#vDl').onclick=()=>{if(!vCur)return;if(vCur.repo){toast('This game is made of many files, so it can\u2019t be saved as one page.','err');return}dlApp(vCur.name,vCur.url,vText)};
 $('#vDlL').onclick=dlLauncher;
 $('#vExit').onclick=()=>V.classList.remove('bare');
 $('#vFull').onclick=()=>{
