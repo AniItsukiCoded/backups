@@ -951,6 +951,42 @@ html[data-bg="black"] .bgfx,html[data-bg="black"] .bgx{display:none}
 html[data-bg="black"] body{background:#04040a}
 html[data-bg="black"]{--g1:#04040a;--g2:#0a0a14}
 
+
+/* ---------- Roblox announcement (top left, level with the nav) ---------- */
+/* Big screens: a card in the empty left gutter beside the nav. Its width follows the free space, and everything
+   inside is sized in cqw, so it scales smoothly from a wide monitor down to a 1366px Chromebook.
+   Narrower than that there is no gutter, so it becomes a slim pill tucked just under the nav. */
+.rbx{position:fixed;top:12px;left:8px;z-index:34;width:clamp(154px,calc((100vw - 996px)/2 - 18px),224px);container-type:inline-size;color:var(--text);
+  transform-origin:0 50%;transform:translateX(-130%) rotate(-6deg);opacity:0;pointer-events:none}
+.rbx .rc{position:relative;display:block;padding:6.2cqw;border-radius:9cqw;overflow:hidden;
+  background:linear-gradient(160deg,rgba(34,30,58,.9),rgba(15,16,30,.92));backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);
+  border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 34px rgba(0,0,0,.5),0 0 26px color-mix(in srgb,var(--a) 30%,transparent)}
+.rbx .rc::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--a),var(--b),var(--a));background-size:200% 100%;animation:rbxLine 4s linear infinite}
+.rbx .rc::after{content:"";position:absolute;right:-15cqw;top:-15cqw;width:50cqw;height:50cqw;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--b) 38%,transparent),transparent 70%);pointer-events:none}
+.rbx.in{pointer-events:auto;animation:rbxIn 1s var(--spring) .3s forwards,rbxBob 5s ease-in-out 1.5s infinite}
+@keyframes rbxIn{0%{transform:translateX(-130%) rotate(-6deg);opacity:0}45%{opacity:1}72%{transform:translateX(4%) rotate(2deg);opacity:1}100%{transform:none;opacity:1}}
+@keyframes rbxBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes rbxLine{to{background-position:200% 0}}
+.rbx .rh{position:relative;z-index:1;display:flex;align-items:center;gap:4.5cqw}
+.rbx .rl{flex:0 0 auto;width:17cqw;height:17cqw;border-radius:5cqw;display:grid;place-items:center;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 6px 16px color-mix(in srgb,var(--a) 45%,transparent);transform:rotate(-8deg);transition:transform .4s var(--spring)}
+.rbx:hover .rl{transform:rotate(8deg) scale(1.08)}
+.rbx .rl svg{width:52%;height:52%;display:block}
+.rbx .rt{min-width:0}
+.rbx .rt small{display:block;font-size:max(9px,4.5cqw);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--b) 70%,#fff);margin-bottom:1.4cqw}
+.rbx .rt b{display:block;font-size:max(11px,6.3cqw);line-height:1.25;font-weight:800;letter-spacing:-.01em}
+.rbx .rt b em{font-style:normal;background:linear-gradient(135deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.rbx .rv{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:3.5cqw;margin-top:5.4cqw;padding:4.5cqw 6cqw;border-radius:6cqw;font-family:inherit;font-weight:800;font-size:max(12px,6cqw);line-height:1;color:#fff;text-decoration:none;
+  background:linear-gradient(135deg,var(--a),var(--c));border:1px solid rgba(255,255,255,.2);box-shadow:0 8px 20px color-mix(in srgb,var(--a) 40%,transparent);transition:transform .25s var(--spring),box-shadow .25s,filter .25s}
+.rbx .rv svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s var(--spring)}
+.rbx .rv:hover{transform:translateY(-2px);filter:brightness(1.12);box-shadow:0 12px 26px color-mix(in srgb,var(--a) 55%,transparent)}
+.rbx .rv:hover svg{transform:translate(2px,-2px)}
+.rbx .rv:active{transform:scale(.97)}
+.rbx .rv:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* no gutter left (Chromebooks, laptops, small windows): the same box, a bit smaller, tucked just under the nav */
+@media(max-width:1339px){.rbx{top:74px;width:188px}}
+@media(max-width:560px){.rbx{left:6px;width:164px}}
+@media(max-height:520px){.rbx{top:62px}}
+html.app-open .rbx,html.app-launching .rbx,html.no-signs .rbx,html.os-mode .rbx{display:none!important}
 /* ---------- hide the two signs ---------- */
 html.no-signs .hsign,html.no-signs .dly{display:none!important}
 html.no-signs .nav{margin-right:0!important;margin-left:0!important}
@@ -1235,6 +1271,11 @@ html.app-open .os,html.app-launching .os{display:none!important}
 <div id="deco" aria-hidden="true"></div>
 <div class="toasts" id="toasts"></div>
 <div class="dly" id="dly" role="group" aria-label="Loading screen time: how many seconds DeltaMath shows before your site or game loads"><span class="pic"><img id="dlyImg" alt=""><span class="st" title="How many seconds the DeltaMath page shows before your site or game loads"><i>Screen time</i><span class="row"><button class="stp" id="dlyMinus" type="button" aria-label="One second less"><svg viewBox="0 0 40 40" aria-hidden="true"><path class="disc" d="M20.2 3.4c9.1-.5 16.6 6.5 16.8 15.9.2 9.6-6.9 17.2-16.6 17.4-9.5.2-17-6.8-17.1-16.2C3.2 11 10.6 3.9 20.2 3.4z"/><path class="shine" d="M9.2 14.2c1.8-4.4 5.2-7 9.4-7.7"/><path class="mark" d="M12.4 20.6c4.9-.5 10.1-.7 15.3-.8"/></svg></button><input id="dlyIn" type="number" min="0" max="60" step="1" inputmode="numeric" aria-label="Seconds to show DeltaMath before the site or game loads"><button class="stp" id="dlyPlus" type="button" aria-label="One second more"><svg viewBox="0 0 40 40" aria-hidden="true"><path class="disc" d="M19.8 3.3c9.3-.2 16.9 6.8 17 16.3.1 9.4-7 17-16.5 17.2-9.4.2-17-6.9-17.1-16.3C3.1 10.9 10.4 3.5 19.8 3.3z"/><path class="shine" d="M9.2 14.2c1.8-4.4 5.2-7 9.4-7.7"/><path class="mark" d="M12.3 20.3c5.1-.6 10.2-.8 15.4-.6M20 12.2c-.4 5.2-.4 10.3-.2 15.6"/></svg></button></span><span class="unit">seconds before<br>your game loads</span><button class="chip dlyRec" type="button">Recommended: 6s</button></span><button class="info" id="dlyInfo" type="button" aria-label="What is this?" aria-expanded="false">?</button></span><div class="dtip" role="note"><button class="dx" id="dlyClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="dh"><span class="dq">?</span><b>What is this?</b></div><p>When you open a site or game, a DeltaMath page shows first. Pick how many seconds it stays before your site or game loads.</p><small>0 loads right away. Recommended is 6 seconds.</small><button class="dlyRec" type="button">Recommended: 6s</button></div></div>
+<div class="rbx" id="rbx" role="complementary" aria-label="Itsukis Chat Hub is now on Roblox"><div class="rc">
+  <div class="rh"><span class="rl" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3" transform="rotate(14 12 12)" fill="#fff"/><rect x="9.4" y="9.4" width="5.2" height="5.2" rx=".8" transform="rotate(14 12 12)" fill="#5a4bff"/></svg></span>
+  <span class="rt"><small>New</small><b>Itsukis Chat Hub is now on <em>Roblox</em></b></span></div>
+  <a class="rv" href="https://www.roblox.com/games/112595801330773/" target="_blank" rel="noopener noreferrer">Visit<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+</div></div>
 <button class="hsign" id="hsign" type="button" title="Open in about:blank (this tab goes to Google)" aria-label="Open in about:blank and send this tab to Google"><span class="pic"><img id="signImg" alt=""><span class="st"><i>launch in</i><b>about<em>:blank</em></b></span></span></button>
 
 <!-- Chat Hub: choose how to launch -->
@@ -2907,7 +2948,7 @@ function panic(){
   try{const a=document.activeElement;if(a&&a.blur)a.blur()}catch(_){}   // keep the key working: nothing inside the page holds focus
   try{window.focus()}catch(_){}
 }
-function showSign(){if(signEl&&signEl.isConnected)signEl.classList.add('in');const d=$('#dly');if(d)d.classList.add('in')}
+function showSign(){if(signEl&&signEl.isConnected)signEl.classList.add('in');const d=$('#dly');if(d)d.classList.add('in');const rb=$('#rbx');if(rb)rb.classList.add('in')}
 
 /* ===================== SCREEN SHIELD + PANIC KEY ===================== */
 let shieldWhy='',rebinding=false;
