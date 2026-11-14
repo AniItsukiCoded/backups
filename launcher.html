@@ -52,6 +52,12 @@ button svg,a svg,.keycap svg{width:15px;height:15px;flex:none;fill:none;stroke:c
 .segc button svg{display:block}
 html{color-scheme:dark;-webkit-text-size-adjust:100%}
 body{
+  /* position:relative makes <body> the containing block for the background
+     layers. They are position:absolute and as tall as the whole document, so
+     the background is part of the page rather than an overlay stuck to the
+     viewport: scrolling moves it with the content, at no cost, because the
+     compositor already owns the layer. See PAGE in the script. */
+  position:relative;
   min-height:100vh;background:var(--bg);color:var(--tx);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;
@@ -64,8 +70,8 @@ a{color:var(--ac-tx);text-decoration:none}
 /* The dot field, its pointer light and Quick Pause's halftone belong to the
    Modern design. They are off here so that they can never lay themselves out
    as ordinary elements if, for any reason, no design sheet is active. */
-#dots{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;display:none}
-#dotglow{position:fixed;top:0;left:0;z-index:0;pointer-events:none;display:none}
+#dots{position:absolute;top:0;left:0;z-index:0;width:100%;height:var(--docH,100%);pointer-events:none;display:none}
+#dotglow{position:absolute;top:0;left:0;z-index:0;pointer-events:none;display:none}
 #qpause .qp-dots{display:none}
 /* the corner clock is part of the Modern shell; Classic keeps its own header */
 #timeWrap{display:none}
@@ -251,6 +257,78 @@ html[data-fxlevel="off"] .segc .segi{transition:none}
 .selwrap svg{position:absolute;right:9px;width:13px;height:13px;pointer-events:none;color:var(--tx3);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 select.field{appearance:none;-webkit-appearance:none;padding-right:28px}
 .cspace{flex:1}
+
+/* ======================================================================
+   CUSTOM DROPDOWN (.dd)
+   A replacement for <select>, because a native one cannot be styled: the
+   popup is drawn by the operating system, so it arrives grey and square in
+   the middle of a dark launcher and takes the theme with it.
+
+   The shape is a trigger button plus a panel, and the panel is appended to
+   <body> rather than nested in the trigger. That is deliberate: the controls
+   that use this sit inside .ctrl and .setrow, which are flex containers with
+   their own overflow and stacking, and a panel nested inside one of those
+   gets clipped by it or trapped under a later sibling. At the top level it
+   answers to nothing but its own z-index, and ddPlace() puts it where the
+   trigger is — above the trigger instead of below when there is not enough
+   room underneath, which is what makes the last row of Settings usable on a
+   short window.
+
+   Everything structural lives here in the base sheet so both designs get the
+   same behaviour and the same geometry; each design sheet then restyles the
+   surfaces, so the dropdown looks like it belongs to whichever one is on.
+   ====================================================================== */
+.dd{position:relative;display:inline-flex;min-width:0;max-width:100%}
+.dd-t{
+  display:inline-flex;align-items:center;gap:8px;width:100%;min-width:0;
+  height:34px;padding:0 10px 0 12px;border-radius:var(--r1);
+  background:var(--s2);border:1px solid var(--line2);color:var(--tx);
+  font-size:13.5px;font-weight:550;text-align:left;
+  transition:background var(--t1),border-color var(--t1),box-shadow var(--t1);
+}
+.dd-t:hover{background:var(--s3);border-color:var(--line3)}
+.dd-t .dd-lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-t .dd-cv{flex:none;width:13px;height:13px;color:var(--tx3);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--t2) var(--ease)}
+.dd.open .dd-t{border-color:var(--ac-line);box-shadow:0 0 0 3px var(--ac-soft)}
+.dd.open .dd-t .dd-cv{transform:rotate(180deg)}
+.dd-t .dd-sw{flex:none;width:14px;height:14px;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+
+/* the panel — one per document, moved and refilled rather than rebuilt */
+.dd-pop{
+  position:absolute;z-index:620;min-width:168px;max-width:min(92vw,360px);
+  padding:5px;border-radius:var(--r2);
+  background:var(--s2);border:1px solid var(--line2);box-shadow:var(--sh3);
+  max-height:min(62vh,360px);overflow:auto;overscroll-behavior:contain;
+  transform-origin:top center;
+}
+.dd-pop[hidden]{display:none}
+.dd-pop.up{transform-origin:bottom center}
+.dd-pop.in{animation:ddIn .15s var(--ease) both}
+.dd-pop.up.in{animation-name:ddInUp}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+@keyframes ddInUp{from{opacity:0;transform:translateY(6px) scale(.97)}}
+.dd-pop.out{opacity:0;transform:translateY(-4px) scale(.985);transition:opacity .12s ease,transform .12s ease}
+.dd-pop.up.out{transform:translateY(4px) scale(.985)}
+html[data-fxlevel="off"] .dd-pop.in{animation:none}
+html[data-fxlevel="off"] .dd-pop.out{transition:none}
+.dd-o{
+  display:flex;align-items:center;gap:9px;width:100%;
+  padding:7px 9px;border-radius:var(--r1);
+  font-size:13.5px;font-weight:550;color:var(--tx2);text-align:left;
+  transition:background var(--t1),color var(--t1);
+}
+.dd-o .dd-ot{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-o .dd-sw{flex:none;width:14px;height:14px;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+/* The tick is always in the layout and only ever changes opacity, so picking
+   an option cannot shift the text of every row by its width. */
+.dd-o .dd-ck{flex:none;width:14px;height:14px;opacity:0;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.dd-o:hover,.dd-o.cur{background:var(--s4);color:var(--tx)}
+.dd-o.on{color:var(--ac-tx)}
+.dd-o.on .dd-ck{opacity:1}
+.dd-o.on.cur,.dd-o.on:hover{background:var(--ac-soft)}
+.dd-sep{height:1px;margin:4px 6px;background:var(--line)}
+.dd-hd{padding:6px 9px 4px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+@media(max-width:620px){.dd{width:100%}}
 .ccount{font-size:12px;color:var(--tx3);white-space:nowrap}
 
 /* proxies side list */
@@ -368,11 +446,12 @@ html[data-fxlevel="off"] .tg i{transition:none}
 /* a five-button segmented control is wider than a phone, so on narrow screens
    rows that hold one stack the control under its label instead of overflowing */
 @media(max-width:700px){
-  .setrow:has(.segc),.setrow:has(.field),.setrow:has(.delay),.setrow:has(.keycap){flex-direction:column;align-items:stretch;gap:9px}
-  .setrow:has(.segc) .ctl,.setrow:has(.field) .ctl,.setrow:has(.keycap) .ctl{width:100%}
+  .setrow:has(.segc),.setrow:has(.field),.setrow:has(.delay),.setrow:has(.keycap),.setrow:has(.dd){flex-direction:column;align-items:stretch;gap:9px}
+  .setrow:has(.segc) .ctl,.setrow:has(.field) .ctl,.setrow:has(.keycap) .ctl,.setrow:has(.dd) .ctl{width:100%}
   .setrow .lbl small{max-width:none}
   .field.w{width:100%}
   .selwrap,.selwrap select{width:100%}
+  .dd{width:100%}
 }
 @supports not selector(:has(*)){
   @media(max-width:700px){.setrow{flex-wrap:wrap}.setrow .lbl{flex:1 1 100%}.setrow .ctl{width:100%}}
@@ -492,13 +571,30 @@ html[data-fxlevel="subtle"] .modal-bg.show .modal{animation:vin .16s var(--ease)
 .spinr{flex:none;width:15px;height:15px;border-radius:50%;border:2px solid var(--s4);border-top-color:var(--ac);animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ---------- viewer ---------- */
-#viewer{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:#06060a}
+/* ---------- viewer ----------
+   --vbar is the toolbar's real height, written by the script after layout.
+   The loading screen and the blocked panel are positioned from it, so they
+   start exactly under the bar at any font size, in either design, and on a
+   phone where the bar wraps to two rows. It used to be a hardcoded 44px,
+   which was right in Modern on a desktop and wrong everywhere else. */
+#viewer{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:#06060a;--vbar:46px}
 #viewer.show{display:flex}
 .vbar{flex:none;display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--line)}
-.vbar .vt{flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
-.vbar .vt i{flex:none;width:6px;height:6px;border-radius:50%;background:var(--ok)}
-.vbar .vt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar .vt{flex:1;min-width:0;display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600}
+.vbar .vt .vt-ic{
+  flex:none;width:24px;height:24px;border-radius:7px;overflow:hidden;
+  display:grid;place-items:center;font-size:10px;font-weight:700;letter-spacing:-.02em;
+  background:var(--s3);color:var(--tx2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+}
+.vbar .vt .vt-ic img,.vbar .vt .vt-ic svg{width:100%;height:100%;display:block}
+.vbar .vt .vt-tx{min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.vbar .vt b{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar .vt small{font-size:10.5px;font-weight:500;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar .vt small:empty{display:none}
+.vb-more{flex:none;display:inline-flex}
+.vb-more .dd-t{height:30px;padding:0 8px;border-radius:8px;background:var(--s3);border:0;box-shadow:none}
+.vb-more .dd-t:hover{background:var(--s4)}
+.vb-more .dd-t .dd-lb{display:none}
 .vb{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;background:var(--s3);font-size:12.5px;font-weight:600;color:var(--tx2);white-space:nowrap;transition:background var(--t1),color var(--t1)}
 .vb svg{flex:none;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .vb:hover{background:var(--s4);color:var(--tx)}
@@ -508,7 +604,39 @@ html[data-fxlevel="subtle"] .modal-bg.show .modal{animation:vin .16s var(--ease)
 #viewer.bare .vbar{display:none}
 #viewer .vexit{display:none;position:absolute;top:9px;right:9px;z-index:4;background:rgba(0,0,0,.7)}
 #viewer.bare .vexit{display:inline-flex}
-.vload{position:absolute;left:0;right:0;top:44px;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#06060a;color:var(--tx2);font-size:13px;font-weight:550;transition:opacity .2s;pointer-events:none}
+.vload{position:absolute;left:0;right:0;top:var(--vbar,46px);bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#06060a;color:var(--tx2);font-size:13px;font-weight:550;transition:opacity .2s;pointer-events:none}
+#viewer.bare .vload{top:0}
+/* The loading screen stops taking clicks the moment the app behind it is
+   up, as well as fading — opacity alone would leave an invisible sheet over
+   the game. */
+#viewer.loaded .vload{visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+/* The loading panel takes clicks again when it is carrying buttons, which it
+   does only when something has gone wrong and there is a choice to make. */
+.vload:has(.vl-act:not(:empty)){pointer-events:auto}
+
+/* the escape hatch */
+.vhint{
+  position:absolute;left:50%;bottom:calc(16px + var(--safeB));z-index:6;
+  transform:translateX(-50%);
+  display:flex;align-items:center;gap:10px;
+  padding:8px 8px 8px 14px;border-radius:999px;
+  background:rgba(14,14,18,.92);border:1px solid var(--line3);
+  box-shadow:0 18px 44px -12px rgba(0,0,0,.8);
+  font-size:12.5px;font-weight:550;color:var(--tx2);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  animation:vhIn .3s var(--ease) both;
+  max-width:calc(100% - 24px);
+}
+@keyframes vhIn{from{opacity:0;transform:translate(-50%,10px)}}
+.vhint[hidden]{display:none}
+.vhint.out{opacity:0;transform:translate(-50%,8px);transition:opacity .25s,transform .25s}
+.vhint-x{
+  flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  color:var(--tx3);background:transparent;
+}
+.vhint-x:hover{background:var(--s4);color:var(--tx)}
+.vhint-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+@media(max-width:480px){.vhint{font-size:12px;gap:8px;padding:7px 7px 7px 12px}}
 /* the loading screen's shape, shared by both designs so Classic gets a
    sensible layout too; Modern restyles the surfaces on top of this */
 .vl-box{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(360px,calc(100vw - 48px));text-align:center}
@@ -753,46 +881,96 @@ html{background:var(--bg)}
 body{background:transparent;letter-spacing:-.006em}
 
 /* ======================================================================
-   2 · BACKGROUND — the signature dot field
-   The dots are painted on a canvas (#dots) once per size change: thousands
-   of individually placed dots, each with its own opacity, distributed on a
-   radial falloff so they fade away behind the content and breathe back in
-   towards the edges. There is no animation loop behind it.
-   Everything that moves is a compositor-only CSS layer on top.
+   2 · BACKGROUND — the signature dot field, across the whole document
+
+   Every layer here is position:absolute inside <body> and as tall as the
+   document, not the viewport. That is the whole point: the background is a
+   property of the page, so scrolling slides it with the content the way a
+   painted wall slides past a window. Nothing recalculates, nothing resets,
+   there is no seam where one screenful ends and the next begins, and the
+   main thread does no work at all while the page scrolls — the compositor
+   already holds these layers and simply moves them.
+
+   The dots are painted on a canvas (#dots) once per size change: tens of
+   thousands of individually placed dots, each with its own opacity,
+   distributed on a falloff that runs the length of the page (see dotBuild).
+   There is no animation loop behind it. Everything that moves is either a
+   compositor-only CSS layer or a small dirty region of this canvas.
    ====================================================================== */
 .bgfx{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
+  position:absolute;top:0;left:0;z-index:0;
+  width:100%;
+  /* Tall enough for the glow and the wash to finish, and not one pixel
+     taller. The gradient below resolves to exactly var(--bg) by 900px, and
+     <html> is painted var(--bg), so past the cap the page simply continues
+     in the same colour — there is nothing left to draw and no seam to see.
+     Keeping the box page-tall instead cost a re-raster of a gradient the
+     whole way down a scroll, for a region that is a flat colour. */
+  height:min(var(--docH,100%),1400px);pointer-events:none;
+  /* overflow:hidden is load-bearing, not tidiness. ::after below is inset by
+     a negative percentage so its drift never exposes an edge, which means it
+     hangs past the bottom of this box — and an unclipped overflow of an
+     absolutely positioned child of <body> adds to the document's scrollable
+     height. The page would grow, --docH is measured from the page, the box
+     would grow with it, and round again: the background would walk itself
+     taller every time it was measured. Clipping here ends that, and
+     pageMeasure skips these layers as well. Two locks on one door. */
+  overflow:hidden;
+  /* The base wash is a page-long vertical gradient, plus one glow at the very
+     top of the document. Both are document-anchored, so the top glow reads as
+     light falling on the head of the page and stays there as you scroll down
+     instead of following you. */
   background:
-    radial-gradient(1100px 620px at 50% -14%,rgba(255,255,255,.045),transparent 62%),
-    radial-gradient(900px 700px at 100% 108%,rgba(255,255,255,.022),transparent 60%),
-    linear-gradient(180deg,var(--bg2),var(--bg) 46%);
+    radial-gradient(1100px 620px at 50% -2%,rgba(255,255,255,.05),transparent 62%),
+    linear-gradient(180deg,var(--bg2),var(--bg) 900px);
 }
-/* A slow ambient sweep. One element, one transform — nothing per frame. */
+/* The ambient drift — and the one layer here that stays with the viewport.
+
+   This is light, not paint. The wash and the dot field are properties of the
+   page and scroll with it; a soft glow drifting across the screen is the
+   room the page is being read in, and a viewport-sized one is both the right
+   model and, by some distance, the cheaper one: fixed means the browser
+   rasterises a single screenful once and composites it during a scroll for
+   nothing. Measured on a long page, making this page-tall was the largest
+   single cost in a scroll — more than the dot canvas and the wash together —
+   because a tiled pair of radial gradients has to be re-rastered tile by
+   tile the whole way down. Nothing about it is scroll-dependent in the way
+   that matters: there is no seam to see, no repeat to notice, and no
+   position that resets.
+
+   Transform only, so the drift itself costs a composite and never a paint. */
 .bgfx::after{
-  content:"";position:absolute;inset:-20%;pointer-events:none;
-  background:radial-gradient(42% 38% at 50% 50%,rgba(255,255,255,.035),transparent 70%);
-  animation:amb 26s var(--ease) infinite alternate;
+  content:"";position:fixed;inset:-14%;pointer-events:none;
+  background:
+    radial-gradient(44% 38% at 30% 22%,rgba(255,255,255,.034),transparent 70%),
+    radial-gradient(40% 34% at 74% 70%,rgba(255,255,255,.022),transparent 72%);
+  animation:amb 34s var(--ease) infinite alternate;
 }
 @keyframes amb{
-  from{transform:translate3d(-7%,-4%,0) scale(1)}
-  to{transform:translate3d(7%,5%,0) scale(1.14)}
+  from{transform:translate3d(-2.6%,-1.1%,0) scale(1)}
+  to{transform:translate3d(2.6%,1.3%,0) scale(1.07)}
 }
 
 /* No CSS mask here on purpose. The field's own falloff feathers the far
    edges, and a mask would also clip the click ripples, which are drawn on
    this same canvas and need to survive a tap in the corner of the screen. */
 #dots{
-  display:block;position:fixed;inset:0;z-index:0;
-  width:100%;height:100%;pointer-events:none;
+  display:block;position:absolute;top:0;left:0;z-index:0;
+  width:100%;height:var(--docH,100%);pointer-events:none;
 }
 /* If the canvas can't be used, a masked CSS halftone stands in for it. */
 html.nodots #dots{display:none}
+/* The stand-in has to run the length of the page too, so the mask is a
+   vertical corridor rather than one viewport-sized ellipse: dark down the
+   middle where the content sits, brighter towards the left and right, and
+   feathered at both edges. That is the same shape dotBuild draws, and being
+   purely horizontal it cannot repeat or seam however long the page is. */
 html.nodots .bgfx::before{
   content:"";position:absolute;inset:0;pointer-events:none;
   background-image:radial-gradient(rgba(255,255,255,.3) .9px,transparent 1px);
   background-size:17px 17px;
-  -webkit-mask:radial-gradient(78% 72% at 50% 42%,transparent 16%,#000 78%,transparent 100%);
-          mask:radial-gradient(78% 72% at 50% 42%,transparent 16%,#000 78%,transparent 100%);
+  -webkit-mask:linear-gradient(90deg,transparent 0%,#000 17%,#000 33%,transparent 47%,transparent 53%,#000 67%,#000 83%,transparent 100%);
+          mask:linear-gradient(90deg,transparent 0%,#000 17%,#000 33%,transparent 47%,transparent 53%,#000 67%,#000 83%,transparent 100%);
 }
 
 /* The soft light that trails the pointer — a cursor halo on a desktop, the
@@ -800,9 +978,17 @@ html.nodots .bgfx::before{
    translate3d and nothing else, so following the pointer costs a composite
    rather than a repaint of a full-screen gradient. Its opacity and scale are
    written by the same animation frame that paints the dots, which is why
-   there is no CSS transition on either. */
+   there is no CSS transition on either.
+
+   It lives inside #wavefx in the markup, and not as a sibling of it, for one
+   concrete reason: it is positioned in document coordinates and is 600px
+   across, so near the foot of a page its own box would hang past the end of
+   the document and add up to 300px of scrollable height. The page would grow,
+   --docH would grow with it, the canvas would be rebuilt one size larger, and
+   round it would go again. #wavefx clips, so nothing inside it can push the
+   page out. */
 #dotglow{
-  display:block;position:fixed;top:0;left:0;z-index:0;pointer-events:none;
+  display:block;position:absolute;top:0;left:0;z-index:0;pointer-events:none;
   width:600px;height:600px;margin:-300px 0 0 -300px;
   opacity:0;transform:translate3d(-9999px,-9999px,0);
   will-change:transform,opacity;contain:strict;
@@ -833,15 +1019,25 @@ html.nodots .bgfx::before{
    second loop, no CSS animation per click, and no element is created or
    destroyed on a tap — the pool below is allocated once and reused.
 
-   The gradient is the CapCut look, read from the outside in: a bright
-   luminous boundary, a feather beyond it, a trough just inside it that
-   reads as a lens edge, and a gently lifted interior. Because the whole
-   element is scaled, the boundary and the feather thicken as the disc
-   grows, which is how a real wavefront behaves.
+   The gradient is read from the outside in, and it is shaped like a cross
+   section through a real ripple rather than like a ring: a feathered outer
+   edge, a bright luminous crest, a dark trough immediately behind it where
+   the surface dips, then a second, fainter crest, a second trough, and a
+   gently lifted interior that settles back to nothing. Those alternating
+   bands are what the eye reads as water: one circle reads as a drawn
+   outline, a crest-trough-crest train reads as a surface deforming.
+
+   Because the whole element is scaled, every band thickens as the disc
+   grows, which is how a real wavefront disperses.
+
+   The layer is document-tall and absolutely positioned, like the dots, so a
+   ripple belongs to the spot on the page that was clicked. Scroll away and
+   come back mid-ripple and it is still where you left it.
    ---------------------------------------------------------------------- */
 #wavefx{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  overflow:hidden;contain:strict;
+  position:absolute;top:0;left:0;z-index:0;
+  width:100%;height:var(--docH,100%);pointer-events:none;
+  overflow:hidden;contain:paint;
 }
 #wavefx .wf{
   position:absolute;left:0;top:0;display:block;
@@ -850,33 +1046,55 @@ html.nodots .bgfx::before{
   transform:translate3d(-9999px,-9999px,0) scale(.02);
   will-change:transform,opacity;
   background:radial-gradient(closest-side circle,
-    rgba(255,255,255,.050) 0%,
-    rgba(255,255,255,.056) 58%,
-    rgba(255,255,255,.018) 79%,                  /* the trough: a lens edge */
-    rgba(255,255,255,.155) 90%,
-    rgba(255,255,255,.455) 96.2%,                /* the luminous boundary  */
-    rgba(255,255,255,.085) 99%,                  /* feathered outer edge   */
+    rgba(255,255,255,.042) 0%,
+    rgba(255,255,255,.050) 44%,
+    rgba(255,255,255,.088) 62%,                  /* inner crest            */
+    rgba(255,255,255,.012) 72%,                  /* inner trough           */
+    rgba(255,255,255,.150) 83%,                  /* second crest           */
+    rgba(255,255,255,.006) 89.5%,                /* the trough: a lens edge */
+    rgba(255,255,255,.255) 94%,
+    rgba(255,255,255,.480) 96.6%,                /* the luminous boundary  */
+    rgba(255,255,255,.105) 99%,                  /* feathered outer edge   */
     transparent 100%);
 }
-/* The trailing wave is dimmer and cooler, and its boundary sits a shade
-   further in — two of these at slightly different scales is what gives the
-   sweep its depth and its faintly refractive quality. */
+/* The trailing wave is dimmer and cooler, and its crests sit a shade
+   further in — two or three of these at slightly different scales and
+   speeds is what gives the sweep its depth and its refractive quality. */
 #wavefx .wf.w2{
   background:radial-gradient(closest-side circle,
-    rgba(255,255,255,.030) 0%,
-    rgba(255,255,255,.026) 62%,
-    rgba(255,255,255,.012) 82%,
-    rgba(255,255,255,.085) 92%,
-    rgba(255,255,255,.215) 97%,
-    rgba(255,255,255,.04) 99.3%,
+    rgba(255,255,255,.026) 0%,
+    rgba(255,255,255,.030) 52%,
+    rgba(255,255,255,.062) 68%,
+    rgba(255,255,255,.008) 78%,
+    rgba(255,255,255,.098) 88%,
+    rgba(255,255,255,.004) 92.5%,
+    rgba(255,255,255,.240) 97.2%,
+    rgba(255,255,255,.048) 99.3%,
+    transparent 100%);
+}
+/* The third layer is the deep one: almost no crest, mostly a broad dim lens
+   that lags well behind the others and reads as the swell underneath. */
+#wavefx .wf.w3{
+  background:radial-gradient(closest-side circle,
+    rgba(255,255,255,.020) 0%,
+    rgba(255,255,255,.016) 60%,
+    rgba(255,255,255,.044) 84%,
+    rgba(255,255,255,.003) 93%,
+    rgba(255,255,255,.120) 98%,
     transparent 100%);
 }
 /* Subtle keeps the sweep at about half the presence and drops the trailing
    layer — that is decided in fxCfg, because opacity here is written inline
    by the frame loop and a stylesheet rule could not win against it. Off is
    belt and braces: fxCfg already returns null, and this makes it visual. */
-html[data-fxlevel="off"] #wavefx{display:none}
-@media(prefers-reduced-motion:reduce){#wavefx{display:none}}
+/* Off and reduced motion hide the waves, not the box. #wavefx is also the
+   clipping layer for the pointer light that lives inside it (see the note on
+   #dotglow above), and a display:none box would take that with it — and
+   would also let the light extend the page's scrollable height, which is how
+   a background layer ends up changing the size of the document it is
+   measuring itself against. */
+html[data-fxlevel="off"] #wavefx .wf{display:none}
+@media(prefers-reduced-motion:reduce){#wavefx .wf{display:none}}
 
 /* Classic furniture never appears in Modern. */
 .bgx,#deco,#fx{display:none!important}
@@ -1151,13 +1369,18 @@ html[data-blur="low"] .topbar{backdrop-filter:blur(6px);-webkit-backdrop-filter:
 .btn.sm{height:34px;padding:0 13px;font-size:12.5px;border-radius:var(--r1)}
 .btn.sm svg{width:14px;height:14px}
 
+/* The three weights now differ by light as well as by surface: primary catches a
+   top highlight, secondary a fainter one, ghost none at all. That is what
+   separates them at a glance on a dark background, where two greys one step
+   apart otherwise read as the same button. */
 .btn.pri{
-  background:var(--s3);color:#fff;border-color:var(--line3);
+  background:linear-gradient(180deg,rgba(255,255,255,.07),transparent 46%),var(--s3);
+  color:#fff;border-color:var(--line3);
   box-shadow:var(--lip2),var(--sh1);
 }
-.btn.pri:hover{background:var(--s4);border-color:var(--line4)}
-.btn.sec{background:var(--s2);border-color:var(--line2);color:var(--tx);box-shadow:var(--lip)}
-.btn.sec:hover{background:var(--s3);border-color:var(--line3)}
+.btn.pri:hover{background:linear-gradient(180deg,rgba(255,255,255,.1),transparent 46%),var(--s4);border-color:var(--line4);box-shadow:var(--lip2),var(--sh2)}
+.btn.sec{background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 46%),var(--s2);border-color:var(--line2);color:var(--tx);box-shadow:var(--lip)}
+.btn.sec:hover{background:linear-gradient(180deg,rgba(255,255,255,.055),transparent 46%),var(--s3);border-color:var(--line3)}
 .btn.ghost{background:transparent;border-color:var(--line2);color:var(--tx2);box-shadow:none}
 .btn.ghost:hover{background:var(--s2);border-color:var(--line3);color:var(--tx)}
 html[data-fxlevel="full"] .btn:hover{transform:translateY(-1px)}
@@ -1283,10 +1506,14 @@ html[data-fxlevel="off"] .pressed::after{animation:none;opacity:0}
 /* ======================================================================
    7 · CARDS, GRIDS, GROUP HEADINGS
    ====================================================================== */
-.grid{grid-template-columns:repeat(auto-fill,minmax(262px,1fr));gap:10px}
+/* A slightly wider minimum and a touch more gap. At 262px a three-up row on
+   a 1100px stage left the cards just narrow enough that a two-word app name
+   wrapped, which is what made the grid look busier than it is; 272 holds the
+   same column counts at every breakpoint and gives the text room. */
+.grid{grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:12px}
 
 .card{
-  gap:12px;padding:14px;border-radius:var(--r3);
+  gap:12px;padding:15px;border-radius:var(--r3);
   background:var(--s1);border:1px solid var(--line);
   box-shadow:var(--lip);
   transition:background var(--t1),border-color var(--t1),
@@ -1298,11 +1525,18 @@ html[data-fxlevel="off"] .pressed::after{animation:none;opacity:0}
     rgba(255,255,255,.06),transparent 68%);
   transition:opacity var(--t2);
 }
+/* The lit top edge, as a second background layer rather than a third
+   pseudo-element. ::before and ::after are both positioned boxes here, and a
+   positioned box paints above its parent's in-flow text however little
+   z-index you give it — an overlay gradient would sit on the app's name, not
+   behind it. A background layer cannot, by construction. It also means the
+   lift and the light are one transition instead of two. */
 .card:hover,.card:focus-visible{
-  background:var(--s2);border-color:var(--line3);box-shadow:var(--lip2),var(--sh2);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 42%),var(--s2);
+  border-color:var(--line3);box-shadow:var(--lip2),var(--sh2);
 }
 html[data-fxlevel="full"] .card:hover,
-html[data-fxlevel="full"] .card:focus-visible{transform:translateY(-2px)}
+html[data-fxlevel="full"] .card:focus-visible{transform:translateY(-3px)}
 
 .hub-ic{
   width:40px;height:40px;border-radius:11px;font-size:11.5px;font-weight:650;
@@ -1647,6 +1881,31 @@ html[data-fxlevel="full"] .opt:hover{transform:translateY(-2px)}
 .field option{background:#181818;color:var(--tx)}
 .selwrap svg{right:11px;color:var(--tx4)}
 
+/* ---------- dropdown, Modern ----------
+   Same graphite surfaces and hairline borders as every other control here,
+   so it reads as part of the set rather than as a widget that wandered in.
+   The panel is a shade lighter than the trigger and sits on the heavy
+   shadow, which is how every other floating surface in Modern is built. */
+.dd-t{
+  height:36px;padding:0 11px 0 13px;border-radius:var(--r1);
+  background:var(--s2);border:1px solid var(--line2);box-shadow:var(--lip);
+  transition:border-color var(--t1),background var(--t1),box-shadow var(--t2);
+}
+.dd-t:hover{background:var(--s3);border-color:var(--line3)}
+.dd-t .dd-cv{color:var(--tx4)}
+.dd.open .dd-t{background:var(--s3);border-color:var(--line4);box-shadow:var(--lip2),0 0 0 3px rgba(255,255,255,.05)}
+.dd-pop{
+  padding:6px;border-radius:var(--r2);
+  background:#16161b;border:1px solid var(--line3);
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 56px -16px rgba(0,0,0,.85);
+}
+.dd-o{padding:8px 10px;color:var(--tx2)}
+.dd-o:hover,.dd-o.cur{background:var(--s4);color:var(--tx)}
+.dd-o.on{color:#fff}
+.dd-o.on .dd-ck{color:var(--ac-tx)}
+.dd-o.on.cur,.dd-o.on:hover{background:var(--s4)}
+.dd-sep{background:var(--line2)}
+
 .danger{color:var(--bad)!important;border-color:rgba(248,113,113,.3)!important}
 .danger:hover{background:rgba(248,113,113,.1)!important;border-color:rgba(248,113,113,.45)!important}
 
@@ -1819,7 +2078,8 @@ html[data-blur="high"] .modal-bg.show{backdrop-filter:blur(6px);-webkit-backdrop
 .vb:hover{background:var(--s4);border-color:var(--line3);color:var(--tx)}
 .vb.cl{background:#ededed;border-color:#ededed;color:#111;font-weight:600}
 .vb.cl:hover{background:#fff;border-color:#fff;color:#111}
-.vload{top:calc(49px + var(--safeT));background:#0c0c0c;color:var(--tx3);font-size:12.5px;font-weight:500}
+.vload{top:calc(var(--vbar,49px) + var(--safeT));background:#0c0c0c;color:var(--tx3);font-size:12.5px;font-weight:500}
+#viewer.bare .vload{top:var(--safeT)}
 .vload .spinr{width:30px;height:30px;border-width:3px}
 .vl-box{
   display:flex;flex-direction:column;align-items:center;gap:12px;
@@ -2058,10 +2318,10 @@ html.app-open #timeWrap,html.os-mode #timeWrap,html.drawer #timeWrap{display:non
 .sv.leaving{display:none}           /* Off: swapped instantly, no layer */
 
 html[data-fxlevel="subtle"]{--mv:9px}
-html[data-fxlevel="full"]{--mv:22px}
+html[data-fxlevel="full"]{--mv:26px}
 
 html[data-fxlevel="subtle"] .sv.on{animation:mvin .32s cubic-bezier(.22,1,.36,1) both}
-html[data-fxlevel="full"] .sv.on{animation:mvin .46s cubic-bezier(.19,1,.31,1) both}
+html[data-fxlevel="full"] .sv.on{animation:mvin .5s cubic-bezier(.17,.89,.26,1) both}
 
 html[data-fxlevel="subtle"] .sv.leaving,
 html[data-fxlevel="full"] .sv.leaving{
@@ -2077,8 +2337,24 @@ html[data-fxlevel="full"] .sv.leaving{
 @keyframes mvout{
   to{opacity:0;transform:translate3d(calc(var(--sx,1) * var(--mv,16px) * -1),0,0) scale(.994)}
 }
+/* On Full the section's own blocks arrive a beat behind the section, which
+   is the difference between a page that slides in and a page that assembles.
+   Three steps only, and all of them on transform and opacity, so it is a
+   compositor animation and the stagger costs nothing. The home hero is left
+   out: it has its own entrance, and two would collide. */
+html[data-fxlevel="full"] .sv.on>.ph,
+html[data-fxlevel="full"] .sv.on>.sec-h{animation:mvrise .52s cubic-bezier(.17,.89,.26,1) .04s both}
+html[data-fxlevel="full"] .sv.on>.ctrl,
+html[data-fxlevel="full"] .sv.on>.feat{animation:mvrise .52s cubic-bezier(.17,.89,.26,1) .09s both}
+html[data-fxlevel="full"] .sv.on>.grid,
+html[data-fxlevel="full"] .sv.on>.tiles,
+html[data-fxlevel="full"] .sv.on>.feats,
+html[data-fxlevel="full"] .sv.on>.setwrap,
+html[data-fxlevel="full"] .sv.on>.pxwrap{animation:mvrise .52s cubic-bezier(.17,.89,.26,1) .14s both}
+html[data-fxlevel="full"] #s-home.on>*{animation:none}
+@keyframes mvrise{from{opacity:0;transform:translate3d(0,11px,0)}}
 @media(prefers-reduced-motion:reduce){
-  .sv.on{animation:none!important}
+  .sv.on,.sv.on>*{animation:none!important}
   .sv.leaving{display:none!important}
 }
 /* vin stays: the settings panes, the modals and the search dropdown use it. */
@@ -2307,12 +2583,28 @@ kbd{font:600 11px ui-monospace,monospace;padding:2px 6px;border-radius:6px;backg
 @keyframes popIn{from{opacity:0;transform:translateY(-8px) scale(.94)}}
 @keyframes beat{40%{transform:scale(1.35)}}
 
-/* ---------- background layers ---------- */
-.bgfx{position:fixed;inset:0;z-index:-4;pointer-events:none;
-  background:radial-gradient(1000px 640px at 10% -8%,color-mix(in srgb,var(--a) 32%,transparent),transparent 58%),
-             radial-gradient(900px 600px at 96% 8%,color-mix(in srgb,var(--b) 20%,transparent),transparent 58%),
-             linear-gradient(160deg,var(--g1),var(--g2))}
-.bgx{position:fixed;inset:0;z-index:-3;pointer-events:none;background:var(--bgx,none);opacity:1;transition:opacity .6s}
+/* ---------- background layers ----------
+   The two painted layers — the themed gradient wash and the theme's own
+   overlay — run the full height of the document, exactly as they do in
+   Modern, so Classic's background is continuous from the top of the page to
+   the bottom and slides with the content instead of sitting still behind it.
+   The themed corner glows are anchored to the head of the document and the
+   wash below them is a page-long vertical gradient, so there is no seam and
+   no section of the page is a repeat of another.
+
+   #fx and #deco stay fixed to the viewport, and deliberately so. They are
+   not background: #fx is the particle system (snow, leaves, bats, fireworks)
+   and #deco is the hanging scenery, and both are weather in front of you
+   rather than paint on the wall. Their own animations are written in vw/vh
+   as well, so a ghost that rises 112vh and bats that fly across 118vw only
+   mean anything against the viewport. Pinning them to an 8000px page would
+   put most of a Halloween night somewhere you are not looking, and would
+   cost nine screenfuls of particles to fill. */
+.bgfx{position:absolute;top:0;left:0;z-index:-4;width:100%;height:var(--docH,100%);pointer-events:none;
+  background:radial-gradient(1000px 640px at 10% 0%,color-mix(in srgb,var(--a) 32%,transparent),transparent 58%),
+             radial-gradient(900px 600px at 96% 2%,color-mix(in srgb,var(--b) 20%,transparent),transparent 58%),
+             linear-gradient(160deg,var(--g1),var(--g2) 1100px)}
+.bgx{position:absolute;top:0;left:0;z-index:-3;width:100%;height:var(--docH,100%);pointer-events:none;background:var(--bgx,none);background-attachment:local;opacity:1;transition:opacity .6s}
 #fx{position:fixed;inset:0;z-index:-2;width:100%;height:100%;pointer-events:none}
 #deco{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;opacity:1;transition:opacity .35s}
 #deco.out{opacity:0}
@@ -2382,6 +2674,17 @@ kbd{font:600 11px ui-monospace,monospace;padding:2px 6px;border-radius:6px;backg
 
 /* ---------- layout ---------- */
 .shell{max-width:1040px;margin:0 auto;padding:14px 22px 28px;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:2}
+/* 2.0 markup, 1.x layout. The original launcher had .stage as a direct child
+   of .shell, so `.stage{flex:1}` was enough to push the footer to the bottom
+   of the window. 2.0 wraps the sections in .main so Modern can put a topbar
+   above them, which left .stage a grandchild and its flex:1 with nothing to
+   grow inside — the footer rode up under the content on any short section.
+   Making .main the flex column that .stage grows inside restores the 1.x
+   behaviour exactly, without touching the markup either design shares.
+   .topbar and .navscrim belong to Modern's shell and have no part here. */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.wrap{min-width:0;max-width:100%}
+.topbar,.navscrim{display:none!important}
 .nav{position:sticky;top:12px;z-index:30;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 14px;border-radius:22px;background:var(--panel);backdrop-filter:blur(22px) saturate(170%);-webkit-backdrop-filter:blur(22px) saturate(170%);border:1px solid var(--bd);box-shadow:0 12px 40px rgba(0,0,0,.35),inset 0 1.5px 0 rgba(255,255,255,.12);animation:drop .6s var(--spring) both}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
 .brand .bi{width:34px;height:34px;border-radius:50%;overflow:hidden;border:1px solid var(--bd);box-shadow:0 0 18px color-mix(in srgb,var(--a) 45%,transparent);display:grid;place-items:center;background:linear-gradient(135deg,var(--a),var(--b));font-size:18px}
@@ -2649,6 +2952,44 @@ html.booting .shell,html.booting .shell *,html.booting .shell *::before,html.boo
 .tg.on i{transform:translateX(20px)}
 .field{width:min(260px,100%);padding:11px 16px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--bd);outline:0;transition:.25s}
 .field:focus{border-color:var(--a);box-shadow:0 0 0 3px color-mix(in srgb,var(--a) 22%,transparent)}
+
+/* ---------- dropdown, Classic ----------
+   Built out of the same parts 1.x used for its own popup menus — the theme
+   picker and the cloak list: generous radii, the translucent panel over a
+   blur, the accent for the border on focus and for the selected row, and the
+   same spring easing. The option that is chosen gets the accent wash the
+   .cko rows had, and the arrow turns over the way the .ckbtn chevron did. */
+.dd-t{
+  height:auto;min-height:44px;padding:11px 14px;border-radius:14px;gap:10px;
+  background:rgba(255,255,255,.07);border:1px solid var(--bd);color:var(--text);
+  font-size:14.5px;font-weight:600;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.dd-t:hover{background:rgba(255,255,255,.11);border-color:var(--bd)}
+.dd-t .dd-cv{width:14px;height:14px;color:var(--muted);transition:transform .3s var(--spring)}
+.dd.open .dd-t{background:rgba(255,255,255,.11);border-color:var(--a);box-shadow:0 0 0 1px var(--a),0 6px 22px color-mix(in srgb,var(--a) 28%,transparent)}
+.dd-pop{
+  padding:8px;border-radius:18px;
+  background:var(--panel2);border:1px solid var(--bd);
+  backdrop-filter:blur(28px) saturate(170%);-webkit-backdrop-filter:blur(28px) saturate(170%);
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+}
+.dd-pop.in{animation:popIn .25s var(--spring) both}
+.dd-pop.up.in{animation:popInUp .25s var(--spring) both}
+@keyframes popInUp{from{opacity:0;transform:translateY(8px) scale(.94)}}
+.dd-o{
+  gap:12px;padding:9px 10px;border-radius:12px;
+  font-size:14.5px;font-weight:600;color:var(--text);
+  transition:background .15s;
+}
+.dd-o:hover,.dd-o.cur{background:rgba(255,255,255,.09);color:var(--text)}
+.dd-o.on{background:color-mix(in srgb,var(--a) 22%,transparent);color:var(--text)}
+.dd-o.on .dd-ck{color:var(--a)}
+.dd-o.on.cur,.dd-o.on:hover{background:color-mix(in srgb,var(--a) 30%,transparent)}
+.dd-sep{background:var(--bd);margin:5px 8px}
+.dd-hd{color:var(--muted);letter-spacing:.08em;padding:6px 10px 4px}
+.dd-pop::-webkit-scrollbar{width:8px}
+.dd-pop::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--a) 50%,transparent);border-radius:8px}
 @media(max-width:620px){.setrow{flex-wrap:wrap}}
 
 /* ---------- modals ---------- */
@@ -2717,10 +3058,43 @@ html.booting .shell,html.booting .shell *,html.booting .shell *::before,html.boo
 #viewer.bare .vbar{display:none}
 #viewer .vexit{display:none;position:absolute;top:10px;right:10px;z-index:4;padding:7px 12px;border-radius:10px;background:rgba(0,0,0,.65);font-size:12px;font-weight:700}
 #viewer.bare .vexit{display:block}
-.vload{position:absolute;left:0;right:0;top:50px;bottom:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#07080f;color:var(--muted);font-weight:600;transition:opacity .2s;pointer-events:none}
-#viewer.loaded .vload{opacity:0}
+.vload{position:absolute;left:0;right:0;top:var(--vbar,50px);bottom:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#07080f;color:var(--muted);font-weight:600;transition:opacity .2s;pointer-events:none}
+#viewer.bare .vload{top:0}
+#viewer.loaded .vload{visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+.vload:has(.vl-act:not(:empty)){pointer-events:auto}
 .vload .spinr{width:34px;height:34px}
-@media(max-width:560px){.vb span{display:none}}
+/* the escape hatch, in Classic's glass */
+.vhint{
+  position:absolute;left:50%;bottom:calc(18px + var(--safeB));z-index:6;
+  transform:translateX(-50%);
+  display:flex;align-items:center;gap:11px;
+  padding:9px 9px 9px 16px;border-radius:999px;
+  background:var(--panel2);border:1px solid var(--bd);
+  backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+  font-size:13.5px;font-weight:600;color:var(--text);
+  animation:vhIn .36s var(--spring) both;
+  max-width:calc(100% - 28px);
+}
+.vhint-x{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--muted);background:transparent}
+.vhint-x:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.vhint-x svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+/* ---------- viewer toolbar, Classic ---------- */
+.vbar .vt .vt-ic{
+  flex:none;width:28px;height:28px;border-radius:9px;overflow:hidden;
+  display:grid;place-items:center;font-size:11px;font-weight:800;
+  background:rgba(255,255,255,.1);border:1px solid var(--bd);color:var(--text);
+}
+.vbar .vt .vt-ic img,.vbar .vt .vt-ic svg{width:100%;height:100%;display:block}
+.vbar .vt .vt-tx{min-width:0;display:flex;flex-direction:column;line-height:1.22}
+.vbar .vt b{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar .vt small{font-size:11px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar .vt small:empty{display:none}
+.vb-more{flex:none;display:inline-flex}
+.vb-more .dd-t{min-height:0;height:34px;padding:0 10px;border-radius:11px;background:rgba(255,255,255,.08);border:0;box-shadow:none}
+.vb-more .dd-t:hover{background:rgba(255,255,255,.16)}
+.vb-more .dd-t .dd-lb{display:none}
+@media(max-width:560px){.vb span.lb{display:none}}
 
 /* main hub full-screen iframe */
 #appFrame{position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2000;background:#0b0c1a;display:block;opacity:0;transform:scale(1.03);transition:opacity .4s ease,transform .45s cubic-bezier(.22,1,.36,1)}
@@ -3469,11 +3843,16 @@ html[data-design="modern"] .os[data-skin="winxp"] .os-bar{height:30px;border-bot
 </script>
 </head>
 <body>
-<div class="bgfx" aria-hidden="true"></div>
+<!-- data-bgl marks a background layer. Every layer in this block is as tall
+     as the whole document and scrolls with it, and pageMeasure() skips
+     anything carrying this attribute when it works out how tall the page is —
+     otherwise these layers would be measuring themselves. #wavefx clips, and
+     carries the pointer light, so that light can never push the page taller
+     than it already is either. -->
+<div class="bgfx" data-bgl aria-hidden="true"></div>
 <!-- The signature dot field. Painted once per size change, never per frame. -->
-<canvas id="dots" aria-hidden="true"></canvas>
-<div id="dotglow" aria-hidden="true"></div>
-<div id="wavefx" aria-hidden="true"></div>
+<canvas id="dots" data-bgl aria-hidden="true"></canvas>
+<div id="wavefx" data-bgl aria-hidden="true"><div id="dotglow" aria-hidden="true"></div></div>
 
 <!-- The clock in the corner, and the date changer behind it. -->
 <div id="timeWrap" hidden>
@@ -3502,9 +3881,13 @@ html[data-design="modern"] .os[data-skin="winxp"] .os-bar{height:30px;border-bot
     </div>
   </div>
 </div>
-<div class="bgx" id="bgx" aria-hidden="true"></div>
-<canvas id="fx" aria-hidden="true"></canvas>
-<div id="deco" aria-hidden="true"></div>
+<!-- Classic's own layers. .bgx is the theme's painted overlay and is
+     document-tall like the rest; #fx (particles) and #deco (hanging scenery)
+     stay fixed to the viewport by design — see the note in css-classic. All
+     three are background and none of them may be measured. -->
+<div class="bgx" id="bgx" data-bgl aria-hidden="true"></div>
+<canvas id="fx" data-bgl aria-hidden="true"></canvas>
+<div id="deco" data-bgl aria-hidden="true"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
 <!-- Quick Pause: a neutral, launcher-branded screen. No portal, no sign-in form,
@@ -3566,13 +3949,13 @@ html[data-design="modern"] .os[data-skin="winxp"] .os-bar{height:30px;border-bot
 <!-- viewer: a game, app, hub or proxy running inside the launcher -->
 <div id="viewer" role="dialog" aria-modal="true" aria-label="Viewer">
   <div class="vbar">
-    <button class="vb cl" id="vClose" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="lb">Close</span></button>
-    <div class="vt"><i></i><span id="vName"></span></div>
-    <button class="vb" id="vReload" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.6-5.7M19.5 4.5V9H15"/></svg><span class="lb">Reload</span></button>
-    <button class="vb" id="vFull" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 9V4.5H9m6 0h4.5V9m0 6v4.5H15m-6 0H4.5V15"/></svg><span class="lb">Fullscreen</span></button>
-    <button class="vb" id="vTab" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6m0-6-8.5 8.5M18 14.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5"/></svg><span class="lb">New tab</span></button>
-    <button class="vb" id="vDl" type="button" title="Download this app's page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v11m-4.5-4.5L12 14.5l4.5-4.5M5 19.5h14"/></svg><span class="lb">App</span></button>
-    <button class="vb" id="vDlL" type="button" title="Download the launcher"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v11m-4.5-4.5L12 14.5l4.5-4.5M5 19.5h14"/></svg><span class="lb">Launcher</span></button>
+    <button class="vb cl" id="vClose" type="button" aria-label="Back to the launcher"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5.5 8.5 12l6.5 6.5"/></svg><span class="lb">Back</span></button>
+    <div class="vt"><span class="vt-ic" id="vIcon" aria-hidden="true"></span><span class="vt-tx"><b id="vName"></b><small id="vHost"></small></span></div>
+    <button class="vb" id="vReload" type="button" aria-label="Reload"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.6-5.7M19.5 4.5V9H15"/></svg><span class="lb">Reload</span></button>
+    <button class="vb" id="vFull" type="button" aria-label="Fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 9V4.5H9m6 0h4.5V9m0 6v4.5H15m-6 0H4.5V15"/></svg><span class="lb">Fullscreen</span></button>
+    <button class="vb" id="vTab" type="button" aria-label="Open in a new tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6m0-6-8.5 8.5M18 14.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5"/></svg><span class="lb">New tab</span></button>
+    <!-- everything else lives behind this, so the bar still reads on a phone -->
+    <span class="vb-more" id="vMoreHost"></span>
   </div>
   <button class="vb vexit" id="vExit" type="button">Show bar</button>
   <div class="vload" id="vLoad">
@@ -3584,6 +3967,16 @@ html[data-design="modern"] .os[data-skin="winxp"] .os-bar{height:30px;border-bot
       <small class="vl-slow" id="vLoadSlow" hidden>Still loading? Some apps take a little longer. Please keep waiting.</small>
       <div class="vl-act" id="vLoadAct"></div>
     </div>
+  </div>
+  <!-- The escape hatch. A browser will not tell a page whether the site in
+       its iframe actually rendered — see vHint in the script — so when a
+       plain URL is being shown this appears a few seconds in, offering the
+       one thing that always works. It is small, it sits out of the way, and
+       it goes away on its own. -->
+  <div class="vhint" id="vHint" hidden>
+    <span>Nothing showing?</span>
+    <button class="btn pri sm" id="vHintTab" type="button">Open in new tab</button>
+    <button class="vhint-x" id="vHintX" type="button" aria-label="Dismiss"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <iframe id="vFrame" title="Viewer" allow="fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture" allowfullscreen></iframe>
 </div>
@@ -3740,6 +4133,35 @@ const isModern=()=>design()==='modern';
   if(cn&&!String(store.get('tabName','')||'').trim())store.set('tabName',cn);
   store.set('mig2',true);
 })();
+
+/* ---- 2.0 effects migration: everybody starts this version on Full ----
+   This version's whole point is the background and the water ripple, so it
+   ships with effects turned all the way up rather than leaving most people on
+   a setting that hides it. It runs exactly once, guarded by its own flag:
+
+     · it writes Full over whatever was there before, including Off and
+       Subtle, so an existing install sees the new effects on first load;
+     · the flag is set in the same breath, so a reload is not a second
+       migration and the setting is never forced again. From here on
+       effects() reads what the user chose, and what the user chose wins;
+     · an install that has never had the key set gets Full too, which is
+       simply the new default below.
+
+   The one exception is a system that asks for reduced motion. Overriding
+   that would be the launcher deciding it knows better than an accessibility
+   setting, which is not a call it gets to make — so the migration stands
+   down and records itself as done, leaving effects() to return Off. Anyone
+   in that position can still pick Full by hand, and it will stick.       */
+(function migrateFx(){
+  if(store.get('mig3fx',false)===true)return;
+  store.set('mig3fx',true);
+  if(reduceEarly())return;
+  store.set('effects','full');
+})();
+/* matchMedia is cheap and this runs before `reduce` is defined further down */
+function reduceEarly(){
+  try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(_){return false}
+}
 
 /* ===================== BRANDING =====================
    An original ICH mark: black disc, white conversation bubble, two dots.
@@ -3900,13 +4322,18 @@ function applyTabIdentity(){
 }
 
 /* ===================== EFFECTS =====================
-   off | subtle (default) | full. `prefers-reduced-motion` forces off unless the
-   user has explicitly asked for more, and animations stop while the tab is hidden. */
+   off | subtle | full (default). `prefers-reduced-motion` forces off unless the
+   user has explicitly asked for more, and animations stop while the tab is hidden.
+
+   Full is the 2.0 default, for new installs and — once, through the migration
+   above — for existing ones. A stored value always wins over the default, so
+   the moment someone picks Off or Subtle that is what they get, on this load
+   and every load after it. */
 const EFFECTS=['off','subtle','full'];
 function effects(){
   const v=store.get('effects',null);
   if(EFFECTS.includes(v))return v;
-  return reduce?'off':'subtle';
+  return reduce?'off':'full';
 }
 function applyEffects(){
   ROOT.dataset.fxlevel=effects();
@@ -4318,6 +4745,246 @@ addEventListener('resize',()=>{
   rzT=requestAnimationFrame(()=>{rzT=0;segs.forEach(s=>s.place());ind();if(FX.cfg){fxResize();FX.P.forEach(p=>{if(p.x>FX.W)p.x=rnd(0,FX.W)})}});
 },{passive:true});
 
+/* ===================== CUSTOM DROPDOWN =====================
+   A replacement for <select>. One panel exists for the whole document and is
+   lent to whichever dropdown is open, so opening one is a reflow of a few
+   rows rather than building and discarding a menu, and there is never more
+   than one open — closing the previous one is implicit in taking the panel.
+
+   WHY THE PANEL LIVES ON <body>
+   These controls sit in .ctrl and .setrow, which are flex rows that scroll
+   and clip. A menu nested inside one gets cut off at the row's edge or ends
+   up underneath the next card, and no amount of z-index fixes it because the
+   row is its own stacking context. At the top level the panel is clipped by
+   nothing, and ddPlace puts it against the trigger by measurement.
+
+   WHAT IT HAS TO GET RIGHT
+   · flip up when there is not enough room below, and shrink to fit when
+     there is not enough either way — the last setting on a short window is
+     the case that catches every home-made dropdown;
+   · follow the trigger if the page scrolls or resizes underneath it;
+   · close on outside click, on Escape, and when focus leaves;
+   · full keyboard control: Up/Down/Home/End to move, Enter/Space to take,
+     Escape to abandon, and type-ahead, because that is what a native select
+     does and losing it is the usual cost of replacing one;
+   · announce itself properly. The trigger is a button with aria-haspopup
+     and aria-expanded, the panel is a listbox, the rows are options, and
+     aria-activedescendant tells a screen reader which row is highlighted
+     without moving focus off the trigger.                                 */
+const DD={pop:null,cur:null,hideT:0,typed:'',typeT:0};
+let ddSeq=0;
+function ddPop(){
+  if(DD.pop)return DD.pop;
+  const el=document.createElement('div');
+  el.className='dd-pop';el.hidden=true;el.setAttribute('role','listbox');
+  document.body.appendChild(el);
+  return DD.pop=el;
+}
+/* Put the panel against its trigger: under it if it fits, over it if not,
+   and clamped into the viewport either way. Called on open, and again on
+   scroll and resize while open. */
+function ddPlace(){
+  const d=DD.cur;if(!d)return;
+  const pop=ddPop(),r=d.el.getBoundingClientRect();
+  const sx=window.scrollX||0,sy=window.scrollY||0;
+  const vw=document.documentElement.clientWidth,vh=document.documentElement.clientHeight;
+  const GAP=6,EDGE=8;
+  /* Measure at natural height first, then decide which way to go. */
+  pop.style.maxHeight='';
+  const want=pop.offsetHeight||0,wide=pop.offsetWidth||0;
+  const below=vh-r.bottom-GAP-EDGE,above=r.top-GAP-EDGE;
+  const up=want>below&&above>below;
+  const room=Math.max(96,up?above:below);
+  if(want>room)pop.style.maxHeight=room+'px';
+  pop.classList.toggle('up',up);
+  const h=Math.min(want,room);
+  let left=r.left+sx;
+  /* keep it on screen horizontally */
+  if(left+wide>sx+vw-EDGE)left=sx+vw-EDGE-wide;
+  if(left<sx+EDGE)left=sx+EDGE;
+  pop.style.left=Math.round(left)+'px';
+  pop.style.top=Math.round(up?(r.top+sy-GAP-h):(r.bottom+sy+GAP))+'px';
+}
+function ddRender(){
+  const d=DD.cur;if(!d)return;
+  const pop=ddPop();
+  pop.id=pop.id||'ddPop';
+  pop.innerHTML=d.items.map((it,i)=>{
+    if(it.sep)return '<div class="dd-sep"></div>';
+    if(it.head)return '<div class="dd-hd">'+esc(it.head)+'</div>';
+    const on=it.value===d.value;
+    return '<button class="dd-o'+(on?' on':'')+'" type="button" role="option" '
+      +'id="'+d.id+'-o'+i+'" data-i="'+i+'" aria-selected="'+on+'">'
+      +(it.swatch?'<span class="dd-sw" style="background:'+esc(it.swatch)+'"></span>':'')
+      +'<span class="dd-ot">'+esc(it.label)+'</span>'
+      +'<svg class="dd-ck" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PATHS.check+'"/></svg>'
+      +'</button>';
+  }).join('');
+  pop.style.minWidth=Math.max(168,d.el.offsetWidth)+'px';
+}
+function ddMark(i){
+  const d=DD.cur;if(!d)return;
+  const pop=ddPop();
+  $$('.dd-o',pop).forEach(b=>b.classList.remove('cur'));
+  const b=$('.dd-o[data-i="'+i+'"]',pop);
+  if(!b)return;
+  b.classList.add('cur');
+  d.cursor=i;
+  d.btn.setAttribute('aria-activedescendant',b.id);
+  try{b.scrollIntoView({block:'nearest'})}catch(_){}
+}
+function ddOpen(d){
+  if(DD.cur&&DD.cur!==d)ddClose(true);
+  const pop=ddPop();
+  clearTimeout(DD.hideT);
+  DD.cur=d;
+  pop.hidden=false;pop.classList.remove('out');
+  ddRender();
+  ddPlace();
+  pop.classList.add('in');
+  d.el.classList.add('open');
+  d.btn.setAttribute('aria-expanded','true');
+  d.btn.setAttribute('aria-controls',pop.id);
+  /* start on the chosen row, or the first real one */
+  let i=d.items.findIndex(x=>!x.sep&&!x.head&&x.value===d.value);
+  if(i<0)i=d.items.findIndex(x=>!x.sep&&!x.head);
+  ddMark(i);
+}
+function ddClose(instant){
+  const d=DD.cur;if(!d)return;
+  const pop=ddPop();
+  DD.cur=null;
+  d.el.classList.remove('open');
+  d.btn.setAttribute('aria-expanded','false');
+  d.btn.removeAttribute('aria-activedescendant');
+  pop.classList.remove('in');
+  if(instant||effects()==='off'){pop.hidden=true;return}
+  pop.classList.add('out');
+  clearTimeout(DD.hideT);
+  DD.hideT=setTimeout(()=>{pop.hidden=true;pop.classList.remove('out')},130);
+}
+function ddStep(dir){
+  const d=DD.cur;if(!d)return;
+  const n=d.items.length;
+  let i=d.cursor;
+  for(let k=0;k<n;k++){
+    i+=dir;
+    if(i<0)i=n-1;else if(i>=n)i=0;
+    const it=d.items[i];
+    if(it&&!it.sep&&!it.head){ddMark(i);return}
+  }
+}
+function ddEdge(last){
+  const d=DD.cur;if(!d)return;
+  const idx=d.items.map((it,i)=>(!it.sep&&!it.head)?i:-1).filter(i=>i>=0);
+  if(idx.length)ddMark(last?idx[idx.length-1]:idx[0]);
+}
+function ddTake(i){
+  const d=DD.cur;if(!d)return;
+  const it=d.items[i];
+  if(!it||it.sep||it.head)return;
+  const changed=it.value!==d.value;
+  d.value=it.value;
+  ddClose();
+  d.paint();
+  try{d.btn.focus({preventScroll:true})}catch(_){}
+  if(changed&&d.cb)d.cb(it.value,it);
+}
+/* type-ahead, the same as a native select: letters jump to the next option
+   that starts with what has been typed, and the buffer forgets after a
+   second of silence */
+function ddType(ch){
+  const d=DD.cur;if(!d)return;
+  clearTimeout(DD.typeT);
+  DD.typed+=ch.toLowerCase();
+  DD.typeT=setTimeout(()=>{DD.typed=''},900);
+  const n=d.items.length;
+  for(let k=1;k<=n;k++){
+    const i=(d.cursor+k)%n,it=d.items[i];
+    if(it&&!it.sep&&!it.head&&String(it.label).toLowerCase().startsWith(DD.typed)){ddMark(i);return}
+  }
+  /* a repeated single letter cycles through the options beginning with it */
+  if(DD.typed.length>1&&DD.typed.split('').every(c=>c===DD.typed[0])){DD.typed=DD.typed[0];ddType('')}
+}
+
+/* Build one. `items` is [{value,label,swatch?}] with optional {sep:true} and
+   {head:'…'} rows. Returns a handle with .value, .set() and .items() so the
+   caller can drive it the way it drove the <select> it replaces. */
+function dd(host,opts){
+  if(!host)return null;
+  opts=opts||{};
+  const el=document.createElement('div');
+  el.className='dd'+(opts.cls?' '+opts.cls:'');
+  const id='dd'+(++ddSeq);
+  el.innerHTML='<button class="dd-t" type="button" id="'+id+'b" aria-haspopup="listbox" aria-expanded="false">'
+    +'<span class="dd-sw" hidden></span>'
+    +'<span class="dd-lb"></span>'
+    +'<svg class="dd-cv" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PATHS.chevd+'"/></svg>'
+    +'</button>';
+  const btn=$('.dd-t',el);
+  if(opts.label)btn.setAttribute('aria-label',opts.label);
+  const d={el,btn,id,items:opts.items||[],value:opts.value,cursor:0,cb:opts.onChange,paint:null};
+  d.paint=()=>{
+    const it=d.items.find(x=>!x.sep&&!x.head&&x.value===d.value)||d.items.find(x=>!x.sep&&!x.head)||{};
+    $('.dd-lb',el).textContent=it.label||'';
+    const sw=$('.dd-sw',btn);
+    if(it.swatch){sw.hidden=false;sw.style.background=it.swatch}else{sw.hidden=true}
+    btn.title=(opts.label?opts.label+': ':'')+(it.label||'');
+  };
+  btn.onclick=e=>{e.stopPropagation();DD.cur===d?ddClose():ddOpen(d)};
+  btn.onkeydown=e=>{
+    const open=DD.cur===d;
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      if(!open){ddOpen(d);return}
+      ddStep(e.key==='ArrowDown'?1:-1);return;
+    }
+    if(!open){
+      if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){e.preventDefault();ddOpen(d)}
+      return;
+    }
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();ddClose()}
+    else if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){e.preventDefault();ddTake(d.cursor)}
+    else if(e.key==='Home'){e.preventDefault();ddEdge(false)}
+    else if(e.key==='End'){e.preventDefault();ddEdge(true)}
+    else if(e.key==='Tab'){ddClose(true)}
+    else if(e.key&&e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();ddType(e.key)}
+  };
+  host.appendChild(el);
+  d.paint();
+  return{
+    el,
+    get value(){return d.value},
+    set(v,silent){d.value=v;d.paint();if(!silent&&d.cb)d.cb(v)},
+    items(list){d.items=list;if(DD.cur===d)ddRender();d.paint()},
+    close(){if(DD.cur===d)ddClose(true)}
+  };
+}
+/* One set of listeners for every dropdown there will ever be. */
+document.addEventListener('click',e=>{
+  if(!DD.cur)return;
+  const pop=ddPop();
+  const row=e.target.closest&&e.target.closest('.dd-o');
+  if(row&&pop.contains(row)){ddTake(+row.dataset.i);return}
+  if(!e.composedPath().includes(pop)&&!e.composedPath().includes(DD.cur.el))ddClose();
+});
+document.addEventListener('pointerover',e=>{
+  if(!DD.cur)return;
+  const row=e.target.closest&&e.target.closest('.dd-o');
+  if(row&&ddPop().contains(row))ddMark(+row.dataset.i);
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(DD.cur&&e.key==='Escape'){e.stopPropagation();const b=DD.cur.btn;ddClose();try{b.focus({preventScroll:true})}catch(_){}}
+},true);
+/* The panel is positioned from a measurement, so it has to be re-measured
+   when the thing it was measured against can have moved. Capture phase picks
+   up scrolling inside .setnav and the library, not just the window. */
+addEventListener('scroll',()=>{if(DD.cur)ddPlace()},{passive:true,capture:true});
+addEventListener('resize',()=>{if(DD.cur)ddPlace()},{passive:true});
+/* A section change replaces the markup the trigger lives in. Without this the
+   panel would be left floating next to a button that no longer exists. */
+function ddCheck(){if(DD.cur&&!DD.cur.el.isConnected)ddClose(true)}
+
 /* ===================== THEME ENGINE ===================== */
 let curKey=null,decoTimer=0;
 const ACCENTS=[['modern','Graphite (default)'],['blue','Blue'],['violet','Violet'],['teal','Teal'],['rose','Rose'],['theme','Follow seasonal theme']];
@@ -4431,7 +5098,7 @@ function renderNav(){
         +'<button class="nbtn" id="navDl" type="button">'+svgi('dl')+'<span>Download launcher</span></button>'
       +'</div>';
   }else{
-    nav.innerHTML='<div class="brand"><span class="bi" id="brandIc">'+ichMark({label:'ICH'})+'</span><b>Itsukis Hub</b></div>'
+    nav.innerHTML='<div class="brand"><span class="bi" id="brandIc">'+brandArt('Itsukis Hub')+'</span><b>Itsukis Hub</b></div>'
       +tabsHtml
       +'<button class="tbtn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false"></button>';
   }
@@ -4532,6 +5199,7 @@ function go(n){
   if(!ORD.includes(n))n='home';
   if(n===at)return;
   closePop();
+  ddClose(true);                   /* its trigger is about to be replaced */
   goClear();                       /* whatever was leaving is gone now */
   const tok=++goTok,prev=at&&$('#s-'+at),el=$('#s-'+n);
   if(!el)return;
@@ -5163,6 +5831,10 @@ function rlProgress(name){
 
 /* ======== js_viewer.js ======== */
 const V=$('#viewer');let vCur=null,vText=null,vTok=0,vFr=$('#vFrame');
+/* vBlockT is the timer behind the "this site won't embed" panel; vScroll is
+   where the launcher was scrolled to when the viewer opened, so closing it
+   puts you back on the same row of the same section rather than at the top. */
+let vBlockT=0,vScroll=null;
 function vFresh(){
   const f=document.createElement('iframe');f.id='vFrame';f.title='Viewer';
   f.setAttribute('allow','fullscreen; clipboard-read; clipboard-write; autoplay; microphone; camera; geolocation; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');
@@ -5221,20 +5893,208 @@ function vLoadError(h){
     const g=$('#vGiveUp');if(g)g.onclick=viewerClose;
   }
 }
+/* ---- the toolbar ----
+   The bar's own height drives where the loading screen starts, so it is
+   measured rather than assumed: it changes with the design, with the font
+   setting, and on a phone where the buttons wrap. */
+function vBarSync(){
+  const bar=$('.vbar',V);
+  if(!bar)return;
+  const h=Math.round(bar.getBoundingClientRect().height);
+  if(h>0)V.style.setProperty('--vbar',h+'px');
+}
+/* The app's own icon and host, so the bar says what you are looking at
+   rather than just carrying a green dot. The icon is the same tile the card
+   in the library uses, which is the point — it is the thing you clicked. */
+function vIdent(h){
+  const ic=$('#vIcon');
+  if(ic){
+    ic.style.background='';ic.style.color='';ic.textContent='';ic.innerHTML='';
+    if(h&&h.main)ic.innerHTML=ichMark({label:"Itsuki's Chat Hub"});
+    else if(h){
+      const c=HUB_COLORS[(h.color||'').toLowerCase()]||HUB_COLORS.grey;
+      ic.style.background=c.bg;ic.style.color=c.fg;
+      ic.textContent=String(h.icon||h.name.slice(0,2)).slice(0,3);
+    }
+  }
+  setT('vName',h?h.name:'');
+  const host=$('#vHost');
+  if(host){
+    let t='';
+    if(h&&h.repo)t='Multi-file app';
+    else if(h&&h.url){try{t=new URL(h.url,location.href).hostname.replace(/^www\./,'')}catch(_){t=''}}
+    host.textContent=t;
+  }
+}
+
+/* ======== WHEN A SITE REFUSES TO BE EMBEDDED ========
+   A site that sends `X-Frame-Options: DENY` or `Content-Security-Policy:
+   frame-ancestors 'none'` is stopped by the browser before any of our code
+   runs, and the frame is left empty.
+
+   THE PART WORTH KNOWING: THIS CANNOT BE DETECTED.
+
+   Not "is hard to detect" — cannot, and deliberately so. Every signal a page
+   can reach is identical for a site that loaded fine across origins and a
+   site that was refused:
+
+       load event             fires for both
+       contentDocument        null for both
+       contentWindow          a Window for both
+       .location.href         throws SecurityError for both
+       .length / .origin      0 / throws, for both
+       resource timing entry  present for both, all fields zeroed
+
+   That is the same-origin policy doing its job: an embedder is not allowed to
+   learn anything about a frame it does not own, and "did it render" is
+   something. Every "detect X-Frame-Options" trick that claims otherwise
+   either predates Chrome firing load for refused frames, or quietly relies on
+   same-origin frames, where the question does not arise.
+
+   So this does not guess. Three honest mechanisms instead:
+
+     1 · KNOWN REFUSERS, up front. A launcher has a fixed catalogue, and the
+         big sites that refuse framing are a known, stable list. Those go
+         straight to the panel below without a pointless wait, and a
+         catalogue entry can also carry noembed:true to say so explicitly.
+     2 · NOTHING AT ALL, detected properly. A site that never fires load is a
+         real, observable failure — a dead host, DNS gone, a network that
+         dropped — and that is what the timeout below catches.
+     3 · THE ESCAPE HATCH, for everything else. If a site refuses and is not
+         on the list, the user sees a blank frame and the launcher genuinely
+         does not know. So vHint puts a small "Nothing showing? Open in new
+         tab" pill at the foot of the viewer a few seconds in. One tap, and a
+         tab has no embedding rules to break.
+
+   Which is the whole of "do not pretend every website can be embedded": say
+   what is known, offer the way out, and never show a confident error about
+   something the browser refused to tell us. */
+const NOEMBED=[
+  'google.com','www.google.com','accounts.google.com','docs.google.com',
+  'youtube.com','www.youtube.com','m.youtube.com',
+  'roblox.com','www.roblox.com',
+  'discord.com','discord.gg','netflix.com','www.netflix.com',
+  'facebook.com','www.facebook.com','instagram.com','www.instagram.com',
+  'x.com','twitter.com','www.twitter.com','reddit.com','www.reddit.com',
+  'amazon.com','www.amazon.com','github.com','www.github.com',
+  'login.microsoftonline.com','outlook.com','outlook.office.com',
+  'classroom.google.com','drive.google.com','mail.google.com',
+  'tiktok.com','www.tiktok.com','twitch.tv','www.twitch.tv',
+  'spotify.com','open.spotify.com','linkedin.com','www.linkedin.com'
+];
+function willRefuse(h){
+  if(!h||h.repo||needsText(h))return false;   /* srcdoc cannot be refused */
+  if(h.noembed)return true;
+  let host='';
+  try{host=new URL(h.url,location.href).hostname.toLowerCase().replace(/\.$/,'')}catch(_){return false}
+  return NOEMBED.some(d=>host===d||host.endsWith('.'+d));
+}
+/* `why` is 'refused' when we know the site refuses framing, and 'silent' when
+   the frame simply never answered. The wording differs because what we know
+   differs — the second case is not claimed to be a refusal. */
+function vBlocked(h,why){
+  clearTimeout(vSlowT);clearTimeout(vHintT);
+  vHintHide(true);
+  const refused=why==='refused';
+  setT('vLoadTxt',refused?(h.name+' can’t open inside the launcher')
+                         :(h.name+' isn’t responding'));
+  setT('vLoadSub',refused
+    ? 'This site tells browsers it may not be shown inside another page. That is the site’s own rule, and nothing here can override it — but it opens normally in its own tab.'
+    : 'Nothing came back from the site. It may be down, blocked on this network, or just very slow. Opening it in its own tab usually says more.');
+  const bar=$('#vLoadBar'),sp=$('#vLoadSpin'),slow=$('#vLoadSlow'),act=$('#vLoadAct');
+  if(bar)bar.hidden=true;
+  if(sp)sp.style.display='none';
+  if(slow)slow.hidden=true;
+  if(act){
+    act.innerHTML='<button class="btn pri sm" id="vOpenTab" type="button">'+svgi('ext')+'Open in new tab</button>'
+                 +(refused?'':'<button class="btn sec sm" id="vRetry2" type="button">Try again</button>')
+                 +'<button class="btn ghost sm" id="vGiveUp2" type="button">Back</button>';
+    const o=$('#vOpenTab');if(o)o.onclick=()=>{openTab(h)};
+    const r=$('#vRetry2');if(r)r.onclick=()=>viewerOpen(h);
+    const g=$('#vGiveUp2');if(g)g.onclick=viewerClose;
+  }
+}
+/* ---- the escape hatch ----
+   It has to be shown without knowing whether anything is wrong, so the thing
+   that matters is that it stops appearing once it clearly isn't needed. An
+   app that has been sat in for half a minute is an app that loaded, so it is
+   remembered as good and never prompts again — and so is one whose prompt
+   the user dismissed. In practice that means it shows once for an app you
+   have never opened, and after that only for the ones that really are blank.
+   The list is a plain array in the same store as every other preference, so
+   it survives a reload like the rest of them. */
+let vHintT=0,vHintFor=null,vGoodT=0;
+const vGood=()=>{const a=store.get('vOk',[]);return Array.isArray(a)?a:[]};
+function vMarkGood(h){
+  const k=h&&(h.key||h.url);
+  if(!k)return;
+  const a=vGood();
+  if(a.indexOf(k)>=0)return;
+  a.push(k);
+  /* keep it from growing without bound; the oldest are the least useful */
+  store.set('vOk',a.slice(-120));
+}
+function vHintShow(h){
+  const el=$('#vHint');
+  if(!el||!V.classList.contains('show'))return;
+  if(vHintFor===h)return;            /* already offered for this app */
+  const k=h&&(h.key||h.url);
+  if(k&&vGood().indexOf(k)>=0)return;        /* known to work: say nothing */
+  vHintFor=h;
+  el.hidden=false;el.classList.remove('out');
+  /* It is an offer, not a warning, so it takes itself away. */
+  clearTimeout(vHintT);
+  vHintT=setTimeout(()=>vHintHide(),14000);
+}
+function vHintHide(instant){
+  const el=$('#vHint');
+  if(!el)return;
+  clearTimeout(vHintT);
+  if(instant){el.hidden=true;el.classList.remove('out');return}
+  if(el.hidden)return;
+  el.classList.add('out');
+  vHintT=setTimeout(()=>{el.hidden=true;el.classList.remove('out')},260);
+}
 async function viewerOpen(h){
-  vCur=h;vText=null;const tok=++vTok;$('#vTab').style.display='none';
-  $('#vName').textContent=h.name;
+  vCur=h;vText=null;const tok=++vTok;
+  if(!V.classList.contains('show'))vScroll=window.scrollY||window.pageYOffset||0;
+  vHintHide(true);vHintFor=null;
+  vIdent(h);
   vLoadReset(h.name);
   V.classList.remove('loaded','bare');V.classList.add('show');ROOT.style.overflow='hidden';
+  vMoreSync();
+  requestAnimationFrame(vBarSync);
   const f=vFresh();let done=false;
   const reveal=()=>{
     if(done||tok!==vTok)return;
-    done=true;clearTimeout(vSlowT);
+    done=true;clearTimeout(vSlowT);clearTimeout(vBlockT);
     V.classList.add('loaded');        /* a fade, so nothing jumps */
   };
-  f.addEventListener('load',()=>{if(f.getAttribute('src')==='about:blank')return;setTimeout(reveal,40)});
-  setTimeout(reveal,15000);
+  f.addEventListener('load',()=>{
+    if(!f.getAttribute('src')&&!f.srcdoc)return;     /* the initial blank */
+    setTimeout(()=>{
+      if(done||tok!==vTok)return;
+      reveal();
+      /* The frame has answered, and that is all we are allowed to know — see
+         the long note above vBlocked. If this is a plain URL, offer the way
+         out a few seconds in, in case what arrived was nothing; and if the
+         app is still open well after that, take it as proof it works and
+         stop offering for good. */
+      if(!needsText(h)){
+        clearTimeout(vHintT);
+        vHintT=setTimeout(()=>{if(tok===vTok)vHintShow(h)},4200);
+        clearTimeout(vGoodT);
+        vGoodT=setTimeout(()=>{if(tok===vTok&&V.classList.contains('show'))vMarkGood(h)},30000);
+      }
+    },60);
+  });
+  clearTimeout(vBlockT);
+  /* A site we already know refuses framing does not get a loading screen and
+     a wait — it goes straight to the panel and the button that works. */
+  if(willRefuse(h)){vBlocked(h,'refused');return}
   if(needsText(h)){
+    /* srcdoc cannot be refused by a header, so this is only the backstop */
+    vBlockT=setTimeout(reveal,20000);
     try{
       const text=await appText(h,h.repo?((fr,l)=>{if(tok===vTok)vLoadProgress(fr,l||'Loading',h.name)}):null);
       if(tok!==vTok)return;
@@ -5243,26 +6103,105 @@ async function viewerOpen(h){
       f.srcdoc=text;
     }
     catch(e){if(tok!==vTok)return;vLoadError(h)}
-  }else f.src=h.url;
+  }else{
+    f.src=h.url;
+    /* Nothing at all came back. That is a real failure and genuinely
+       observable, unlike a refusal. A working site answers long before this,
+       and reveal() cancels the timer when it does. */
+    vBlockT=setTimeout(()=>{if(!done&&tok===vTok)vBlocked(h,'silent')},12000);
+  }
 }
 function viewerClose(){
   if(!V.classList.contains('show'))return;
   try{if(document.fullscreenElement)document.exitFullscreen()}catch(_){}
-  clearTimeout(vSlowT);
+  clearTimeout(vSlowT);clearTimeout(vBlockT);clearTimeout(vGoodT);
+  vHintHide(true);vHintFor=null;
+  ddClose(true);
   vTok++;V.classList.remove('show','bare');ROOT.style.overflow='';
+  /* Back to exactly where the launcher was. The section was never torn down
+     — the viewer is a layer over it — so all that has to be put back is the
+     scroll position, which locking <html> to overflow:hidden discards. */
+  if(vScroll!=null){const y=vScroll;vScroll=null;requestAnimationFrame(()=>scrollTo({top:y,behavior:'instant'}))}
   setTimeout(()=>{if(!V.classList.contains('show')){vFresh();vCur=null}},400);
 }
 $('#vClose').onclick=viewerClose;
 $('#vReload').onclick=()=>{if(vCur)viewerOpen(vCur)};
 $('#vTab').onclick=()=>{if(vCur)openTab(vCur)};
-$('#vDl').onclick=()=>{if(!vCur)return;if(vCur.repo){toast('This game is made of many files, so it can\u2019t be saved as one page.','err');return}dlApp(vCur.name,vCur.url,vText)};
-$('#vDlL').onclick=dlLauncher;
-$('#vExit').onclick=()=>V.classList.remove('bare');
+$('#vExit').onclick=()=>{V.classList.remove('bare');vBarSync()};
+$('#vHintTab').onclick=()=>{if(vCur)openTab(vCur);vHintHide()};
+/* Dismissing it is the user saying the page is fine, so take them at their
+   word and do not ask about this app again. */
+$('#vHintX').onclick=()=>{if(vCur)vMarkGood(vCur);vHintHide()};
+/* Fullscreen goes on the viewer, not on the iframe. Putting the iframe
+   fullscreen takes the toolbar with it, so there is no way back out but the
+   browser's own Escape. With the whole viewer fullscreen the bar stays, Back
+   still works, and the app still fills the screen. If the browser refuses
+   outright, `bare` hides the bar instead \u2014 the same effect without the API,
+   which is what a phone that has no Fullscreen API ends up with. */
 $('#vFull').onclick=()=>{
-  const fr=vFr,can=!!(fr.requestFullscreen||fr.webkitRequestFullscreen);
-  if(!can){V.classList.add('bare');return}
-  const p=(fr.requestFullscreen||fr.webkitRequestFullscreen).call(fr);if(p&&p.catch)p.catch(()=>V.classList.add('bare'));
+  try{
+    if(document.fullscreenElement||document.webkitFullscreenElement){
+      (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+      return;
+    }
+  }catch(_){}
+  const req=V.requestFullscreen||V.webkitRequestFullscreen;
+  if(!req){V.classList.add('bare');vBarSync();return}
+  try{
+    const p=req.call(V);
+    if(p&&p.catch)p.catch(()=>{V.classList.add('bare');vBarSync()});
+  }catch(_){V.classList.add('bare');vBarSync()}
 };
+document.addEventListener('fullscreenchange',()=>requestAnimationFrame(vBarSync));
+addEventListener('resize',()=>{if(V.classList.contains('show'))vBarSync()},{passive:true});
+
+/* ---- the More menu ----
+   The actions that do not earn a button of their own, in the same custom
+   dropdown the rest of the launcher uses, so it matches whichever design is
+   on. Rebuilt per app because what belongs on it depends on the app: a game
+   made of many files cannot be saved as a single page, so that row is simply
+   not offered rather than being offered and then refused. */
+let vMore=null;
+function vMoreSync(){
+  const host=$('#vMoreHost');
+  if(!host)return;
+  if(vMore)vMore.close();
+  host.innerHTML='';vMore=null;
+  const items=[];
+  if(vCur&&!vCur.repo)items.push({value:'dl',label:'Download this app as one page'});
+  items.push({value:'dll',label:'Download the launcher'});
+  items.push({sep:true});
+  items.push({value:'tab',label:'Open in a new tab'});
+  items.push({value:'reload',label:'Reload'});
+  items.push({value:'bare',label:'Hide the toolbar'});
+  items.push({sep:true});
+  items.push({value:'close',label:'Back to the launcher'});
+  vMore=dd(host,{
+    label:'More actions',
+    value:'',
+    items:items,
+    onChange:k=>{
+      if(k==='dl'&&vCur)dlApp(vCur.name,vCur.url,vText);
+      else if(k==='dll')dlLauncher();
+      else if(k==='tab'&&vCur)openTab(vCur);
+      else if(k==='reload'&&vCur)viewerOpen(vCur);
+      else if(k==='bare'){V.classList.add('bare');vBarSync();toast('Toolbar hidden \u2014 use \u201cShow bar\u201d to bring it back')}
+      else if(k==='close')viewerClose();
+      /* nothing stays "selected" in an action menu, so the trigger is reset */
+      if(vMore)vMore.set('',true);
+    }
+  });
+  /* the trigger is an icon button, so it gets the three dots and a tooltip
+     rather than the label of whichever row was last used */
+  const t=$('.dd-t',host);
+  if(t){
+    t.innerHTML='<svg class="dd-cv" viewBox="0 0 24 24" aria-hidden="true" style="transform:none">'
+      +'<circle cx="12" cy="5.5" r="1.65" fill="currentColor" stroke="none"/>'
+      +'<circle cx="12" cy="12" r="1.65" fill="currentColor" stroke="none"/>'
+      +'<circle cx="12" cy="18.5" r="1.65" fill="currentColor" stroke="none"/></svg>';
+    t.title='More actions';
+  }
+}
 
 /* ======== js_fetchapp.js ======== */
 async function fetchApp(){
@@ -5398,15 +6337,29 @@ const FOOT='<footer class="foot">'
  +'<div class="tqq-sis" aria-hidden="true"><i style="background:#ff9ec4"></i><i style="background:#b78cff"></i><i style="background:#5aa9ff"></i><i style="background:#5ee08a"></i><i style="background:#ff5d73"></i></div></div>'
  +'<div class="foot-keys"><kbd>1</kbd>–<kbd>5</kbd> sections · <kbd>/</kbd> search · <kbd>Esc</kbd> close</div></footer>';
 
+/* The face of the hub, in whichever design is on.
+
+   Classic shows the original avatar — the embedded photo the 1.x launcher
+   put in the hero ring and on the main-site card, and the single most
+   recognisable thing about that design. Modern shows the drawn ICH mark,
+   which is what it was built around. Both come from the same place they
+   always did: the picture is window.__ICON, embedded as a data URI so a
+   school filter can never leave a hole where it should be, and the onerror
+   fallback from 1.x is kept for the case where even that fails. */
+function brandArt(label){
+  if(isModern()||!ICON)return ichMark({label:label||'ICH'});
+  return '<img src="'+ICON+'" alt="'+esc(label||'Itsukis Chat Hub')
+        +'" onerror="this.parentNode.textContent=\'\\uD83D\\uDCAC\'">';
+}
 function featCard(){
   const chips=[['chat','Global chat'],['bell','DMs'],['music','Music'],['ticket','VIP & daily spin'],['gift','Seasonal passes']];
   return '<section class="feat">'
-   +'<div class="fi">'+ichMark({label:"Itsuki's Chat Hub"})+'</div>'
+   +'<div class="fi">'+brandArt("Itsuki's Chat Hub")+'</div>'
    +'<div class="fb"><span class="tagline"><i></i>Main site</span><h3>Itsuki’s Chat Hub</h3>'
      +'<p>The global chat hub: rooms, DMs, music, the VIP lounge and seasonal passes. Sign in with your account and jump straight into chat.</p>'
      +'<div class="chips">'+chips.map(([i,t])=>'<span>'+svgi(i)+esc(t)+'</span>').join('')+'</div></div>'
    +'<div class="fa">'
-     +'<button class="btn pri wide" id="mainGo" type="button">'+svgi('rocket')+'Launch Chat Hub</button>'
+     +'<button class="btn pri wide" id="mainGo" type="button">'+modeIc('rocket','🚀')+'Launch Chat Hub</button>'
      +'<span class="fnote" id="mainNote"></span>'
      +'<button class="dlcard" id="homeDl" type="button" aria-label="Download the auto-updating launcher">'
        +'<span class="dli"><svg class="i-dl" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PATHS.dl+'"/></svg>'
@@ -5439,7 +6392,7 @@ function renderHome(){
   if(isModern()){
     h.push('<div class="ph"><h2 id="greetLine">Home</h2><p id="greetSub"></p></div>');
   }else{
-    h.push('<header class="hero"><div class="hero-icon" id="heroIc">'+ichMark({label:'ICH'})+'</div>'
+    h.push('<header class="hero"><div class="hero-icon" id="heroIc">'+brandArt('Itsukis Chat Hub')+'</div>'
      +'<h1 class="logo">Itsukis Chat Hub</h1><div class="holi-pill" id="holiPill"></div>'
      +'<div class="sbar"><span class="si">🔎</span>'
      +'<input class="search" id="q" placeholder="Search every hub, game, app and proxy…" autocomplete="off" spellcheck="false">'
@@ -5511,8 +6464,7 @@ function renderLib(){
         +'<button type="button" data-k="list" title="List">'+svgi('rows')+'</button>'
         +'<button type="button" data-k="tiles" title="Tiles">'+svgi('box')+'</button></div>':'')
      +'<span class="cspace"></span>'
-     +'<label class="selwrap"><span class="hidden">Sort</span><select class="field" id="libSort" aria-label="Sort">'
-       +SORTS.map(([k,l])=>'<option value="'+k+'"'+(libSort===k?' selected':'')+'>'+l+'</option>').join('')+'</select>'+svgi('chevd')+'</label>'
+     +'<span id="libSortHost"></span>'
      +'<span class="ccount" id="libCount"></span>'
    +'</div>'
    +(isModern()?'<div class="sbar" style="max-width:none;margin:0 0 14px"><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="'+PATHS.search+'"/></svg><input class="search" id="lq" placeholder="Filter this list…" autocomplete="off" spellcheck="false" value="'+esc(libQ)+'" style="padding-right:14px"></div>':'')
@@ -5524,7 +6476,15 @@ function renderLib(){
     let t=0;
     lq.oninput=()=>{clearTimeout(t);const v=lq.value;t=setTimeout(()=>{libQ=v.trim().toLowerCase();drawLib()},120)};
   }
-  $('#libSort').onchange=e=>{libSort=e.target.value;store.set('libSort',libSort);drawLib()};
+  /* The sorting menu — the one the custom dropdown was asked for by name.
+     Same four orders as before, same stored key, so an existing preference
+     carries straight over. */
+  dd($('#libSortHost'),{
+    label:'Sort',
+    value:libSort,
+    items:SORTS.map(([k,l])=>({value:k,label:l})),
+    onChange:k=>{libSort=k;store.set('libSort',libSort);drawLib()}
+  });
   drawLib();
 }
 function drawLib(){
@@ -5786,9 +6746,7 @@ PANES.appearance=()=>{
   let look='';
   if(d==='modern'){
     look=row('Accent','The colour used for highlights, buttons and the active tab.',
-      '<label class="selwrap"><select class="field" id="setAccent" aria-label="Accent">'
-      +ACCENTS.map(([k,l])=>'<option value="'+k+'"'+(store.get('accent','modern')===k?' selected':'')+'>'+l+'</option>').join('')
-      +'</select>'+svgi('chevd')+'</label>')
+      '<span id="setAccentHost"></span>')
      +segRow('Density','How much fits on screen.','denTabs',[['compact','Compact'],['comfy','Comfy'],['roomy','Roomy']])
      +segRow('Card layout','Cards is the default. List is one per row, Tiles packs more in.','layTabs',[['cards','Cards'],['list','List'],['tiles','Tiles']])
      +segRow('Font','The typeface used across the launcher.','fontTabs',[['default','Default'],['rounded','Rounded'],['mono','Mono'],['serif','Serif'],['hand','Hand']])
@@ -5806,10 +6764,26 @@ PANES.appearance=()=>{
   return grp('Design','Modern is the default for everyone. Classic restores the original launcher, and stays available here for good.',body)
    +grp(d==='modern'?'Modern look':'Classic look','Small adjustments on top of the design you picked.',look);
 };
+/* The colour each accent actually paints with, so the dropdown can show it
+   rather than only name it. "theme" follows the seasonal palette, so its
+   swatch is read live from the variable the theme engine writes. */
+const ACCENT_SW={modern:'#6366f1',blue:'#3b82f6',violet:'#8b5cf6',teal:'#14b8a6',rose:'#f43f5e'};
+function accentSwatch(k){
+  if(k!=='theme')return ACCENT_SW[k]||'#6366f1';
+  try{
+    const v=getComputedStyle(ROOT).getPropertyValue('--a').trim();
+    if(v)return v;
+  }catch(_){}
+  return 'linear-gradient(135deg,#6366f1,#f43f5e)';
+}
 WIRE.appearance=()=>{
   $$('[data-dm]').forEach(b=>b.onclick=()=>setDesign(b.dataset.dm));
-  const a=$('#setAccent');
-  if(a)a.onchange=e=>{store.set('accent',e.target.value);ROOT.dataset.accent=e.target.value;toast('Accent updated')};
+  dd($('#setAccentHost'),{
+    label:'Accent',
+    value:store.get('accent','modern'),
+    items:ACCENTS.map(([k,l])=>({value:k,label:l,swatch:accentSwatch(k)})),
+    onChange:v=>{store.set('accent',v);ROOT.dataset.accent=v;toast('Accent updated')}
+  });
   [['layTabs','layout'],['uiTabs','ui'],['radTabs','rad'],['blurTabs','blur'],['denTabs','den'],['fontTabs','font'],['bgTabs','bg']]
     .forEach(([id,key])=>{if($('#'+id))seg($('#'+id),v=>lookSet(key,v),lookGet(key))});
   bindToggle('tsign','signs',()=>applyLook());
@@ -5845,10 +6819,10 @@ WIRE.themes=()=>{
 };
 
 /* ---- 3. Effects ---- */
-PANES.effects=()=>grp('Motion and effects','How much the launcher moves. Subtle is the default: short transitions, a little hover lighting, nothing that runs non-stop.',
-  segRow('Effects','Off removes animation entirely. Subtle keeps short transitions. Full adds hover lighting and, in Classic, the seasonal particles.','fxTabs',[['off','Off'],['subtle','Subtle'],['full','Full']])
+PANES.effects=()=>grp('Motion and effects','How much the launcher moves. Full is the default in 2.0: the whole water ripple, the pointer light and every transition. Turn it down here and the choice sticks.',
+  segRow('Effects','Off removes animation entirely. Subtle keeps short transitions and a smaller ripple. Full is everything: three wave layers, the pointer light, finger trails and, in Classic, the seasonal particles.','fxTabs',[['off','Off'],['subtle','Subtle'],['full','Full']])
  +(reduce?note('Your system is set to <b>reduce motion</b>, so the launcher defaults to Off. Choosing Subtle or Full here overrides that for this browser.'):'')
- +note('Animations pause while this tab is in the background, and the Modern design runs no continuous particle system at all — the background is a single static layer.'))
+ +note('Animations pause while this tab is in the background, and the Modern design runs no continuous particle system at all — the dot field is painted once and only the area a ripple touches is ever redrawn.'))
  +(isModern()?'':grp('Classic particles','Seasonal particles and decorations belong to Classic and follow the setting above.',
     row('Current theme effects',(TH[curKey]||TH.default).fx?'This theme has particles. They run at Subtle and Full, and stop at Off.':'This theme has no particles.',
       '<b>'+esc((TH[curKey]||TH.default).n)+'</b>')));
@@ -5957,14 +6931,16 @@ WIRE.desktop=()=>{
 PANES.personal=()=>grp('You','Small touches.',
   row('Nickname','Used in your greeting on Home and on the desktop start menu.',
     '<input class="field w" id="nick" maxlength="24" placeholder="What should we call you?" value="'+esc(store.get('nick','Guest'))+'">')
- +row('Start on','Which section the launcher opens on.',
-   '<label class="selwrap"><select class="field" id="startTab" aria-label="Start on">'
-   +TABS.map(([k,,,n])=>'<option value="'+k+'"'+(store.get('startTab','home')===k?' selected':'')+'>'+n+'</option>').join('')
-   +'</select>'+svgi('chevd')+'</label>'));
+ +row('Start on','Which section the launcher opens on.','<span id="startTabHost"></span>'));
 WIRE.personal=()=>{
   const n=$('#nick');
   n.oninput=()=>{store.set('nick',n.value.trim());tick();if(at==='home')fillHomeDynamic()};
-  $('#startTab').onchange=e=>store.set('startTab',e.target.value);
+  dd($('#startTabHost'),{
+    label:'Start on',
+    value:store.get('startTab','home'),
+    items:TABS.map(([k,,,nm])=>({value:k,label:nm})),
+    onChange:v=>store.set('startTab',v)
+  });
 };
 
 /* ---- 9. Advanced ---- */
@@ -6387,10 +7363,125 @@ function applyOS(){
      every interactive part quietly stands down.
    · Off / Subtle / Full is honoured throughout — see fxCfg.               */
 
+/* ===================== PAGE METRICS =====================
+   One place that answers "how tall is the document, and how wide is the
+   viewport", and one place that writes the answer out as --docH for the
+   background layers to be sized by.
+
+   Why this exists at all. The background layers are position:absolute and as
+   tall as the document, which is what makes them part of the page rather than
+   an overlay pinned to the viewport. CSS cannot express "as tall as the
+   document" — percentage heights resolve against the containing block, and
+   body's height is content-driven, so height:100% on an absolutely positioned
+   child of body gives you the viewport, not the page. So the number has to be
+   measured and written back, once per real change.
+
+   Two traps this is built around:
+
+   · Measuring must not change what is measured. Anything inside a layer that
+     is sized from --docH can, if it overflows downward, make the document
+     taller, which makes --docH larger, which makes the layer taller again.
+     The markup closes that loop (#wavefx clips, and carries the pointer
+     light), and so does measuring scrollHeight with the layers already laid
+     out — but the guard below is the belt and braces: a new height has to
+     differ by more than a whisker before it is taken, so a one-pixel
+     disagreement between layout passes cannot oscillate.
+
+   · The address bar is not a resize. The viewport width comes from the
+     documentElement's client box, which is the large viewport and does not
+     change when Android Chrome slides its address bar in and out. Document
+     height is read from scrollHeight, which likewise does not move with the
+     bar. This is the same rule the 1.x engine followed and the reason the
+     field no longer slides as you scroll on a phone.                      */
+const PAGE={h:0,w:0,vh:0,ro:null,t:0};
+const PAGE_MIN_DELTA=24;      /* ignore smaller changes: layout noise, not a resize */
+const PAGE_MAX=24000;         /* a sanity ceiling; nothing here is ever this tall */
+function pageMeasure(){
+  const de=document.documentElement,b=document.body;
+  const vw=Math.max(1,de.clientWidth||innerWidth||1);
+  const vh=Math.max(1,de.clientHeight||innerHeight||1);
+  /* THE MEASUREMENT MUST NOT INCLUDE THE THING IT IS SIZING.
+
+     scrollHeight is the obvious way to ask how tall a page is and the wrong
+     one here, because the background layers are absolutely positioned
+     children of <body> and so count towards it. Size a layer from
+     scrollHeight and it is measuring itself: any overflow at all, down to a
+     pseudo-element with a negative inset, makes the page taller, which makes
+     the layer taller, which makes the page taller. It does not oscillate, it
+     ratchets — the background grows a few percent every time it is measured
+     and trails a lengthening strip of dead scroll under the footer.
+
+     So the content is measured directly instead. Every background layer
+     carries data-bgl and is skipped; so is anything position:fixed, which by
+     definition cannot lengthen the document. What is left is the real content
+     — the shell, and anything else in normal flow — and the farthest bottom
+     edge among them is where the page actually ends. */
+  let h=0;
+  if(b){
+    const kids=b.children;
+    for(let i=0;i<kids.length;i++){
+      const el=kids[i];
+      if(el.nodeType!==1||el.hasAttribute('data-bgl'))continue;
+      if(el.tagName==='SCRIPT'||el.tagName==='STYLE'||el.tagName==='LINK')continue;
+      let pos='';
+      try{pos=getComputedStyle(el).position}catch(_){}
+      if(pos==='fixed')continue;
+      const r=el.getBoundingClientRect();
+      if(!r.height)continue;
+      const bot=r.bottom;
+      if(bot>h)h=bot;
+    }
+    /* rects are viewport-relative; make them document-relative */
+    h+=(window.scrollY||window.pageYOffset||0);
+    /* and allow for padding on <body> below the last child */
+    try{h+=parseFloat(getComputedStyle(b).paddingBottom)||0}catch(_){}
+  }
+  /* Fall back to scrollHeight only if the walk found nothing at all, which
+     means the shell has not been rendered yet. */
+  if(h<vh)h=Math.max(h,vh,de.clientHeight||0);
+  if(!h)h=Math.max(de.scrollHeight||0,vh);
+  if(h>PAGE_MAX)h=PAGE_MAX;
+  return{w:vw,h:Math.round(h),vh:vh};
+}
+/* Returns true when the committed size actually moved. */
+function pageSync(force){
+  const m=pageMeasure();
+  const moved=force||!PAGE.h
+    ||m.w!==PAGE.w
+    ||Math.abs(m.h-PAGE.h)>=PAGE_MIN_DELTA
+    ||Math.abs(m.vh-PAGE.vh)>=PAGE_MIN_DELTA;
+  if(!moved)return false;
+  PAGE.w=m.w;PAGE.h=m.h;PAGE.vh=m.vh;
+  /* One custom property drives every background layer in both designs. */
+  try{ROOT.style.setProperty('--docH',m.h+'px')}catch(_){}
+  return true;
+}
+/* Content changes height for all sorts of reasons that are not resizes: a
+   section swap, a filter that hides half the library, an image arriving, the
+   settings panes opening. A ResizeObserver on body catches the lot without
+   anything having to remember to call us. It is coalesced through a timer so
+   a burst of mutations costs one rebuild, not twenty. */
+function pageWatch(){
+  /* 140ms rather than a tighter debounce on purpose: a section change
+     animates one view out while the next is already in flow, so the document
+     is briefly as tall as both. Waiting for that to settle means one rebuild
+     at the real height instead of two at the wrong one. */
+  const run=()=>{clearTimeout(PAGE.t);PAGE.t=setTimeout(()=>{if(pageSync())dotSync(true)},140)};
+  if(window.ResizeObserver&&document.body){
+    try{
+      PAGE.ro=new ResizeObserver(run);
+      PAGE.ro.observe(document.body);
+    }catch(_){}
+  }
+  /* The observer does not fire for a viewport change on its own when the
+     content height happens to be unchanged, so the window events stay. */
+  addEventListener('resize',run,{passive:true});
+}
+
 const DOTS={
   cv:$('#dots'),ctx:null,key:'',due:false,ok:true,t:0,
   n:0,x:null,y:null,a:null,r:null,          /* the field itself */
-  w:0,h:0
+  w:0,h:0,vh:0,dpr:1
 };
 const AMAX=.62,NB=32;                       /* alpha ceiling and bucket count */
 const DGROW=4;                              /* widest a dot can paint, in px */
@@ -6405,24 +7496,112 @@ function dotHash(i,j){
 }
 const dotStep=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t)};
 
-/* ---------- the field ---------- */
-function dotBuild(w,h){
+/* ---------- the field ----------
+   THE SHAPE OF THE FIELD, AND WHY IT CHANGED
+
+   1.x built the field for one viewport and put a single ellipse in the middle
+   of it: a dark well under the reading area, a bright band around it, fading
+   again at the far edges. That is a good shape for a box exactly one screen
+   tall, and the wrong shape for a page eight screens tall. Stretched over the
+   document it becomes one enormous ellipse — dark somewhere near the top,
+   bright somewhere near the bottom — and the character of it is gone.
+
+   Tiling it per screenful is worse. Repeat anything at exactly the viewport
+   height and the result is visibly a repeat: the eye finds the rhythm within
+   a screen or two of scrolling, and a background that is plainly eight copies
+   of itself is further from "one continuous environment" than a flat wash is.
+
+   So the shape is now a corridor. The falloff is horizontal — dark down the
+   centre column where the content sits, blooming out towards the left and
+   right, feathering away at both edges — which is exactly the character of
+   the original read across any single screen, and it is scroll-invariant by
+   construction: there is nothing to repeat, nothing to seam, and no vertical
+   position is privileged over any other.
+
+   On its own a corridor would be a stripe, so three sines of incommensurate
+   period breathe it in and out down the length of the page: the dark centre
+   widens and narrows, the whole field lifts and dims a little. Their periods
+   are tied to the viewport height so the breathing reads at the same scale on
+   any screen, and because 1.37, 2.11 and 0.83 share no common multiple
+   anywhere near a real page length, the pattern never comes back round. The
+   sines are evaluated once per row, not once per dot.
+
+   Short pages keep the original ellipse untouched. A page that is barely
+   taller than the window has no corridor to be — it is the case 1.x was
+   designed for — so it gets exactly what it always got, and the two blend
+   through a band rather than switching over at a threshold.                */
+const TAU=Math.PI*2;
+/* Where the dark middle of the corridor should sit. The point of the dark
+   well is that it falls behind what you are reading, and in Modern what you
+   are reading is not centred in the window — there is a 248px sidebar down
+   the left, so the content column's middle is well right of the canvas's.
+   Measuring it keeps the well under the text in both designs and at every
+   width, including while the mobile drawer is closed and .main is the whole
+   screen. Falls back to the middle of the canvas if the shell is not up yet. */
+function dotCentre(w){
+  try{
+    const el=document.querySelector('.shell .main')||document.querySelector('.shell');
+    if(el){
+      const r=el.getBoundingClientRect();
+      if(r.width>80)return Math.min(w,Math.max(0,r.left+r.width/2));
+    }
+  }catch(_){}
+  return w*.5;
+}
+function dotBuild(w,h,vh){
   const gap=w<480?11.5:w<760?13:w<1280?15:16;
-  const cx=w*.5,cy=h*.4,rx=Math.max(w*.54,290),ry=Math.max(h*.6,290);
+  const cx=dotCentre(w);
+  vh=Math.max(360,vh||h);
+  /* How much of a long page this is: 0 for one screenful, 1 by two and a
+     half, smoothly in between. Everything below is a blend between the 1.x
+     ellipse and the corridor on this one number, so there is no threshold
+     at which the background visibly changes its mind. */
+  const long=dotStep(1.15,2.5,h/vh);
+  /* The horizontal radius is worked out per side, because the centre of the
+     corridor is the centre of the *content* and that is not the centre of the
+     canvas: Modern's sidebar makes the left half narrower than the right.
+     Normalising each side against its own half-width is what makes both edges
+     of the screen feather identically even though they are different
+     distances from the well. With the well in the middle, both reduce to the
+     single radius 1.x used, so a Classic page is unchanged. */
+  const halfL=Math.max(1,cx),halfR=Math.max(1,w-cx);
+  /* Ellipse geometry (1.x), used at long = 0: .54 of the full width. */
+  const cy=h*.4,ryE=Math.max(h*.6,290);
+  const rxEL=Math.max(halfL*1.08,290),rxER=Math.max(halfR*1.08,290);
+  /* Corridor geometry, used at long = 1. Tighter, so the far edges of the
+     screen land out in the fade rather than on the bright band — the field
+     has to feather off at the sides, or on a wide monitor it would end on a
+     hard vertical line. */
+  const rxCL=Math.max(halfL*.76,220),rxCR=Math.max(halfR*.76,220);
+  const rxL=rxEL+(rxCL-rxEL)*long,rxR=rxER+(rxCR-rxER)*long;
+  const P1=vh*1.37,P2=vh*2.11,P3=vh*.83;
   const cap=Math.ceil((w/gap+3)*(h/gap+3))+128;
   const X=new Float32Array(cap),Y=new Float32Array(cap),
         A=new Float32Array(cap),R=new Float32Array(cap);
   let n=0;
   for(let y=gap*.5,j=0;y<h+gap&&n<cap;y+=gap,j++){
+    /* ---- once per row ---- */
+    /* The breathing. Roughly -1..1, and zero-mean, so it brightens as often
+       as it dims and the page has no overall drift. */
+    const v=.52*Math.sin(TAU*y/P1)
+           +.31*Math.sin(TAU*y/P2+1.7)
+           +.17*Math.sin(TAU*y/P3+4.1);
+    const wob=1+.17*v*long;        /* the corridor widens and narrows      */
+    const lift=1+.13*v*long;       /* and the whole row lifts and dims     */
+    /* The vertical term of the ellipse, faded out as the page gets longer
+       until only the horizontal corridor is left. */
+    const dyE=(y-cy)/ryE;
+    const dy=dyE*(1-long);
     /* every other row is offset, which breaks the square-grid look */
     for(let x=(j&1?gap*.5:0),i=0;x<w+gap&&n<cap;x+=gap,i++){
-      const d=Math.hypot((x-cx)/rx,(y-cy)/ry);
+      const dx=(x-cx)/(x<cx?rxL:rxR)*wob;
+      const d=dy?Math.sqrt(dx*dx+dy*dy):(dx<0?-dx:dx);
       /* Dark behind the content, blooming outward, fading right down again at
          the far edges so the field never ends on a hard line. The curve is
          deliberately steep: a wide dark well under the reading area and a
          bright band around it reads far more like the reference than an even
          scatter would. */
-      let a=dotStep(.12,.86,d)*(1-dotStep(1.04,1.95,d)*.82);
+      let a=dotStep(.12,.86,d)*(1-dotStep(1.04,1.95,d)*.82)*lift;
       if(a<=0)continue;
       const q=dotHash(i,j);
       a*=.17+.83*q;
@@ -6438,7 +7617,7 @@ function dotBuild(w,h){
       n++;
     }
   }
-  DOTS.x=X;DOTS.y=Y;DOTS.a=A;DOTS.r=R;DOTS.n=n;DOTS.w=w;DOTS.h=h;
+  DOTS.x=X;DOTS.y=Y;DOTS.a=A;DOTS.r=R;DOTS.n=n;DOTS.w=w;DOTS.h=h;DOTS.vh=vh;
 }
 
 /* ---------- dirty regions ----------
@@ -6550,16 +7729,76 @@ function dotRender(zones,inf){
           if(d>.001){const s=ff*inf.push*inf.amp/d;ox+=dx*s;oy+=dy*s}
         }
       }
+      /* ---- the waves ----
+         THE WATER MODEL
+
+         1.x pushed every dot in the band outward, by an amount that peaked at
+         the wavefront and fell off either side of it. That is a bulge
+         travelling outward, and a bulge is not what water does. It gave the
+         ripple two tells: nothing ever moved inward, so the field inflated
+         rather than oscillated; and because displacement and brightness were
+         the same quantity, the crest could not be bright while the dots
+         around it were dark.
+
+         What a real surface does, when something touches it, is carry a wave
+         *packet*: a short train of crests and troughs under a travelling
+         envelope. A point on the surface rises, falls below where it started,
+         rises less, and settles. So that is what this is — a sinusoid in the
+         distance behind the front, multiplied by an envelope that travels
+         with it:
+
+             s  = (d - r) / lam          how far behind the front, in waves
+             env= exp(-(s/width)^2)      a Gaussian packet, smooth to zero
+             u  = sin(TAU * s + phi)     the oscillation itself
+
+         `u` is signed, so dots move outward on a crest and inward in a
+         trough, and they pass back through their rest position on the way —
+         which is the whole difference between water and a shockwave. The
+         envelope is what returns them: as it passes, u is multiplied by
+         something going smoothly to zero, so every dot settles exactly where
+         it started with no spring to simulate and no state to keep.
+
+         Brightness is taken from |u| and weighted towards the crests, so the
+         front reads as a bright moving line with a dark trough behind it —
+         the two are now separate quantities and can disagree, which is what
+         makes the band look like light bending through a surface.
+
+         The amplitude falls as 1/sqrt(r): a circular wave spreading on a
+         surface spreads its energy over a growing circumference, so this is
+         the real law, and it is also why a ripple looks strong near the touch
+         and faint by the time it is wide.
+
+         There is a tangential term as well — `swirl` — which moves dots a
+         little along the wavefront rather than across it. Real water has
+         that from the orbital motion of the surface; here it is what stops
+         the displacement looking perfectly radial, and it is what "the dots
+         bend" actually comes from.                                        */
       const L=inf.rip;
       for(let q=0;q<L.length;q++){
         const rp=L[q];
-        if(rp.p<0||rp.fade<=.012)continue;
-        const dx=x-rp.x,dy=y-rp.y,d=Math.sqrt(dx*dx+dy*dy);
-        let w=1-(d>rp.r?d-rp.r:rp.r-d)/rp.band;
-        if(w<=0)continue;
-        const ww=w*w*rp.fade*rp.amp;
-        bo+=ww*1.3;
-        if(d>.001){const s=ww*inf.push*2.2/d;ox+=dx*s;oy+=dy*s}   /* the wave carries them outward */
+        if(rp.p<0||rp.env<=.004)continue;
+        const dx=x-rp.x,dy=y-rp.y,d2=dx*dx+dy*dy;
+        /* cheap reject: outside the packet's reach entirely */
+        if(d2>rp.out2||d2<rp.in2)continue;
+        const d=Math.sqrt(d2);
+        const s=(d-rp.r)/rp.lam;
+        const e=s/rp.wide;
+        if(e<-3.2||e>3.2)continue;
+        const env=Math.exp(-e*e)*rp.env;
+        if(env<=.002)continue;
+        const u=Math.sin(TAU*s+rp.phi);
+        /* light: crest-weighted, so troughs go dark instead of bright */
+        const lum=u>0?u*u:u*u*.34;
+        bo+=lum*env*rp.lumW;
+        if(d>.001){
+          const amp=env*rp.ampW*inf.push;
+          const s1=u*amp/d;
+          ox+=dx*s1;oy+=dy*s1;                 /* across the wavefront */
+          if(rp.swirl){
+            const s2=Math.cos(TAU*s+rp.phi)*amp*rp.swirl/d;
+            ox+=-dy*s2;oy+=dx*s2;              /* along the wavefront  */
+          }
+        }
       }
       const B=inf.burst;
       for(let q=0;q<B.length;q++){
@@ -6613,41 +7852,59 @@ function dotRender(zones,inf){
   ctx.globalAlpha=1;
 }
 
-/* ---------- the viewport box ----------
-   THE ONE RULE: the canvas bitmap is sized from the canvas element's own
-   box, never from innerWidth/innerHeight and never from the document.
+/* ---------- the canvas box ----------
+   THE ONE RULE: the canvas bitmap is sized from PAGE — the measured width of
+   the large viewport and the measured height of the document — and never
+   from innerWidth/innerHeight.
 
-   Why this matters more than it looks. #dots is position:fixed with inset:0,
-   so its containing block is the viewport and its box is laid out against
-   the *large* viewport — the one that does not shrink when Android Chrome
-   shows its address bar. innerHeight, meanwhile, is the *small* viewport and
-   drops by 60-120px the moment that bar slides in. Sizing the bitmap from
-   innerHeight while the CSS box stays at the large height means the browser
-   stretches the bitmap to fit: every dot slides down a little as the bar
-   appears and snaps back as it goes, which is exactly the "background moves
-   with the page" that this was reported as. It was never a scroll bug — it
-   was an address-bar bug that only shows up while scrolling.
+   Why the width matters more than it looks. innerHeight is the *small*
+   viewport and drops by 60-120px the moment Android Chrome shows its address
+   bar; documentElement.clientWidth/Height is the *large* viewport and does
+   not move. 1.x sized the bitmap from innerHeight while the CSS box stayed at
+   the large height, so the browser stretched the bitmap to fit and every dot
+   slid down a little as the bar appeared and snapped back as it went. That
+   was reported as "the background moves when you scroll"; it was never a
+   scroll bug, it was an address-bar bug that only shows up while scrolling.
+   Nothing here reads inner* for layout, so it cannot come back.
 
-   Measuring the element instead makes the bitmap and the box the same size
-   by construction. The field is then built once for a height that does not
-   change, so the address bar sliding about is not a resize at all and
-   nothing rebuilds, nothing jumps, and live ripples keep their positions.
+   THE COORDINATE SYSTEM IS THE DOCUMENT. The canvas is absolutely positioned
+   at the top-left of <body> and is as tall as the page, so canvas coordinates
+   are page coordinates: canvas y of 4000 is 4000px down the document, whatever
+   is currently on screen. Every ripple, burst, trail and dirty region in this
+   engine is stored that way, which is what makes a ripple belong to the spot
+   on the page that was clicked rather than to a spot on the glass.
 
-   clientX/clientY map onto this 1:1: both are relative to the viewport
-   origin, which is where this element's top-left corner sits. No scroll
-   offset is ever added anywhere — scrollY appears nowhere in this engine. */
+   A pointer event is the one thing that arrives in the other system —
+   clientX/clientY are viewport-relative — so it is converted on the way in,
+   once, by pageX()/pageY() below. Those two functions are the only place
+   scroll offset is ever applied.
+
+   RESOLUTION. A document-tall bitmap is a lot of pixels, so the device pixel
+   ratio is traded off against area: full ratio up to a budget, then scaled
+   back so the bitmap stays within it. The budget below is about 32MB of
+   bitmap, and at real page sizes — the tallest screen in this launcher is
+   roughly 390x8000 on a phone and 1920x4100 on a desktop — it works out at a
+   ratio between 1 and 2 everywhere, so the dots stay crisp. Dot radius is
+   compensated if it ever does fall under 1, so they can never thin out to
+   nothing on some future page far longer than anything here.              */
+const DOT_MAXPX=8e6;            /* device pixels we are willing to hold */
 function dotBox(){
+  if(!PAGE.h)pageSync(true);
   const cv=DOTS.cv;
-  let w=0,h=0;
-  if(cv){w=cv.clientWidth;h=cv.clientHeight}
-  /* before first layout, or if the element is display:none, fall back to the
-     documentElement box (also the large viewport) and only then to inner*. */
-  if(!w||!h){
-    const de=document.documentElement;
-    w=w||de.clientWidth||innerWidth||1;
-    h=h||de.clientHeight||innerHeight||1;
-  }
-  return{w:Math.max(1,Math.round(w)),h:Math.max(1,Math.round(h))};
+  let w=PAGE.w,h=PAGE.h;
+  /* The element's own width is preferred when it has been laid out: it
+     accounts for a scrollbar, which documentElement.clientWidth also does,
+     but this way the bitmap and the box can never disagree. */
+  if(cv&&cv.clientWidth)w=cv.clientWidth;
+  if(!w)w=innerWidth||1;
+  if(!h)h=innerHeight||1;
+  return{w:Math.max(1,Math.round(w)),h:Math.max(1,Math.round(h)),vh:Math.max(1,PAGE.vh||innerHeight||1)};
+}
+function dotDpr(w,h){
+  const want=Math.min(devicePixelRatio||1,2);
+  const area=Math.max(1,w*h);
+  const fit=Math.sqrt(DOT_MAXPX/area);
+  return Math.max(.75,Math.min(want,fit));
 }
 
 function dotPaint(){
@@ -6657,11 +7914,16 @@ function dotPaint(){
     const ctx=DOTS.ctx||(DOTS.ctx=cv.getContext('2d'));
     if(!ctx)throw new Error('no 2d context');
     const box=dotBox(),w=box.w,h=box.h;
-    const dpr=Math.min(devicePixelRatio||1,2);
+    const dpr=dotDpr(w,h);
+    DOTS.dpr=dpr;
     cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+    if(!cv.width||!cv.height)throw new Error('canvas too large');
     ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.clearRect(0,0,w,h);
-    dotBuild(w,h);
+    dotBuild(w,h,box.vh);
+    /* Below one device pixel per CSS pixel a 0.95px dot would render as a
+       barely-there smudge, so give the radius back what the ratio took. */
+    if(dpr<1&&DOTS.r){const k=1/dpr,R=DOTS.r;for(let i=0;i<DOTS.n;i++)R[i]*=k}
     /* The first paint goes through exactly the same clipped path that every
        interactive repaint uses, over a region that happens to be the whole
        canvas. Chrome rasterises inside a clip a shade differently from
@@ -6677,24 +7939,28 @@ function dotPaint(){
   }
 }
 
-/* The key is taken from the element's own box, which is the large viewport
-   and therefore already immune to the address bar — so no fuzzy rounding is
-   needed to paper over it any more. Both axes round to 4px: a dragged window
-   still redraws, and a one-pixel scrollbar flicker does not. */
+/* The key decides whether a rebuild is needed at all. Width rounds to 4px so
+   a dragged window redraws and a one-pixel scrollbar flicker does not. Height
+   rounds to 48px: the document's length wanders by a few pixels as fonts
+   settle and sections render, and rebuilding tens of thousands of dots for
+   that would be a waste — PAGE's own threshold already filters the noise, and
+   this is the second line of defence. The viewport height is in the key
+   because it sets the scale of the field's vertical breathing. */
 function dotKey(){
   const b=dotBox();
-  return Math.round(b.w/4)+'|'+Math.round(b.h/4)+'|'+Math.min(devicePixelRatio||1,2);
+  return Math.round(b.w/4)+'|'+Math.round(b.h/48)+'|'+Math.round(b.vh/48)+'|'+Math.min(devicePixelRatio||1,2);
 }
 function dotSync(force){
   if(!DOTS.cv||!DOTS.ok)return;
   if(!isModern()||ROOT.classList.contains('os-mode')){DOTS.key='';fxReset();return}
+  pageSync(force);
   const k=dotKey();
   if(!force&&k===DOTS.key)return;
   if(document.hidden){DOTS.due=true;return}
   DOTS.key=k;DOTS.due=false;
-  /* A genuine resize rebuilds the field, but live waves are kept: their
-     coordinates are viewport-relative, so they are still exactly where the
-     user put them. Only the static field is invalidated. */
+  /* A genuine resize rebuilds the field, but live waves are kept: they live
+     in document coordinates, which a resize does not invalidate. Only the
+     static field is thrown away. */
   fxKeepReset();
   dotPaint();
   dfxWake();
@@ -6732,9 +7998,22 @@ const DFX={
   glow:$('#dotglow'),qp:$('#qpause'),
   raf:0,last:0,prev:zoneNew(),rip:[],burst:[],trail:[],
   px:0,py:0,tx:0,ty:0,amp:0,tamp:0,have:false,
+  /* vx/vy are the pointer in viewport coordinates — the system the event
+     arrives in. tx/ty are the same point in document coordinates, which is
+     the system the canvas works in. Keeping both means a scroll moves the
+     light to the right place without a pointer event having to happen. */
+  vx:0,vy:0,
   down:false,touch:false,dx0:0,dy0:0,moved:0,tlx:0,tly:0
 };
-const RIP_MAX=12,BURST_MAX=3,TRAIL_MAX=8;
+const RIP_MAX=15,BURST_MAX=3,TRAIL_MAX=8;
+
+/* ---------- the one place scroll offset is applied ----------
+   Everything the engine stores is in document coordinates. Pointer events are
+   the only input in viewport coordinates, so they are converted here, on the
+   way in, and nowhere else. scrollX/scrollY are fractional on a zoomed or
+   high-ratio display, which is fine: the canvas is in CSS pixels too. */
+const pageX=cx=>cx+(window.scrollX||window.pageXOffset||0);
+const pageY=cy=>cy+(window.scrollY||window.pageYOffset||0);
 
 /* ---------- the wavefront pool ----------
    Six elements, created once on first use and then reused for ever. A click
@@ -6779,7 +8058,9 @@ function frontTake(){
   }
   return best;
 }
-function frontSpawn(x,y,dia,dur,delay,ease,alpha,second){
+/* `layer` picks which cross-section the element paints: 0 is the leading
+   front, 1 the dimmer trailing one, 2 the broad deep swell. */
+function frontSpawn(x,y,dia,dur,delay,ease,alpha,layer){
   frontInit();
   const f=frontTake();
   if(!f)return;
@@ -6791,7 +8072,8 @@ function frontSpawn(x,y,dia,dur,delay,ease,alpha,second){
     f.el.style.width=s+'px';f.el.style.height=s+'px';
     f.el.style.margin=(-s/2)+'px 0 0 '+(-s/2)+'px';
   }
-  f.el.classList.toggle('w2',!!second);
+  f.el.classList.toggle('w2',layer===1);
+  f.el.classList.toggle('w3',layer===2);
   f.el.style.opacity='0';
   f.el.style.transform='translate3d('+x.toFixed(1)+'px,'+y.toFixed(1)+'px,0) scale(.02)';
 }
@@ -6817,17 +8099,27 @@ function frontStep(now){
 }
 
 /* Off is off. Subtle is a smaller light, a gentler push and two short waves.
-   Full is the lot: three waves, the bloom, the scatter and finger trails. */
+   Full is the lot: three wave packets, three wavefront layers, the bloom, the
+   scatter and finger trails.
+
+   Full is the 2.0 default (see the migration in js_ui_a1), so it has been
+   given room to actually be the maximum setting rather than a slightly busier
+   Subtle: a wider and brighter pointer light, a noticeably stronger push so
+   the dots visibly ride the wave, and the third wavefront layer. */
 function fxCfg(){
   const lv=effects();
   if(lv==='off')return null;
-  if(lv==='full')return{r:235,push:3.2,gain:.46,glow:1,scale:1,rmax:1,ring:1,
-                        full:true,trail:true,trailR:62,
-                        front:.55,frontA:1,front2:true};
-  return             {r:168,push:1.1,gain:.28,glow:.62,scale:.74,rmax:.58,ring:.7,
+  if(lv==='full')return{r:280,push:4.4,gain:.52,glow:1.15,scale:1.1,rmax:1,ring:1.08,
+                        full:true,trail:true,trailR:70,
+                        front:.55,frontA:1,front2:true,front3:true};
+  return             {r:168,push:1.4,gain:.28,glow:.62,scale:.74,rmax:.58,ring:.7,
                         full:false,trail:false,trailR:46,
-                        front:.38,frontA:.5,front2:false};
+                        front:.38,frontA:.5,front2:false,front3:false};
 }
+/* Every radius in the click effect, on both surfaces, scaled by one number.
+   0.85 trims the reach by 15%: it was spreading further across the page than
+   it needed to. This is the single knob for how far a click travels. */
+const RIP_SCALE=.85;
 function fxLive(){
   return DOTS.ok&&DOTS.n>0&&isModern()
       && !ROOT.classList.contains('os-mode')
@@ -6851,7 +8143,7 @@ function fxReset(skipRestore){
 }
 /* A reset for a real size change. The field is about to be rebuilt and
    repainted whole, so the old dirty region is meaningless — but the waves
-   are not: they live in viewport coordinates, which a resize does not
+   are not: they live in document coordinates, which a resize does not
    invalidate. Dropping them here is what used to make a wave vanish the
    instant a phone's address bar crossed a rounding boundary. */
 function fxKeepReset(){
@@ -6860,13 +8152,20 @@ function fxKeepReset(){
 }
 
 /* ---------- drawing ---------- */
-/* A ring: a crisp core inside two soft halos. Three strokes give a glow for
-   a fraction of what a shadow would cost, and keep the outline thin. */
+/* The wavefront drawn on the canvas: the crest line, and the first trough
+   behind it. Two concentric strokes, one bright and one dark, is what the
+   displacement is already doing to the dots — drawing the same thing in
+   light as well is what ties the two together, so the bright line sits on
+   the crest the dots are riding instead of floating over them.
+
+   Three strokes per line: two thin halos to seat it against the background
+   and one crisp pixel for the edge itself. Strokes rather than a shadow
+   because a shadow costs a blur pass per frame and these do not. */
 function fxRing(ctx,rp,cfg){
-  const f=rp.fade*cfg.ring*rp.ringW;
+  const f=rp.env*cfg.ring*rp.ringW;
   if(f<=.005||rp.r<=1)return;
   const arc=(r,a,w)=>{
-    if(r<=.5)return;
+    if(r<=.5||a<=.002)return;
     ctx.globalAlpha=a;ctx.lineWidth=w;
     ctx.beginPath();ctx.arc(rp.x,rp.y,r,0,6.2832);ctx.stroke();
   };
@@ -6875,14 +8174,17 @@ function fxRing(ctx,rp,cfg){
      read as a glow, which buried the edge inside them; now they only seat
      the lines against the background instead of competing with them. */
   arc(rp.r,.020*f,rp.lw*12);
-  arc(rp.r,.065*f,rp.lw*5);
-  /* The edge itself, brighter and still one pixel wide. */
-  arc(rp.r,.62*f,rp.lw);
-  /* And a second, fainter edge a few pixels inside it. Two lines close
-     together is what makes the band look like something the light is
-     bending through — a single circle just looks drawn on. The gap widens
-     as the wave spreads, the same way its band does. */
-  arc(rp.r-Math.max(2.5,rp.band*.26),.27*f,rp.lw*.8);
+  arc(rp.r,.062*f,rp.lw*5);
+  /* The crest: brighter, and still one pixel wide. */
+  arc(rp.r,.60*f,rp.lw);
+  /* The first trough, one full wavelength behind the crest — the same place
+     the displacement is pulling dots inward. Two lines a wavelength apart is
+     what makes the band read as a surface the light is bending through; a
+     single circle just looks drawn on. The gap widens as the wave disperses
+     because the wavelength does. */
+  arc(rp.r-rp.lam*.52,.26*f,rp.lw*.85);
+  /* and the second crest, fainter again */
+  arc(rp.r-rp.lam*1.04,.11*f,rp.lw*.7);
   ctx.globalAlpha=1;
 }
 /* The origin: a wide soft bloom with a small bright flash inside it. */
@@ -6918,20 +8220,54 @@ function dfxFrame(now){
   if(!ctx||!cfg||!fxLive()){fxReset();return}
   const dt=Math.min(64,DFX.last?now-DFX.last:16);DFX.last=now;
 
+  /* The pointer is tracked in viewport coordinates, because that is what the
+     event gives us, and converted here. Doing it every frame rather than only
+     on pointermove is what makes the light stay under the cursor while the
+     page scrolls beneath it: no pointer event fires during a scroll, but the
+     document coordinate of the same screen position changes. */
+  DFX.tx=pageX(DFX.vx);DFX.ty=pageY(DFX.vy);
   /* ease towards where the pointer actually is, so the light trails it */
   const kp=1-Math.exp(-dt/68),ka=1-Math.exp(-dt/140);
   DFX.px+=(DFX.tx-DFX.px)*kp;DFX.py+=(DFX.ty-DFX.py)*kp;
   DFX.amp+=(DFX.tamp-DFX.amp)*ka;
 
-  /* age the waves — each on its own clock and its own easing */
+  /* ---- age the waves ----
+     Each on its own clock and its own easing. Four quantities describe a
+     packet at any instant, and they are recomputed here once per wave per
+     frame rather than once per dot:
+
+       r     where the front is now. The easing decelerates, which is what
+             makes a ripple look like it is losing energy to the surface
+             rather than being fired outward at a constant speed.
+       lam   the wavelength. It grows as the wave travels: a dispersing
+             wave train spreads out, the crests draw apart, and the whole
+             packet gets visibly softer as it widens.
+       wide  the packet's length in wavelengths. It grows a little too, so
+             a young ripple is a tight pulse and an old one is a long swell.
+       env   the amplitude envelope. Temporal decay multiplied by 1/sqrt(r)
+             for the geometric spreading of a circular wave, normalised so
+             a wave starts at full strength rather than at infinity.
+
+     in2/out2 are the squared radii the packet can reach at all, cached so the
+     per-dot loop can reject most of the field with one comparison and no
+     square root. */
   for(let i=DFX.rip.length-1;i>=0;i--){
     const rp=DFX.rip[i],p=(now-rp.t0)/rp.dur;
     if(p>=1){DFX.rip.splice(i,1);continue}
     if(p<0){rp.p=-1;continue}
     rp.p=p;
     rp.r=rp.max*(1-Math.pow(1-p,rp.ease));
-    rp.band=12+rp.max*.19*p;                /* the wave broadens as it spreads */
-    rp.fade=Math.pow(1-p,1.7);
+    rp.lam=rp.lam0*(1+1.25*p);               /* the crests draw apart      */
+    rp.wide=rp.wide0*(1+.55*p);
+    const spread=Math.sqrt(rp.r0/(rp.r0+rp.r));   /* 1/sqrt(r), normalised */
+    rp.env=Math.pow(1-p,1.65)*spread;
+    /* How far behind and ahead of the front the packet reaches, plus room
+       for the displacement itself. 3.2 envelope widths is where the Gaussian
+       has fallen to e^-10 and is no longer worth a multiply. */
+    const reach=rp.lam*rp.wide*3.2+rp.lw*9+6;
+    const lo=Math.max(0,rp.r-reach),hi=rp.r+reach;
+    rp.in2=lo*lo;rp.out2=hi*hi;
+    rp.reach=reach;
   }
   /* age the bursts: flash, bloom and kick each fade on their own curve */
   for(let i=DFX.burst.length-1;i>=0;i--){
@@ -6955,8 +8291,11 @@ function dfxFrame(now){
   const pad=cfg.push*2.4+5,cur=zoneNew();
   if(DFX.amp>.012)zoneRect(cur,DFX.px-cfg.r-pad,DFX.py-cfg.r-pad,DFX.px+cfg.r+pad,DFX.py+cfg.r+pad);
   for(let i=0;i<DFX.rip.length;i++){
-    const rp=DFX.rip[i];if(rp.p<0)continue;
-    zoneRing(cur,rp.x,rp.y,rp.r-rp.band-pad-rp.lw*9,rp.r+rp.band+pad+rp.lw*9);
+    const rp=DFX.rip[i];if(rp.p<0||rp.env<=.004)continue;
+    /* The ring has to cover the whole packet, not just the crest, or the
+       trough behind the front would be clipped mid-oscillation and leave a
+       hard edge trailing the wave. rp.reach is exactly that span. */
+    zoneRing(cur,rp.x,rp.y,rp.r-rp.reach-pad,rp.r+rp.reach+pad);
   }
   for(let i=0;i<DFX.burst.length;i++){
     const b=DFX.burst[i];
@@ -7015,39 +8354,63 @@ function fxClick(x,y,touch){
      ---- TO RESIZE THE WHOLE EFFECT, CHANGE THESE TWO NUMBERS ----
      `.17` below is the dot-ripple radius as a fraction of the viewport
      diagonal, capped at 300px. `cfg.front` in fxCfg is the wavefront's
-     diameter in the same units (.55 on Full, .38 on Subtle). Both are
-     fractions of the diagonal, so they hold their proportions on any
-     screen; raise them together for a bigger effect, lower them for a
-     quieter one. Nothing else needs touching.                         */
-  const diag=Math.hypot(DOTS.w,DOTS.h);
-  const base=Math.min(300,diag*.17)*cfg.rmax;
-  const dia=diag*cfg.front;
+     diameter in the same units. Both are fractions of the diagonal, so they
+     hold their proportions on any screen; raise them together for a bigger
+     effect, lower them for a quieter one. Nothing else needs touching.
+
+     RIP_SCALE is the 2.0 trim: every radius in the effect, on both surfaces,
+     multiplied by one number. 0.85 is a 15% cut to the radius — the effect
+     was reaching further across the page than it needed to. Change this one
+     constant to tune how far a click spreads; nothing else is involved.
+
+     A note on the diagonal. It is taken from the *viewport*, not from the
+     canvas, which is now as tall as the whole document — scaling the ripple
+     to an 8000px page would make one click swallow the screen. DOTS.vh is
+     the viewport height the field was built for.                        */
+  const diag=Math.hypot(DOTS.w||PAGE.w,DOTS.vh||PAGE.vh||innerHeight);
+  const base=Math.min(300,diag*.17)*cfg.rmax*RIP_SCALE;
+  const dia=diag*cfg.front*RIP_SCALE;
   const t=performance.now(),k=touch?1.2:1;     /* a fingertip gets a stronger pulse */
-  if(DFX.rip.length>RIP_MAX-3)DFX.rip.splice(0,DFX.rip.length-(RIP_MAX-3));
+  if(DFX.rip.length>RIP_MAX-4)DFX.rip.splice(0,DFX.rip.length-(RIP_MAX-4));
   if(DFX.burst.length>=BURST_MAX)DFX.burst.splice(0,DFX.burst.length-BURST_MAX+1);
-  const wave=(max,dur,delay,ease,ringW,amp,lw)=>DFX.rip.push({
-    x:x,y:y,t0:t+delay,dur:dur,max:max,ease:ease,ringW:ringW,amp:amp,lw:lw,
-    p:delay?-1:0,r:0,band:12,fade:1});
-  wave(base*.40, 520, 0,  2.3,1.00,1.15*k,1.1);          /* tight inner pulse  */
-  wave(base,     920, 50, 3.0,0.82,1.00*k,1.3);          /* the main ring      */
+  /* One wave packet. lam0 is its wavelength at birth and wide0 its length in
+     wavelengths; phi offsets the oscillation so two packets launched together
+     are not in step, which is what keeps them from summing into one fat ring.
+     r0 normalises the 1/sqrt(r) spreading so the amplitude starts at 1
+     instead of at infinity. */
+  const wave=(max,dur,delay,ease,ringW,amp,lw,lam,wide,phi,swirl,lumW)=>DFX.rip.push({
+    x:x,y:y,t0:t+delay,dur:dur,max:max,ease:ease,ringW:ringW,lw:lw,
+    lam0:lam,wide0:wide,phi:phi,swirl:swirl,
+    ampW:amp*k*2.3,lumW:lumW*k,
+    r0:Math.max(14,max*.17),
+    p:delay?-1:0,r:0,lam:lam,wide:wide,env:1,in2:0,out2:1e12,reach:lam*wide*3.2+lw*9+6});
+  /* The three packets are deliberately different instruments, not three
+     copies at different sizes: a tight fast pulse right at the touch, the
+     main train behind it, and on Full a long slow swell that arrives late and
+     carries the "secondary wave movement". Their wavelengths are unrelated,
+     so where they overlap they interfere the way real wave trains do. */
+  wave(base*.42, 560, 0,  2.3,1.00,1.15,1.1, 15,0.52,0,       .34,1.45); /* tight inner pulse */
+  wave(base,     980, 45, 2.9,0.86,1.00,1.3, 26,0.74,1.9,     .22,1.00); /* the main train    */
   if(cfg.full)
-    wave(base*.66,1080,190,3.6,0.44,.55*k,1.0);          /* delayed secondary  */
+    wave(base*.74,1240,210,3.5,0.46,0.62,1.0, 40,1.05,3.6,    .46,0.56); /* the deep swell    */
   DFX.burst.push({
     x:x,y:y,t0:t,
     fd:230, gd:cfg.full?640:460, kd:cfg.full?560:380,
-    maxF:(touch?27:22)*cfg.rmax,
+    maxF:(touch?27:22)*cfg.rmax*RIP_SCALE,
     maxG:base*(cfg.full?.52:.40),
     maxK:base*(cfg.full?.42:.30),
     kp:cfg.push*(cfg.full?2.4:1.3)*k,                    /* the outward scatter */
     kg:cfg.full?1.5*k:.9*k,
     fa:0,ga:0,ka:0,fr:0,gr:0});
-  /* the sweep: the leading front, and on Full a slower, dimmer one behind it
-     at a slightly smaller radius, which is what gives the pass its depth */
-  /* shorter now that it travels less far — a small wave on a long clock
-     reads as lingering rather than as a transition */
-  frontSpawn(x,y,dia,     820,  0,2.55,cfg.frontA*(touch?1.08:1),false);
-  if(cfg.front2)
-    frontSpawn(x,y,dia*.72,1020,110,3.15,cfg.frontA*.8,true);
+  /* the sweep: the leading front, then on Full a slower dimmer one behind it
+     and a third, broader one deeper still, which is what gives the pass its
+     depth. Each is a little smaller and a little later than the last, so the
+     three read as one wavefront with thickness rather than as three rings. */
+  frontSpawn(x,y,dia,     860,  0,2.55,cfg.frontA*(touch?1.08:1),0);
+  if(cfg.front2){
+    frontSpawn(x,y,dia*.74,1080,120,3.15,cfg.frontA*.82,1);
+    if(cfg.front3)frontSpawn(x,y,dia*.52,1320,260,3.8,cfg.frontA*.62,2);
+  }
   dfxWake();
 }
 function fxTrailAdd(x,y,cfg){
@@ -7061,9 +8424,16 @@ function fxTrailAdd(x,y,cfg){
    whole launcher. All passive, all on the window, so scrolling, swiping,
    dragging a slider and typing in a field are none of this code's business.
    pointerType is what separates a mouse from a finger; a tap therefore never
-   produces both a pointer effect and a mouse one.                          */
+   produces both a pointer effect and a mouse one.
+
+   COORDINATES. Events arrive in viewport space and the engine works in
+   document space, so clientX/clientY are stashed as vx/vy and converted by
+   pageX/pageY — at the moment of a click, for the ripple that is about to be
+   pinned to the page there; and once per frame for the pointer light, which
+   has to keep up with the cursor even while the document slides under it. */
 function fxTrack(e){
-  DFX.tx=e.clientX;DFX.ty=e.clientY;
+  DFX.vx=e.clientX;DFX.vy=e.clientY;
+  DFX.tx=pageX(e.clientX);DFX.ty=pageY(e.clientY);
   if(!DFX.have){DFX.px=DFX.tx;DFX.py=DFX.ty;DFX.have=true;DFX.tlx=DFX.tx;DFX.tly=DFX.ty}
 }
 addEventListener('pointermove',e=>{
@@ -7077,8 +8447,9 @@ addEventListener('pointermove',e=>{
   fxTrack(e);DFX.tamp=1;
   /* drop a puff of light every so often along the path */
   if(cfg.trail){
-    const tx=e.clientX-DFX.tlx,ty=e.clientY-DFX.tly;
-    if(tx*tx+ty*ty>720){DFX.tlx=e.clientX;DFX.tly=e.clientY;fxTrailAdd(e.clientX,e.clientY,cfg)}
+    const px=DFX.tx,py=DFX.ty;
+    const tx=px-DFX.tlx,ty=py-DFX.tly;
+    if(tx*tx+ty*ty>720){DFX.tlx=px;DFX.tly=py;fxTrailAdd(px,py,cfg)}
   }
   dfxWake();
 },{passive:true});
@@ -7090,13 +8461,13 @@ addEventListener('pointerdown',e=>{
   if(!cfg)return;
   fxPress(e.target,e.clientX,e.clientY);
   if(!fxLive())return;
-  DFX.tlx=e.clientX;DFX.tly=e.clientY;
   if(DFX.touch){
     /* put the light straight under the finger rather than sliding it there */
-    DFX.tx=DFX.px=e.clientX;DFX.ty=DFX.py=e.clientY;DFX.have=true;DFX.tamp=1;dfxWake();
+    fxTrack(e);DFX.px=DFX.tx;DFX.py=DFX.ty;DFX.tamp=1;dfxWake();
   }else{
-    fxTrack(e);DFX.tamp=1;fxClick(e.clientX,e.clientY,false);
+    fxTrack(e);DFX.tamp=1;fxClick(DFX.tx,DFX.ty,false);
   }
+  DFX.tlx=DFX.tx;DFX.tly=DFX.ty;
 },{passive:true});
 
 addEventListener('pointerup',e=>{
@@ -7107,7 +8478,7 @@ addEventListener('pointerup',e=>{
   /* on a touch screen the ripple waits for the finger to lift, and only if it
      stayed put — otherwise every scroll would set one off */
   if(wasTouch){
-    if(moved<12)fxClick(e.clientX,e.clientY,true);
+    if(moved<12)fxClick(pageX(e.clientX),pageY(e.clientY),true);
     DFX.tamp=0;                                   /* and the light fades away */
   }
   dfxWake();
@@ -7115,6 +8486,35 @@ addEventListener('pointerup',e=>{
 
 addEventListener('pointercancel',()=>{
   DFX.down=false;DFX.touch=false;DFX.tamp=0;dfxWake();
+},{passive:true});
+
+/* ---- scrolling ----
+   Scrolling moves the document under a stationary cursor, so the point of the
+   page the light sits on changes without any pointer event firing. The light
+   therefore has to be recomputed — but deliberately NOT while the scroll is
+   still happening.
+
+   Waking the loop per scroll event looks like the obvious thing and is the
+   expensive thing: following the cursor means repainting the dots under the
+   halo, twice over — where it was and where it now is — on every frame of
+   the scroll, which is the one moment the main thread is least able to
+   afford it. Measured, it was the single biggest cost in a scroll.
+
+   So nothing happens during the scroll at all. The halo stays where it is on
+   the page and the compositor carries it along with everything else, for
+   free. When the scrolling stops, one wake lets the easing in dfxFrame draw
+   it back to the cursor over its usual ~70ms, which reads as the light
+   catching up rather than as a jump. The waves need no help either way: they
+   are pinned to the page by design.
+
+   The upshot is that scrolling this launcher costs the main thread nothing —
+   no measuring, no painting, no layout. That is the whole reason the
+   background is a document-tall layer instead of a viewport-sized one. */
+let scT=0;
+addEventListener('scroll',()=>{
+  if(!DFX.have||DFX.amp<=.01)return;
+  clearTimeout(scT);
+  scT=setTimeout(dfxWake,110);
 },{passive:true});
 
 const fxLeave=()=>{DFX.tamp=0;DFX.down=false;DFX.touch=false;dfxWake()};
@@ -7308,7 +8708,12 @@ document.addEventListener('keydown',e=>{
   go(ORD.includes(h)?h:(ORD.includes(store.get('startTab','home'))?store.get('startTab','home'):'home'));
   badge();
   applyOS();
+  /* Measure the document before the first background paint, then keep
+     watching it. The boot screen is still up at this point, so the page is
+     already laid out and scrollHeight is real rather than a guess. */
+  pageSync(true);
   dotSync(true);
+  pageWatch();
   tcSync();
   const k=$('#qpKey');if(k)k.textContent=keyLabel(pauseKey());
   const ql=$('#qpLogo');if(ql)ql.innerHTML=ichMark({label:'ICH'});
