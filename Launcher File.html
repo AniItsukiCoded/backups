@@ -2,104 +2,139 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arlington Collegiate High School</title>
-<link id="fav" rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=aisd.net&sz=64">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0c0c0c">
+<title>Itsukis Chat Hub Launcher</title>
+<link rel="icon" type="image/png" href="https://aniitsukicoded.github.io/backups/icon.png">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;background:#fff;overflow:hidden}
-  #cover{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;min-height:100%;background:#0c0c0c;color:#eeeeee}
+body{
+  display:grid;place-items:center;overflow:hidden;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+#boot{
+  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+  background:#0c0c0c;color:#eeeeee;
+  transition:opacity .34s ease,visibility 0s .34s;
+}
+#boot.done{opacity:0;visibility:hidden;pointer-events:none}
+#boot .b-stars,#boot .b-orb{display:none}
+#boot .bw{text-align:center;padding:24px;animation:bootIn .6s cubic-bezier(.22,1,.36,1) both}
+@keyframes bootIn{from{opacity:0;transform:translateY(14px) scale(.97)}}
+#boot .bring{
+  position:relative;width:62px;height:62px;margin:0 auto 24px;border-radius:20px;
+  overflow:hidden;background:#000;
+  box-shadow:0 0 0 1px rgba(255,255,255,.10),0 0 0 6px rgba(255,255,255,.02);
+}
+#boot .bring svg{width:100%;height:100%;display:block}
+#boot h1{
+  display:block;font-size:15.5px;line-height:1.35;font-weight:600;
+  letter-spacing:-.025em;color:#eeeeee;
+}
+#boot .bbar{
+  width:176px;height:2px;margin:20px auto 13px;border-radius:2px;
+  background:#242424;overflow:hidden;
+}
+#boot .bbar i{
+  display:block;width:0;height:100%;border-radius:2px;background:#e6e6e6;
+  transition:width .3s cubic-bezier(.2,.8,.2,1);
+}
+#boot p{font-size:11.5px;line-height:1.5;font-weight:500;color:#464646}
+#retry{
+  display:none;margin:18px auto 0;padding:7px 13px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.12);background:#181818;color:#bdbdbd;
+  font:600 11.5px Inter,ui-sans-serif,system-ui,sans-serif;cursor:pointer;
+  transition:background .14s,border-color .14s,color .14s;
+}
+#retry:hover{background:#242424;border-color:rgba(255,255,255,.22);color:#eeeeee}
+.failed #retry{display:inline-flex}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
-  <iframe id="cover" title="Arlington Collegiate High School"
-    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
-    referrerpolicy="no-referrer"></iframe>
-
-
+<div id="boot" role="status" aria-live="polite">
+  <div class="bw">
+    <div class="bring" aria-hidden="true">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img">
+        <defs><radialGradient id="ichMarkBg" cx="34%" cy="26%" r="78%">
+          <stop offset="0" stop-color="#232334"/><stop offset=".55" stop-color="#0d0d13"/><stop offset="1" stop-color="#000"/>
+        </radialGradient></defs>
+        <circle cx="32" cy="32" r="32" fill="url(#ichMarkBg)"/>
+        <path fill="#fff" d="M21 15h22a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H31.6l-8.2 6.4A1.6 1.6 0 0 1 20.8 50v-5.4A9 9 0 0 1 12 35.6V24a9 9 0 0 1 9-9Z"/>
+        <circle cx="25.5" cy="30" r="3.9" fill="#0a0a10"/>
+        <circle cx="38.5" cy="30" r="3.9" fill="#0a0a10"/>
+      </svg>
+    </div>
+    <h1 id="title">Itsukis Chat Hub Launcher</h1>
+    <div class="bbar"><i id="fill"></i></div>
+    <p id="message">Getting things ready…</p>
+    <button id="retry" type="button">Try again</button>
+  </div>
+</div>
 <script>
 (function(){
-  var SITE = 'https://www.aisd.net/arlington-collegiate-high-school/';
-  var URL_ = 'https://raw.githubusercontent.com/AniItsukiCoded/backups/main/launcher.html';
-  var CACHE_KEY = 'ich.launcherCache';   // last good copy, used if GitHub can't be reached
-  var TIMEOUT_MS = 8000;
+  'use strict';
+  var URL_='https://raw.githubusercontent.com/AniItsukiCoded/backups/main/launcher.html';
+  var CACHE_KEY='ich.launcherCache';
+  var TIMEOUT_MS=8000,busy=false;
 
-  function $(id){ return document.getElementById(id); }
-
-  /* ---------- 1. Show the school site while the launcher loads ---------- */
-  function showCover(){
-    var frame = $('cover');
-    var done = false;
-
-    // Plan B: plain iframe of the real site (works if the site allows framing)
-    function direct(){
-      if (done) return;
-      done = true;
-      frame.removeAttribute('srcdoc');
-      frame.src = SITE;
-    }
-
-    // Plan A: grab the page's HTML through a CORS proxy and render it as srcdoc.
-    // This works even when the site sends X-Frame-Options / frame-ancestors.
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var t = setTimeout(function(){ if (ctrl) ctrl.abort(); }, 6000);
-    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(SITE), { signal: ctrl ? ctrl.signal : undefined })
-      .then(function(r){
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.text();
-      })
-      .then(function(html){
-        clearTimeout(t);
-        if (html.indexOf('<html') === -1 && html.indexOf('<HTML') === -1) throw new Error('bad');
-        html = html
-          .replace(/<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi, '')
-          .replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + SITE + '">'; });
-        done = true;
-        frame.srcdoc = html;
-      })
-      .catch(function(){ clearTimeout(t); direct(); });
-  }
-
-  /* ---------- 2. Load the real launcher in the background ---------- */
-  function run(html){
-    document.open();
-    document.write(html);
-    document.close();
-  }
-
-  function fail(){ setTimeout(load, 3000); } // silently retry
+  function $(id){return document.getElementById(id)}
+  function setMessage(value){$('message').textContent=value}
+  function setProgress(value){$('fill').style.width=value+'%'}
+  function run(html){document.open();document.write(html);document.close()}
 
   function fromCache(){
-    try {
-      var c = localStorage.getItem(CACHE_KEY);
-      if (c && c.indexOf('<html') !== -1){ run(c); return true; }
-    } catch(_){}
+    try{
+      var cached=localStorage.getItem(CACHE_KEY);
+      if(cached&&cached.toLowerCase().indexOf('<html')!==-1){run(cached);return true}
+    }catch(_){}
     return false;
   }
 
-  function load(){
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
-
-    // Unique query string so GitHub's raw cache never serves an old copy.
-    fetch(URL_ + '?v=' + Date.now(), { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
-      .then(function(r){
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.text();
-      })
-      .then(function(html){
-        clearTimeout(timer);
-        if (html.indexOf('<html') === -1) throw new Error('Unexpected response');
-        try { localStorage.setItem(CACHE_KEY, html); } catch(_){}
-        run(html);
-      })
-      .catch(function(){
-        clearTimeout(timer);
-        if (!fromCache()) fail();
-      });
+  function fail(){
+    busy=false;
+    document.body.classList.add('failed');
+    setMessage("Couldn't load the launcher. Check your connection and try again.");
+    setProgress(0);
   }
 
-  showCover();
+  function load(){
+    if(busy)return;
+    busy=true;
+    document.body.classList.remove('failed');
+    setMessage('Getting things ready…');
+    setProgress(42);
+
+    var ctrl=window.AbortController?new AbortController():null;
+    var timer=setTimeout(function(){if(ctrl)ctrl.abort()},TIMEOUT_MS);
+
+    fetch(URL_+'?v='+Date.now(),{
+      cache:'no-store',
+      signal:ctrl?ctrl.signal:undefined
+    })
+    .then(function(response){
+      if(!response.ok)throw new Error('HTTP '+response.status);
+      return response.text();
+    })
+    .then(function(html){
+      clearTimeout(timer);
+      if(html.toLowerCase().indexOf('<html')===-1)throw new Error('Unexpected response');
+      try{localStorage.setItem(CACHE_KEY,html)}catch(_){}
+      setProgress(100);
+      setTimeout(function(){run(html)},100);
+    })
+    .catch(function(){
+      clearTimeout(timer);
+      if(!fromCache())fail();
+    });
+  }
+
+  $('retry').addEventListener('click',load);
   load();
 })();
 </script>
