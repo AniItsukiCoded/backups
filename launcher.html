@@ -5447,6 +5447,7 @@ async function launchMainFrame(){
     requestAnimationFrame(()=>requestAnimationFrame(()=>f.classList.add('show')));
     ROOT.classList.add('app-open');launching=false;
   };
+  handOffInvite(f,window);
   f.onload=reveal;t=setTimeout(reveal,12000);f.srcdoc=text;document.body.appendChild(f);
   const bar=document.createElement('div');bar.className='appbar';bar.id='appBar';
   bar.innerHTML='<button type="button" data-a="app">'+svgi('dl')+'<span>App</span></button>'
@@ -5479,12 +5480,29 @@ async function openMainInTab(){
       f.setAttribute('allowfullscreen','');
       let shown=false;const show=()=>{if(shown)return;shown=true;f.classList.add('in')};
       f.addEventListener('load',show);setTimeout(show,2500);
+      handOffInvite(f,win);
       f.srcdoc=text;win.document.body.appendChild(f);void f.offsetWidth;
     }
   }catch(e){toast('Failed to load '+MAIN_APP.name,'err')}
   launching=false;
 }
 function mainFlow(){pushRecent(MAIN_ITEM);if(openMode()==='viewer')launchMainFrame();else openMainInTab()}
+/* ICH invite links: https://<launcher>/#invite=CODE. The launcher opens the Chat Hub straight away
+   and, once the hub says it is ready ({type:'ich:ready'}), hands it the code ({type:'ich:open'}).
+   The hub shows its own "Join server?" preview - nothing is joined without the person pressing
+   Accept. The hub only listens when the launcher's address is in its CFG.LAUNCHER_ORIGINS. */
+const PENDING_INVITE=(function(){try{const m=/(?:^#|&)invite=([A-Za-z0-9]{4,32})(?:&|$)/.exec(location.hash||'');return m?m[1]:''}catch(_){return ''}})();
+let inviteHandedOff=false;
+function handOffInvite(f,host){
+  if(!PENDING_INVITE||inviteHandedOff)return;
+  const on=e=>{
+    if(inviteHandedOff||!f.contentWindow||e.source!==f.contentWindow||!e.data||e.data.type!=='ich:ready')return;
+    inviteHandedOff=true;host.removeEventListener('message',on);
+    try{f.contentWindow.postMessage({type:'ich:open',invite:PENDING_INVITE},'*')}catch(_){}
+    try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}
+  };
+  try{host.addEventListener('message',on)}catch(_){}
+}
 
 /* ======== js_fetchtext.js ======== */
 async function fetchText(url){
@@ -8706,6 +8724,8 @@ document.addEventListener('keydown',e=>{
   renderTopbar();
   const h=(location.hash||'').slice(1);
   go(ORD.includes(h)?h:(ORD.includes(store.get('startTab','home'))?store.get('startTab','home'):'home'));
+  /* an invite link opens the Chat Hub right away, inside the launcher (no pop-up to be blocked) */
+  if(PENDING_INVITE)setTimeout(()=>{try{pushRecent(MAIN_ITEM);launchMainFrame()}catch(_){}},400);
   badge();
   applyOS();
   /* Measure the document before the first background paint, then keep
